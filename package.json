@@ -1,7 +1,7 @@
 {
   "name": "language-idris",
   "main": "./lib/language-idris",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "A plugin for developing with Idris",
   "repository": "https://github.com/fangel/atom-language-idris",
