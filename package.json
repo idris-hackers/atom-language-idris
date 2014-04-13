@@ -1,13 +1,17 @@
 {
   "name": "language-idris",
   "main": "./lib/language-idris",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
   "description": "A plugin for developing with Idris",
-  "repository": "https://github.com/atom/language-idris",
+  "repository": "https://github.com/fangel/atom-language-idris",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=0.50.0"
+  },
+  "author": {
+    "name": "Morten Fangel",
+    "url": "http://sevengoslings.net"
   },
   "dependencies": {
     "atom-message-panel": ">=0.1.0"
