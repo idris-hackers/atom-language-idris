@@ -1,0 +1,8 @@
+{
+  ".editor": {
+    "ctrl-alt-c": "language-idris:case-split",
+    "ctrl-alt-t": "language-idris:type-of",
+    "ctrl-alt-a": "language-idris:add-clause",
+    "ctrl-alt-s": "language-idris:proof-search"
+  }
+}
