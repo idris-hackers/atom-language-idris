@@ -26,7 +26,7 @@
        "match": "\\b(Type|Int|Nat|Integer|Float|Char|String|Ptr|Bits8|Bits16|Bits32|Bits64)\\b"
     },
     {  "name": "constant.numeric.idris",
-       "match": "\\b(S|O)\\b"
+       "match": "\\b(S|Z)\\b"
     },
   	{ "match": "\\b([0-9]+|0([xX][0-9a-fA-F]+|[oO][0-7]+))\\b",
   	  "name": "constant.numeric.idris",
