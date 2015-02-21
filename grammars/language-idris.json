@@ -25,11 +25,11 @@
     },
     {  "match": "\\b([0-9]+|0([xX][0-9a-fA-F]+|[oO][0-7]+))\\b",
        "name": "constant.numeric.idris",
-       "comment": "integers"
+       "comment": "integer literal"
     },
     {  "match": "\\b([0-9]+\\.[0-9]+([eE][+-]?[0-9]+)?|[0-9]+[eE][+-]?[0-9]+)\\b",
        "name": "constant.numeric.float.idris",
-       "comment": "floats"
+       "comment": "float literal"
     },
     { "name": "comment.line.idris",
       "match": "(--).*$\n?",
