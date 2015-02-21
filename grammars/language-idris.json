@@ -4,23 +4,18 @@
   "patterns": [
     {  "name": "operator.assignment",
        "match": "="
-
     },
     {  "name": "keyword.control.idris",
        "match": "\\b(if|then|else|do|let|in|data|codata|record|dsl|import)\\b"
-
     },
     {  "name": "keyword.control.idris",
        "match": "\\b(impossible|case|of|total|partial|mutual|infix|infixl|infixr)\\b"
-
     },
     {  "name": "keyword.control.idris",
        "match": "\\b(where|with|syntax|proof|postulate|using|namespace|module|class|instance)\\b"
-
     },
     {  "name": "keyword.control.idris",
        "match":  "\\b(public|private|abstract|implicit)\\b"
-
     },
     {  "name": "storage.type.builtin.idris",
        "match": "\\b(Type|Int|Nat|Integer|Float|Char|String|Ptr|Bits8|Bits16|Bits32|Bits64)\\b"
@@ -28,17 +23,15 @@
     {  "name": "constant.numeric.idris",
        "match": "\\b(S|Z)\\b"
     },
-  	{ "match": "\\b([0-9]+|0([xX][0-9a-fA-F]+|[oO][0-7]+))\\b",
-  	  "name": "constant.numeric.idris",
-  	  "comment": "integers"
+    {  "match": "\\b([0-9]+|0([xX][0-9a-fA-F]+|[oO][0-7]+))\\b",
+       "name": "constant.numeric.idris",
+       "comment": "integers"
     },
-    {
-    	"match": "\\b([0-9]+\\.[0-9]+([eE][+-]?[0-9]+)?|[0-9]+[eE][+-]?[0-9]+)\\b",
-    	"name": "constant.numeric.float.idris",
-    	"comment": "floats"
+    {  "match": "\\b([0-9]+\\.[0-9]+([eE][+-]?[0-9]+)?|[0-9]+[eE][+-]?[0-9]+)\\b",
+       "name": "constant.numeric.float.idris",
+       "comment": "floats"
     },
-    {
-      "name": "comment.line.idris",
+    { "name": "comment.line.idris",
       "match": "(--).*$\n?",
       "comment": "Line comment"
     },
@@ -47,8 +40,7 @@
       "end": "-\\}",
       "comment": "Block comment"
     },
-    {
-      "name": "string.quoted.idris",
+    { "name": "string.quoted.idris",
       "begin": "\"",
       "beginCaptures": {
           "0": { "name": "punctuation.definition.string.begin.idris"}
@@ -62,10 +54,7 @@
            "match": "\\\\\""
         }
       ]
-
     }
-
-
   ],
   "repository": {
 
