@@ -89,119 +89,119 @@ class IdrisController
       @statusbar.hide()
     return
 
-IdrisController::destroy = ->
-  if @idrisModel
-    console.log 'Idris: Shutting down!'
-    @model.stop()
-  @statusbar.destroy()
-  return
-
-IdrisController::getWordUnderCursor = ->
-  editor = atom.workspace.getActiveEditor()
-  cursorPosition = editor.getCursor(0).getCurrentWordBufferRange()
-  editor.getTextInBufferRange cursorPosition
-
-IdrisController::loadFile = (uri) ->
-  console.log 'Loading ' + uri
-  @messages.clear()
-  @model.load uri, ((err, message, progress) ->
-    if err
-      @statusbar.setStatus 'Idris: ' + err.message
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
-      i = 0
-      while i < err.warnings.length
-        warning = err.warnings[i]
-        @messages.add new LineMessageView(
-          line: warning[1]
-          character: warning[2]
-          message: warning[3])
-        i++
-    else if progress
-      console.log '... ' + progress
-      @statusbar.setStatus 'Idris: ' + progress
-    else
-      @statusbar.setStatus 'Idris: ' + message
+  destroy: ->
+    if @idrisModel
+      console.log 'Idris: Shutting down!'
+      @model.stop()
+    @statusbar.destroy()
     return
-  ).bind(this)
-  return
 
-IdrisController::getDocsForWord = ->
-  word = @getWordUnderCursor()
-  @model.docsFor word
-  return
+  getWordUnderCursor: ->
+    editor = atom.workspace.getActiveEditor()
+    cursorPosition = editor.getCursor(0).getCurrentWordBufferRange()
+    editor.getTextInBufferRange cursorPosition
 
-IdrisController::getTypeForWord = ->
-  word = @getWordUnderCursor()
-  @model.getType word, ((err, type) ->
-    if err
-      @statusbar.setStatus 'Idris: ' + err.message
-    else
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-      @messages.add new ProofObligationView(obligation: type)
+  loadFile: (uri) ->
+    console.log 'Loading ' + uri
+    @messages.clear()
+    @model.load uri, ((err, message, progress) ->
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+        @messages.show()
+        @messages.clear()
+        @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
+        i = 0
+        while i < err.warnings.length
+          warning = err.warnings[i]
+          @messages.add new LineMessageView(
+            line: warning[1]
+            character: warning[2]
+            message: warning[3])
+          i++
+      else if progress
+        console.log '... ' + progress
+        @statusbar.setStatus 'Idris: ' + progress
+      else
+        @statusbar.setStatus 'Idris: ' + message
+      return
+    ).bind(this)
     return
-  ).bind(this)
-  return
 
-IdrisController::doCaseSplit = ->
-  editor = atom.workspace.getActiveEditor()
-  line = editor.getCursor(0).getBufferRow()
-  word = @getWordUnderCursor()
-  @model.caseSplit line + 1, word, ((err, split) ->
-    if err
-      @statusbar.setStatus 'Idris: ' + err.message
-    else
-      lineRange = editor.getCursor(0).getCurrentLineBufferRange(includeNewline: true)
-      editor.setTextInBufferRange lineRange, split
+  getDocsForWord: ->
+    word = @getWordUnderCursor()
+    @model.docsFor word
     return
-  ).bind(this)
-  return
 
-IdrisController::doAddClause = ->
-  editor = atom.workspace.getActiveEditor()
-  line = editor.getCursor(0).getBufferRow()
-  word = @getWordUnderCursor()
-  @model.addClause line + 1, word, ((err, clause) ->
-    if err
-      @statusbar.setStatus 'Idris: ' + err.message
-    else
-      editor.transact ->
-        # Insert a newline and the new clause
-        editor.insertNewlineBelow()
-        editor.insertText clause
-        # And move the cursor to the beginning of
-        # the new line
-        editor.moveCursorToBeginningOfLine()
-        return
+  getTypeForWord: ->
+    word = @getWordUnderCursor()
+    @model.getType word, ((err, type) ->
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        @messages.show()
+        @messages.clear()
+        @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+        @messages.add new ProofObligationView(obligation: type)
+      return
+    ).bind(this)
     return
-  ).bind(this)
-  return
 
-IdrisController::doProofSearch = ->
-  editor = atom.workspace.getActiveEditor()
-  line = editor.getCursor(0).getBufferRow()
-  word = @getWordUnderCursor()
-  @model.proofSearch line + 1, word, ((err, res) ->
-    if err
-      @statusbar.setStatus 'Idris: ' + err.message
-    else
-      editor.transact ->
-        # Move the cursor to the beginning of the word
-        editor.moveCursorToBeginningOfWord()
-        # Because the ? in the metavariable isn't part of
-        # the word, we move left once, and then select two
-        # words
-        editor.moveCursorLeft()
-        editor.selectToEndOfWord()
-        editor.selectToEndOfWord()
-        # And then replace the replacement with the guess..
-        editor.insertText res
-        return
+  doCaseSplit: ->
+    editor = atom.workspace.getActiveEditor()
+    line = editor.getCursor(0).getBufferRow()
+    word = @getWordUnderCursor()
+    @model.caseSplit line + 1, word, ((err, split) ->
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        lineRange = editor.getCursor(0).getCurrentLineBufferRange(includeNewline: true)
+        editor.setTextInBufferRange lineRange, split
+      return
+    ).bind(this)
     return
-  ).bind(this)
-  return
+
+  doAddClause: ->
+    editor = atom.workspace.getActiveEditor()
+    line = editor.getCursor(0).getBufferRow()
+    word = @getWordUnderCursor()
+    @model.addClause line + 1, word, ((err, clause) ->
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        editor.transact ->
+          # Insert a newline and the new clause
+          editor.insertNewlineBelow()
+          editor.insertText clause
+          # And move the cursor to the beginning of
+          # the new line
+          editor.moveCursorToBeginningOfLine()
+          return
+      return
+    ).bind(this)
+    return
+
+  doProofSearch: ->
+    editor = atom.workspace.getActiveEditor()
+    line = editor.getCursor(0).getBufferRow()
+    word = @getWordUnderCursor()
+    @model.proofSearch line + 1, word, ((err, res) ->
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        editor.transact ->
+          # Move the cursor to the beginning of the word
+          editor.moveCursorToBeginningOfWord()
+          # Because the ? in the metavariable isn't part of
+          # the word, we move left once, and then select two
+          # words
+          editor.moveCursorLeft()
+          editor.selectToEndOfWord()
+          editor.selectToEndOfWord()
+          # And then replace the replacement with the guess..
+          editor.insertText res
+          return
+      return
+    ).bind(this)
+    return
 
 module.exports = IdrisController
