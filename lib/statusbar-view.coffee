@@ -22,7 +22,6 @@ class StatusBarView extends View
     return
 
   setStatus: (text) ->
-    debugger
     @show().text text
 
   show: ->
@@ -30,7 +29,6 @@ class StatusBarView extends View
       display: 'inline-block'
 
   hide: ->
-    debugger
     super()
 
 module.exports = StatusBarView

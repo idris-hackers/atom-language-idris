@@ -32,14 +32,10 @@ class IdrisModel extends EventEmitter
       @buffer = @buffer.trimLeft()
       # We have 6 chars, which is the length of the command
       len = parseInt(@buffer.substr(0, 6), 16)
-      console.log "buffer", @buffer
-      console.log "len unparsed", @buffer.substr(0, 6)
-      console.log "len", len
       if @buffer.length >= 6 + len
         # We also have the length of the command in the buffer, so
         # let's read in the command
         cmd = @buffer.substr(6, len).trim()
-        console.log "CMD", cmd
         # Remove the length + command from the buffer
         @buffer = @buffer.substr(6 + len)
         # And then we can try to parse to command..
