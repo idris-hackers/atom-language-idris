@@ -16,7 +16,7 @@ class IdrisModel extends EventEmitter
 
   start: ->
     pathToIdris = atom.config.get("atom-language-idris.pathToIdris")
-    @process = spawn pathToIdris, ['--ideslave']
+    @process = spawn pathToIdris, ['--ide-mode']
     @process.on 'exit', @exited.bind(this)
     @process.on 'error', @exited.bind(this)
     @process.stdout.setEncoding('utf8').on 'data', @stdout
