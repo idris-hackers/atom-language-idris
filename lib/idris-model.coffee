@@ -2,6 +2,7 @@ spawn = require('child_process').spawn
 parser = require('./parser')
 utils = require('./utils')
 EventEmitter = require('events').EventEmitter
+{Logger} = require './Logger'
 
 class IdrisModel extends EventEmitter
   constructor: ->
@@ -31,11 +32,12 @@ class IdrisModel extends EventEmitter
     while @buffer.length > 6
       @buffer = @buffer.trimLeft()
       # We have 6 chars, which is the length of the command
-      len = parseInt(@buffer.substr(0, 6), 16)
+      len = parseInt(@buffer.substr(0, 6), 16) + 1
       if @buffer.length >= 6 + len
         # We also have the length of the command in the buffer, so
         # let's read in the command
         cmd = @buffer.substr(6, len).trim()
+        Logger.logIncomingCommand cmd
         # Remove the length + command from the buffer
         @buffer = @buffer.substr(6 + len)
         # And then we can try to parse to command..
@@ -102,10 +104,12 @@ class IdrisModel extends EventEmitter
     ]
     @callbacks[id] = callback
     @warnings[id] = []
-    command = utils.formatObj(cmd)
-
-    @process.stdin.write command, 'UTF-8'
+    @sendCommand cmd
     return
+
+  sendCommand: (cmd) ->
+    Logger.logOutgoingCommand cmd
+    @process.stdin.write utils.formatObj(cmd)
 
 cmds = [
   [
@@ -129,8 +133,7 @@ cmds.forEach (info) ->
     ]
     @callbacks[id] = callback
     @warnings[id] = []
-    debugger
-    @process.stdin.write utils.formatObj(cmd)
+    @sendCommand cmd
     return
 
   return
@@ -160,8 +163,7 @@ cmds.forEach (info) ->
     ]
     @callbacks[id] = callback
     @warnings[id] = []
-    debugger
-    @process.stdin.write utils.formatObj(cmd)
+    @sendCommand cmd
     return
 
   return
@@ -181,8 +183,7 @@ IdrisModel::proofSearch = (line, word, callback) ->
   ]
   @callbacks[id] = callback
   @warnings[id] = []
-  debugger
-  @process.stdin.write utils.formatObj(cmd)
+  @sendCommand cmd
   return
 
 module.exports = IdrisModel
