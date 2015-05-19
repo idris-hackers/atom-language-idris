@@ -38,10 +38,10 @@ class IdrisController
     'language-idris:proof-search': @doProofSearch
 
   isIdrisFile: (uri) ->
-    if uri == undefined
-      false
-    else
+    if uri? && uri.match?
       uri.match /\.idr$/
+    else
+      false
 
   idrisFileOpened: (editor) ->
     @idrisBuffers += 1
@@ -122,7 +122,7 @@ class IdrisController
         console.log '... ' + progress
         @statusbar.setStatus 'Idris: ' + progress
       else
-        @statusbar.setStatus 'Idris: ' + message
+        @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
       return
     ).bind(this)
     return
@@ -132,7 +132,7 @@ class IdrisController
     @model.docsFor word
     return
 
-  getTypeForWord: ->
+  getTypeForWord: =>
     word = @getWordUnderCursor()
     @model.getType word, ((err, type) ->
       if err
@@ -146,9 +146,9 @@ class IdrisController
     ).bind(this)
     return
 
-  doCaseSplit: ->
+  doCaseSplit: =>
     editor = atom.workspace.getActiveEditor()
-    line = editor.getCursor(0).getBufferRow()
+    line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor()
     @model.caseSplit line + 1, word, ((err, split) ->
       if err
