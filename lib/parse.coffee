@@ -28,6 +28,7 @@ symbolChar = text.noneOf ' )'
 symbolP =
   parse.next symbolStartP, parse.many(symbolChar)
     .map streamToString
+    .map (symbol) -> ":#{symbol}"
 
 # sexp
 openP = text.character '('

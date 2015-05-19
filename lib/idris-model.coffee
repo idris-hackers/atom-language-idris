@@ -43,6 +43,7 @@ class IdrisModel extends EventEmitter
         # And then we can try to parse to command..
         try
           obj = parser.parse(cmd.trim())
+          debugger
           @handleCommand obj
         catch e
           console.log cmd.trim()
