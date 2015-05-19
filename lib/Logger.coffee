@@ -7,7 +7,6 @@ class Logger
     fs.appendFile @logFile, str, (err) ->
       if err
         throw err
-      console.log "Logged", str
 
   formatCommand: (cmd) ->
     utils.formatObj cmd
