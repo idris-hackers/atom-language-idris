@@ -91,59 +91,34 @@ class IdrisModel extends EventEmitter
   running: ->
     ! !@process
 
-  load: (uri, callback) ->
-    id = ++@requestId
-    cmd = [[':load-file', uri], id ]
-    @callbacks[id] = callback
-    @warnings[id] = []
-    @sendCommand cmd
+  getUID: -> ++@requestId
 
   sendCommand: (cmd) ->
     Logger.logOutgoingCommand cmd
     @process.stdin.write utils.serialize(cmd)
 
-cmds = [
-  [
-    ':docs-for'
-    'docsFor'
-  ]
-  [
-    ':type-of'
-    'getType'
-  ]
-]
-cmds.forEach (info) ->
-  IdrisModel.prototype[info[1]] = (word, callback) ->
-    id = ++@requestId
-    cmd = [[info[0], word], id]
+  prepareCommand: (cmd, callback) ->
+    id = @getUID()
     @callbacks[id] = callback
     @warnings[id] = []
-    @sendCommand cmd
+    @sendCommand [cmd, id]
 
-cmds = [
-  [
-    ':case-split'
-    'caseSplit'
-  ]
-  [
-    ':add-clause'
-    'addClause'
-  ]
-]
-cmds.forEach (info) ->
+  load: (uri, callback) ->
+    @prepareCommand [':load-file', uri], callback
 
-  IdrisModel.prototype[info[1]] = (line, word, callback) ->
-    id = ++@requestId
-    cmd = [[info[0], line, word], id]
-    @callbacks[id] = callback
-    @warnings[id] = []
-    @sendCommand cmd
+  docsFor: (word, callback) ->
+    @prepareCommand [':docs-for', word], callback
 
-IdrisModel::proofSearch = (line, word, callback) ->
-  id = ++@requestId
-  cmd = [[':proof-search', line, word, []], id]
-  @callbacks[id] = callback
-  @warnings[id] = []
-  @sendCommand cmd
+  getType: (word, callback) ->
+    @prepareCommand [':type-of', word], callback
+
+  caseSplit: (line, word, callback) ->
+    @prepareCommand [':case-split', line, word], callback
+
+  addClause: (line, word, callback) ->
+    @prepareCommand [':add-clause', line, word], callback
+
+  proofSearch = (line, word, callback) ->
+    @prepareCommand [':proof-search', line, word, []], callback
 
 module.exports = IdrisModel
