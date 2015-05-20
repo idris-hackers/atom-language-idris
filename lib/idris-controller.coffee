@@ -90,7 +90,7 @@ class IdrisController
     @statusbar.destroy()
 
   getWordUnderCursor: ->
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
@@ -140,14 +140,14 @@ class IdrisController
         @messages.add new ProofObligationView(obligation: type)
 
   doCaseSplit: =>
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor()
     @model.caseSplit line + 1, word, (err, split) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
-        lineRange = editor.getCursor(0).getCurrentLineBufferRange(includeNewline: true)
+        lineRange = editor.getLastCursor().getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
 
   doAddClause: ->
