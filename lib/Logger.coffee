@@ -3,7 +3,7 @@ utils = require('./utils')
 
 class Logger
   logFile: "log.log"
-  loggerActive: true
+  loggerActive: false
 
   logText: (str) ->
     if @loggerActive
