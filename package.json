@@ -13,8 +13,17 @@
     "name": "Morten Fangel",
     "url": "http://sevengoslings.net"
   },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
   "dependencies": {
     "atom-message-panel": ">=0.1.0",
-    "atom-space-pen-views": "^2.0.3"
+    "atom-space-pen-views": "^2.0.3",
+    "bennu": "17.3.x",
+    "nu-stream": "3.3.x"
   }
 }
