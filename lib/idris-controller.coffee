@@ -28,7 +28,6 @@ class IdrisController
     if activeItem = atom.workspace.getActivePaneItem()
       if activeItem.isModified()
         @idrisFileChanged activeItem
-    return
 
   getCommands: ->
     'language-idris:type-of': @getTypeForWord
@@ -58,7 +57,6 @@ class IdrisController
     @localChanges = false
     if @isIdrisFile(editor.getUri())
       @loadFile editor.getUri()
-    return
 
   idrisFileChanged: (editor) ->
     @localChanges = editor.isModified()
@@ -66,35 +64,30 @@ class IdrisController
       @statusbar.setStatus 'Idris: local modifications'
     else if @isIdrisFile(editor.getUri())
       @loadFile editor.getUri()
-    return
 
   idrisFileClosed: (editor) ->
     @idrisBuffers -= 1
     if @idrisBuffers == 0
       console.log 'Shut down Idris IDESlave'
       @model.stop()
-    return
 
   paneChanged: =>
     @messages.clear()
     @messages.hide()
     editor = atom.workspace.getActiveTextEditor()
-    if !editor
-      return
-    uri = editor.getPath()
-    if @isIdrisFile(uri)
-      @statusbar.show()
-      @loadFile uri
-    else
-      @statusbar.hide()
-    return
+    if editor
+      uri = editor.getPath()
+      if @isIdrisFile(uri)
+        @statusbar.show()
+        @loadFile uri
+      else
+        @statusbar.hide()
 
   destroy: ->
     if @idrisModel
       console.log 'Idris: Shutting down!'
       @model.stop()
     @statusbar.destroy()
-    return
 
   getWordUnderCursor: ->
     editor = atom.workspace.getActiveEditor()
@@ -104,7 +97,7 @@ class IdrisController
   loadFile: (uri) ->
     console.log 'Loading ' + uri
     @messages.clear()
-    @model.load uri, ((err, message, progress) ->
+    @model.load uri, (err, message, progress) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
         @messages.show()
@@ -123,9 +116,6 @@ class IdrisController
         @statusbar.setStatus 'Idris: ' + progress
       else
         @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
-      return
-    ).bind(this)
-    return
 
   getDocsForWord: =>
     word = @getWordUnderCursor()
@@ -140,7 +130,7 @@ class IdrisController
 
   getTypeForWord: =>
     word = @getWordUnderCursor()
-    @model.getType word, ((err, type) ->
+    @model.getType word, (err, type) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
@@ -148,29 +138,23 @@ class IdrisController
         @messages.clear()
         @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
         @messages.add new ProofObligationView(obligation: type)
-      return
-    ).bind(this)
-    return
 
   doCaseSplit: =>
     editor = atom.workspace.getActiveEditor()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor()
-    @model.caseSplit line + 1, word, ((err, split) ->
+    @model.caseSplit line + 1, word, (err, split) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
         lineRange = editor.getCursor(0).getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
-      return
-    ).bind(this)
-    return
 
   doAddClause: ->
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor()
-    @model.addClause line + 1, word, ((err, clause) ->
+    @model.addClause line + 1, word, (err, clause) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
@@ -181,16 +165,12 @@ class IdrisController
           # And move the cursor to the beginning of
           # the new line
           editor.moveCursorToBeginningOfLine()
-          return
-      return
-    ).bind(this)
-    return
 
   doProofSearch: ->
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor()
-    @model.proofSearch line + 1, word, ((err, res) ->
+    @model.proofSearch line + 1, word, (err, res) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
@@ -205,9 +185,5 @@ class IdrisController
           editor.selectToEndOfWord()
           # And then replace the replacement with the guess..
           editor.insertText res
-          return
-      return
-    ).bind(this)
-    return
 
 module.exports = IdrisController

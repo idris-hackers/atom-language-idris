@@ -9,17 +9,13 @@ class StatusBarView extends View
     atom.packages.onDidActivateInitialPackages =>
       setTimeout =>
         @attach()
-        return
-      return
     this
 
   attach: ->
     document.querySelector('status-bar').addLeftTile item: this
-    return
 
   destroy: ->
     @destroy()
-    return
 
   setStatus: (text) ->
     @show().text text

@@ -52,7 +52,6 @@ class IdrisModel extends EventEmitter
         # We didn't have the entire command, so let's break the
         # while-loop and wait for the next data-event
         break
-    return
 
   handleCommand: (cmd) ->
     if cmd.length > 0
@@ -88,7 +87,6 @@ class IdrisModel extends EventEmitter
   exited: ->
     console.log 'Exited'
     @process = undefined
-    return
 
   running: ->
     ! !@process
@@ -105,7 +103,6 @@ class IdrisModel extends EventEmitter
     @callbacks[id] = callback
     @warnings[id] = []
     @sendCommand cmd
-    return
 
   sendCommand: (cmd) ->
     Logger.logOutgoingCommand cmd
@@ -134,9 +131,7 @@ cmds.forEach (info) ->
     @callbacks[id] = callback
     @warnings[id] = []
     @sendCommand cmd
-    return
 
-  return
 cmds = [
   [
     'case-split'
@@ -164,9 +159,6 @@ cmds.forEach (info) ->
     @callbacks[id] = callback
     @warnings[id] = []
     @sendCommand cmd
-    return
-
-  return
 
 IdrisModel::proofSearch = (line, word, callback) ->
   id = ++@requestId
@@ -184,7 +176,6 @@ IdrisModel::proofSearch = (line, word, callback) ->
   @callbacks[id] = callback
   @warnings[id] = []
   @sendCommand cmd
-  return
 
 module.exports = IdrisModel
 
