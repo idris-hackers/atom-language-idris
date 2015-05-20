@@ -30,9 +30,9 @@ class IdrisModel extends EventEmitter
     console.log "Data", data
     @buffer += data
     while @buffer.length > 6
-      @buffer = @buffer.trimLeft()
+      @buffer = @buffer.trimLeft().replace /\r\n/g, "\n"
       # We have 6 chars, which is the length of the command
-      len = parseInt(@buffer.substr(0, 6), 16) + 1
+      len = parseInt(@buffer.substr(0, 6), 16)
       if @buffer.length >= 6 + len
         # We also have the length of the command in the buffer, so
         # let's read in the command
