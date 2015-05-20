@@ -127,10 +127,16 @@ class IdrisController
     ).bind(this)
     return
 
-  getDocsForWord: ->
+  getDocsForWord: =>
     word = @getWordUnderCursor()
-    @model.docsFor word
-    return
+    @model.docsFor word, (err, type) =>
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        @messages.show()
+        @messages.clear()
+        @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+        @messages.add new ProofObligationView(obligation: type)
 
   getTypeForWord: =>
     word = @getWordUnderCursor()
