@@ -15,7 +15,6 @@ module.exports =
     @controller =
       new IdrisController @statusbar, @model
 
-
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', @controller.getCommands()
 

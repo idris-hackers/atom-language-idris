@@ -40,4 +40,3 @@ sexpP = (parse.rec (self) ->
 
 module.exports =
   parse: (input) -> parse.run sexpP, input
-[]

@@ -1,5 +1,5 @@
 spawn = require('child_process').spawn
-parser = require('./parser')
+parse = require './parse'
 utils = require('./utils')
 EventEmitter = require('events').EventEmitter
 {Logger} = require './Logger'
@@ -42,8 +42,8 @@ class IdrisModel extends EventEmitter
         @buffer = @buffer.substr(6 + len)
         # And then we can try to parse to command..
         try
-          obj = parser.parse(cmd.trim())
-          debugger
+          obj = parse.parse(cmd.trim())
+
           @handleCommand obj
         catch e
           console.log cmd.trim()
@@ -55,36 +55,35 @@ class IdrisModel extends EventEmitter
     return
 
   handleCommand: (cmd) ->
-    switch cmd.op
-      when 'return'
-        id = cmd.params[cmd.params.length - 1]
-        ret = cmd.params[0]
-        if !@callbacks[id]
-          break
-        if ret.op == 'ok'
-          @callbacks[id] undefined, ret.params[0]
+    if cmd.length > 0
+      op = cmd[0]
+      params = cmd.slice 1
+      switch op
+        when ':return'
+          id = params[params.length - 1]
+          ret = params[0]
+          if @callbacks[id]
+            if ret[0] == ':ok'
+              @callbacks[id] undefined, ret[1]
+            else
+              @callbacks[id]
+                message: ret[1]
+                warnings: @warnings[id]
+            delete @callbacks[id]
+            delete @warnings[id]
+        when ':write-string'
+          id = params[params.length - 1]
+          msg = params[0]
+          if @callbacks[id]
+            @callbacks[id] undefined, undefined, msg
+        when ':warning'
+          id = params[params.length - 1]
+          warning = params[0]
+          @warnings[id].push warning
+        when ':set-prompt'
+          # Ignore
         else
-          @callbacks[id]
-            message: ret.params[0]
-            warnings: @warnings[id]
-        delete @callbacks[id]
-        delete @warnings[id]
-      when 'write-string'
-        id = cmd.params[cmd.params.length - 1]
-        msg = cmd.params[0]
-        if !@callbacks[id]
-          break
-        @callbacks[id] undefined, undefined, msg
-      when 'warning'
-        id = cmd.params[cmd.params.length - 1]
-        warning = cmd.params[0]
-        @warnings[id].push warning
-      when 'set-prompt'
-        # Ignore
-      else
-        console.log cmd
-        break
-    return
+          console.log op, params
 
   exited: ->
     console.log 'Exited'
