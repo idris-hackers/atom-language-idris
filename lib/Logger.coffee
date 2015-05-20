@@ -3,10 +3,13 @@ utils = require('./utils')
 
 class Logger
   logFile: "log.log"
+  loggerActive: true
+
   logText: (str) ->
-    fs.appendFile @logFile, str, (err) ->
-      if err
-        throw err
+    if @loggerActive
+      fs.appendFile @logFile, str, (err) ->
+        if err
+          throw err
 
   formatCommand: (cmd) ->
     utils.formatObj cmd
