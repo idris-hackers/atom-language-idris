@@ -1,4 +1,4 @@
-
+utils = require '../lib/utils'
 parse = require '../lib/parse'
 
 test1 = "(:protocol-version 1 0)"
@@ -60,3 +60,13 @@ describe "A parser", ->
     expect(parse.parse(test2)).toEqual(list2)
     expect(parse.parse(test3)).toEqual(list3)
     expect(parse.parse(test4)).toEqual(list4)
+
+  it "should serialize back again.", ->
+    expect(utils.formatSexp(list1)).toEqual(test1)
+    expect(utils.formatSexp(list2)).toEqual(test2)
+    expect(utils.formatSexp(list3)).toEqual(test3)
+    expect(utils.formatSexp(list4)).toEqual(test4)
+
+  it "should serialize common commands.", ->
+    loadFile = [[':load-file', "idris.idr"], 1]
+    expect(utils.formatSexp(loadFile)).toEqual '((:load-file "idris.idr") 1)'
