@@ -91,7 +91,7 @@ class IdrisController
 
   getWordUnderCursor: ->
     editor = atom.workspace.getActiveEditor()
-    cursorPosition = editor.getCursor(0).getCurrentWordBufferRange()
+    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
   loadFile: (uri) ->
