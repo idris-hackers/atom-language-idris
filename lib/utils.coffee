@@ -1,3 +1,13 @@
+exec = require('child_process').exec
+
+execPromise = (command, args) ->
+  promise = new Promise (resolve, reject) ->
+    process = exec command, args
+    process.stdout.on 'data', resolve
+    process.stderr.on 'data', reject
+    process.on 'error', reject
+    process.on 'close', reject
+
 isString = (s) ->
   typeof(s) == 'string' || s instanceof String
 
@@ -37,6 +47,7 @@ formatSexp = (sexp) ->
     sexp
 
 module.exports =
+  execPromise: execPromise
   serialize: serialize
   hexLength: hexLength
   formatSexp: formatSexp

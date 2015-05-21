@@ -3,9 +3,10 @@ parse = require './parse'
 utils = require('./utils')
 EventEmitter = require('events').EventEmitter
 {Logger} = require './Logger'
+semver = require 'semver'
 
 class IdrisModel extends EventEmitter
-  constructor: ->
+  constructor: (@version) ->
     @buffer = ''
     @process = undefined
     @callbacks = {}
@@ -17,7 +18,13 @@ class IdrisModel extends EventEmitter
 
   start: ->
     pathToIdris = atom.config.get("atom-language-idris.pathToIdris")
-    @process = spawn pathToIdris, ['--ide-mode']
+    ideCommand =
+      if semver.gt @version, '0.9.16'
+        '--ide-mode'
+      else
+        '--ideslave'
+
+    @process = spawn pathToIdris, [ideCommand]
     @process.on 'exit', @exited.bind(this)
     @process.on 'error', @exited.bind(this)
     @process.stdout.setEncoding('utf8').on 'data', @stdout
