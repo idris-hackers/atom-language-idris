@@ -14,7 +14,7 @@ module.exports =
   activate: ->
     warningNoIdris = 'Please put idris into your path or set the right path in the settings of this package.'
 
-    pathToIdris = atom.config.get "atom-language-idris.pathToIdris"
+    pathToIdris = atom.config.get "language-idris.pathToIdris"
 
     # check for the verion of idris. this has two purposes:
     # 1. see if there is an idris set in your path or the package config

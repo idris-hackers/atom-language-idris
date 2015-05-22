@@ -17,7 +17,7 @@ class IdrisModel extends EventEmitter
   requestId: 0
 
   start: ->
-    pathToIdris = atom.config.get("atom-language-idris.pathToIdris")
+    pathToIdris = atom.config.get("language-idris.pathToIdris")
     ideCommand =
       if semver.gt @version, '0.9.16'
         '--ide-mode'
