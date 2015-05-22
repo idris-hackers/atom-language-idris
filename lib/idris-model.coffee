@@ -3,7 +3,6 @@ parse = require './parse'
 utils = require('./utils')
 EventEmitter = require('events').EventEmitter
 {Logger} = require './Logger'
-semver = require 'semver'
 
 class IdrisModel extends EventEmitter
   constructor: (@version) ->
@@ -18,8 +17,9 @@ class IdrisModel extends EventEmitter
 
   start: ->
     pathToIdris = atom.config.get("language-idris.pathToIdris")
+
     ideCommand =
-      if semver.gt @version, '0.9.16'
+      if utils.versionGreaterEq @version, [0, 9, 16]
         '--ide-mode'
       else
         '--ideslave'

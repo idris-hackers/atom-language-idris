@@ -3,7 +3,6 @@ IdrisController = require './idris-controller'
 IdrisModel = require './idris-model'
 {CompositeDisposable} = require 'atom'
 utils = require './utils'
-semver = require 'semver'
 
 module.exports =
   config:
@@ -22,8 +21,8 @@ module.exports =
     #    and switch to ideslave for older ones
     idrisVersionPromise = utils.execPromise "#{pathToIdris} --version --nobanner"
 
-    idrisVersionPromise.then ((vers) ->
-      Promise.resolve semver.clean(vers.trim().replace('-', ''))
+    idrisVersionPromise.then ((version) ->
+      Promise.resolve utils.parseVersion(version)
     ), (error) ->
       atom.notifications.addWarning warningNoIdris
     .then @startIdrisProcesses
