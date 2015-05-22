@@ -8,6 +8,7 @@ It supports:
  - Clause-adding (ctrl-alt-a)
  - Proof-search (ctrl-alt-s)
  - Showing the types of meta-variables (ctrl-alt-t)
+ - Show the doc of a variable (ctrl-alt-d)
 
 It is rather finicky, and doesn't have very good error-handling yet.
 You will probably need to find the config for the module and put in
@@ -25,4 +26,3 @@ the search-path of your shell.
    - Proof Clause-adding
    - Show list of meta-variables
    - ...
-   
