@@ -26,3 +26,8 @@ the search-path of your shell.
    - Proof Clause-adding
    - Show list of meta-variables
    - ...
+
+## Development
+
+To work on this plugin you need to clone it into your atom directory
+and rename the folder to `language-atom` or the package settings won't get picked up.
