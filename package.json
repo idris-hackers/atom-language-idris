@@ -7,7 +7,7 @@
   "repository": "https://github.com/fangel/atom-language-idris",
   "license": "MIT",
   "engines": {
-    "atom": ">=0.50.0"
+    "atom": ">=0.180.0"
   },
   "author": {
     "name": "Morten Fangel",
