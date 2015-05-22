@@ -55,15 +55,15 @@ class IdrisController
     @messages.clear()
     @messages.hide()
     @localChanges = false
-    if @isIdrisFile(editor.getUri())
-      @loadFile editor.getUri()
+    if @isIdrisFile(editor.getURI())
+      @loadFile editor.getURI()
 
   idrisFileChanged: (editor) ->
     @localChanges = editor.isModified()
     if @localChanges
       @statusbar.setStatus 'Idris: local modifications'
-    else if @isIdrisFile(editor.getUri())
-      @loadFile editor.getUri()
+    else if @isIdrisFile(editor.getURI())
+      @loadFile editor.getURI()
 
   idrisFileClosed: (editor) ->
     @idrisBuffers -= 1
