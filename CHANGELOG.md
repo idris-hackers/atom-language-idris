@@ -4,9 +4,16 @@
 
 ### Added
 
+- Type and doc info highlighting https://github.com/idris-hackers/atom-language-idris/pull/9 (@archaeron)
+
+## v0.1.0
+
+### Added
+
 - Shortcut to Show the doc of a variable (ctrl-alt-d)
 
 ### Fixed
+
 - updated for the new version of Atom (@archaeron)
 - new parser for the ide-mode commands (@archaeron)
 - new serializer for the ide-mode commands (@archaeron)
