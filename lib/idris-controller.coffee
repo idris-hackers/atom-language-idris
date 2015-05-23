@@ -119,25 +119,29 @@ class IdrisController
 
   getDocsForWord: =>
     word = @getWordUnderCursor()
-    @model.docsFor word, (err, type) =>
+    @model.docsFor word, (err, type, highlightingInfo) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
         @messages.show()
         @messages.clear()
         @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-        @messages.add new ProofObligationView(obligation: type)
+        @messages.add new ProofObligationView
+          obligation: type
+          highlightingInfo: highlightingInfo
 
   getTypeForWord: =>
     word = @getWordUnderCursor()
-    @model.getType word, (err, type) =>
+    @model.getType word, (err, type, highlightingInfo) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
         @messages.show()
         @messages.clear()
         @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-        @messages.add new ProofObligationView(obligation: type)
+        @messages.add new ProofObligationView
+          obligation: type
+          highlightingInfo: highlightingInfo
 
   doCaseSplit: =>
     editor = atom.workspace.getActiveTextEditor()

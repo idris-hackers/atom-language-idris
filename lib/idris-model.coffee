@@ -70,7 +70,7 @@ class IdrisModel extends EventEmitter
           ret = params[0]
           if @callbacks[id]
             if ret[0] == ':ok'
-              @callbacks[id] undefined, ret[1]
+              @callbacks[id] undefined, ret.slice(1)...
             else
               @callbacks[id]
                 message: ret[1]
