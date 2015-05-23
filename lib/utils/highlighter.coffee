@@ -9,6 +9,10 @@ highlightInfoListToOb = (list) ->
 decorToClasses = (decor) ->
   switch decor
     when ':type' then 'storage type'
+    when ':function' then 'entity name function'
+    when ':data' then 'constant'
+    when ':keyword' then 'keyword'
+    when ':bound' then ''
     else ''
 
 highlightWord = (word, info) ->
