@@ -12,7 +12,7 @@ class Logger
           throw err
 
   formatCommand: (cmd) ->
-    utils.formatSexp cmd
+    utils.serialize(cmd)
 
   logIncomingCommand: (str) ->
     @logText "< #{str}\n"
