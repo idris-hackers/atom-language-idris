@@ -113,6 +113,9 @@ class IdrisModel extends EventEmitter
   load: (uri, callback) ->
     @prepareCommand [':load-file', uri], callback
 
+  interpret: (code, callback) ->
+    @prepareCommand [':interpret', code], callback
+
   docsFor: (word, callback) ->
     @prepareCommand [':docs-for', word], callback
 

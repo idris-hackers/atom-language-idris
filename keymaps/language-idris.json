@@ -4,6 +4,7 @@
     "ctrl-alt-t": "language-idris:type-of",
     "ctrl-alt-a": "language-idris:add-clause",
     "ctrl-alt-s": "language-idris:proof-search",
-    "ctrl-alt-d": "language-idris:docs-for"
+    "ctrl-alt-d": "language-idris:docs-for",
+    "ctrl-alt-enter": "language-idris:open-repl"
   }
 }

@@ -2,6 +2,7 @@ MessagePanelView = require('atom-message-panel').MessagePanelView
 PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./ProofObligationView')
+REPLView = require './REPLView'
 
 class IdrisController
   idrisBuffers: 0
@@ -35,6 +36,7 @@ class IdrisController
     'language-idris:case-split': @doCaseSplit
     'language-idris:add-clause': @doAddClause
     'language-idris:proof-search': @doProofSearch
+    'language-idris:open-repl': @openREPL
 
   isIdrisFile: (uri) ->
     if uri? && uri.match?
@@ -153,6 +155,18 @@ class IdrisController
       else
         lineRange = editor.getLastCursor().getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
+
+  openREPL: =>
+    callback = (code) =>
+      @model.interpret code, (err, answer) ->
+        replView.addCodeLine answer
+
+    replView = new REPLView callback: callback
+
+    @messages.show()
+    @messages.clear()
+    @messages.setTitle "REPL"
+    @messages.add replView
 
   doAddClause: ->
     editor = atom.workspace.getActiveEditor()
