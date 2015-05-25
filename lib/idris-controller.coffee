@@ -3,6 +3,7 @@ PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./ProofObligationView')
 REPLView = require './REPLView'
+highlighter = require './utils/highlighter'
 
 class IdrisController
   idrisBuffers: 0
@@ -158,9 +159,10 @@ class IdrisController
 
   openREPL: =>
     callback = (code) =>
-      @model.interpret code, (err, answer) ->
-        replView.addCodeLine answer
+      @model.interpret code, (err, answer, highlightingInfo) ->
+        highlighted = highlighter.highlight answer, highlightingInfo
         replView.addInputLine code
+        replView.addCodeLine highlighted
 
     replView = new REPLView callback: callback
 
