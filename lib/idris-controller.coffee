@@ -160,6 +160,7 @@ class IdrisController
     callback = (code) =>
       @model.interpret code, (err, answer) ->
         replView.addCodeLine answer
+        replView.addInputLine code
 
     replView = new REPLView callback: callback
 

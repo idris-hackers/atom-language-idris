@@ -30,6 +30,9 @@ class REPLView extends View
   sendInput: (code) ->
     @callback code
 
+  addInputLine: (input) ->
+    @responseView.append "< #{input}<br>"
+
   addCodeLine: (code) ->
     @responseView.append "> #{code}<br>"
 
