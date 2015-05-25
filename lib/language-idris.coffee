@@ -34,7 +34,7 @@ module.exports =
       new IdrisController @statusbar, @model
 
     @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.commands.add 'atom-workspace', @controller.getCommands()
+    @subscriptions.add atom.commands.add 'atom-text-editor[data-grammar~="idris"]', @controller.getCommands()
 
   consumeStatusBar: ->
     console.log 'STATUSBAR'
