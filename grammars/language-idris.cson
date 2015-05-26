@@ -47,6 +47,11 @@ patterns:
       comment: 'Line comment'
     }
     {
+      name: 'comment.documentation.line.idris'
+      match: '(\\|\\|\\|).*$\n?'
+      comment: 'Line comment'
+    }
+    {
       name: 'comment.block.idris'
       begin: '\\{-'
       end: '-\\}'
