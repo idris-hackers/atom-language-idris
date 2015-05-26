@@ -153,6 +153,9 @@ patterns:
         ]
     }
     {
+      include: '#function_signature'
+    }
+    {
       name: 'keyword.operator.idris'
       match: "[|&!%$?~+:\\-.=</>\\\\*]+"
     }
@@ -259,6 +262,26 @@ repository:
           include: '#language_const'
         }
       ]
+  function_signature:
+    name: 'meta.function.type-signature.idris'
+    begin: "(([\\w']+)|\\(([|!%$+\\-.,=</>:]+)\\))\\s*(:)(?!:)"
+    beginCaptures:
+      2:
+        name: 'entity.name.function.idris'
+      3:
+        name: 'entity.name.function.idris'
+      4:
+        name: 'keyword.operator.colon.idris'
+    end: "(;|(?<=[^\\s>])\\s*(?!->)\\s*$)"
+    patterns:
+      [
+        {
+          include: '#type_signature'
+        }
+      ]
+    comment: """The end patterm is a bit tricky. It's either ';' or something, at the end of the line,
+      but not '->', because a type signature can be multiline. Though, it doesn't help, if you
+      break the signature before arrows."""
   language_const:
     patterns:
       [
