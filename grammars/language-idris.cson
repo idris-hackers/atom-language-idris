@@ -9,7 +9,7 @@ patterns:
     }
     {
       name: 'keyword.control.idris'
-      match: '\\b(if|then|else|do|let|in|data|codata|record|dsl)\\b'
+      match: '\\b(if|then|else|do|let|in|codata|record|dsl)\\b'
     }
     {
       name: 'keyword.control.idris'
@@ -131,8 +131,146 @@ patterns:
           }
         ]
     }
+    {
+      name: 'meta.declaration.data.idris'
+      begin: "\\b(data)\\s+([\\w']+)\\s*(:)?"
+      beginCaptures:
+        1:
+          name: 'keyword.other.idris'
+        2:
+          name: 'entity.name.type.idris'
+        3:
+          name: 'keyword.operator.colon.idris'
+      end: '\\b(where)\\b|(=)'
+      endCaptures:
+        1:
+          name: 'keyword.other.idris'
+        2:
+          name: 'keyword.operator.idris'
+      patterns:
+        [
+          include: '#type_signature'
+        ]
+    }
   ]
 repository:
+  context_signature:
+    patterns:
+      [
+        {
+          name: 'meta.context-signature.idris'
+          match: "([\\w._']+)((\\s+[\\w_']+)+)\\s*(=>)"
+          captures:
+            1:
+              name: 'entity.other.inherited-class.idris'
+            2:
+              name: 'entity.other.attribute-name.idris'
+            4:
+              name: 'keyword.operator.double-arrow.idris'
+        }
+        {
+          name: 'meta.context-signature.idris'
+          comment:
+            """For things like '(Eq a, Show b) =>'
+            It begins with '(' either followed by ') =>' on the same line,
+            or anything but ')' until the end of line."""
+          begin: "(\\()((?=.*\\)\\s*=>)|(?=[^)]*$))"
+          beginCaptures:
+            1:
+              name: 'punctuation.context.begin.idris'
+          end: "(\\))\\s*(=>)"
+          endCaptures:
+            1:
+              name: 'punctuation.context.end.idris'
+            2:
+              name: 'keyword.operator.double-arrow.idris'
+          patterns:
+            [
+              {
+                name: 'meta.class-constraint.idris'
+                match: "([\\w']+)\\s+([\\w']+)"
+                captures:
+                  1:
+                    name: 'entity.other.inherited-class.idris'
+                  2:
+                    name: 'entity.other.attribute-name.idris'
+              }
+            ]
+        }
+      ]
+  parameter_type:
+    comment: "Parameter types in a type signature"
+    patterns:
+      [
+        {
+          include: '#prelude_type'
+        }
+        {
+          name: 'meta.parameter.named.idris'
+          comment: '(x : Nat)'
+          begin: "\\(([\\w']+)\\s*:(?!:)"
+          beginCaptures:
+            1:
+              name: 'entity.name.tag.idris'
+          end: "\\)"
+          patterns:
+            [
+              {
+                include: '#prelude_type'
+              }
+            ]
+        }
+        {
+          name: 'meta.parameter.implicit.idris'
+          comment: '{auto p : a = b}'
+          begin: "\\{((auto|default .+)\\s+)?([\\w']+)\\s*:(?!:)"
+          beginCaptures:
+            1:
+              name: 'storage.modifier.idris'
+            3:
+              name: 'entity.name.tag.idris'
+          end: '\\}'
+          patterns:
+            [
+              {
+                include: '#prelude_type'
+              }
+            ]
+        }
+      ]
+  type_signature:
+    patterns:
+      [
+        {
+          name: 'keyword.operator.arrow.idris'
+          match: '->'
+        }
+        {
+          include: '#context_signature'
+        }
+        {
+          include: '#parameter_type'
+        }
+        {
+          include: '#language_const'
+        }
+      ]
+  language_const:
+    patterns:
+      [
+        {
+          name: 'constant.language.unit.idris'
+          match: "\\(\\)"
+        }
+        {
+          name: 'constant.language.bottom.idris'
+          match: "_\\|_"
+        }
+        {
+          name: 'constant.language.underscore.idris'
+          match: "\\b_\\b"
+        }
+      ]
   escape_characters:
     patterns:
       [
