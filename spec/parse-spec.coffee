@@ -54,12 +54,36 @@ list4 =
     2
   ]
 
+test5 = """(:return (:ok "\"Z\" : String" ((0 3 ((:name "\"Z\""))))) 5)"""
+list5 =
+  [
+    ":return"
+    [
+      ":ok"
+      "\"Z\" : String"
+      [
+        [
+          0
+          3
+          [
+            [
+              ":name"
+              "\"Z\""
+            ]
+          ]
+        ]
+      ]
+    ]
+    5
+  ]
+
 describe "A parser", ->
   it "should parse to the right list.", ->
     expect(parse.parse(test1)).toEqual(list1)
     expect(parse.parse(test2)).toEqual(list2)
     expect(parse.parse(test3)).toEqual(list3)
     expect(parse.parse(test4)).toEqual(list4)
+    expect(parse.parse(test5)).toEqual(list5)
 
   it "should serialize back again.", ->
     expect(utils.formatSexp(list1)).toEqual(test1)
