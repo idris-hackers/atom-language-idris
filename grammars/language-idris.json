@@ -18,7 +18,7 @@
        "match":  "\\b(public|private|abstract|implicit)\\b"
     },
     {  "name": "storage.type.builtin.idris",
-       "match": "\\b(Type|Int|Nat|Integer|Float|Char|String|Ptr|Bits8|Bits16|Bits32|Bits64)\\b"
+       "match": "\\b(Type|Int|Nat|Integer|Float|Char|String|Ptr|Bits8|Bits16|Bits32|Bits64|Bool)\\b"
     },
     {  "name": "constant.numeric.idris",
        "match": "\\b(S|Z)\\b"
