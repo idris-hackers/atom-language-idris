@@ -4,10 +4,6 @@ fileTypes: ['idr']
 patterns:
   [
     {
-      name: 'operator.assignment'
-      match: '='
-    }
-    {
       name: 'keyword.control.idris'
       match: '\\b(if|then|else|do|let|in|codata|record|dsl)\\b'
     }
@@ -155,6 +151,10 @@ patterns:
         [
           include: '#type_signature'
         ]
+    }
+    {
+      name: 'keyword.operator.idris'
+      match: "[|&!%$?~+:\\-.=</>\\\\*]+"
     }
   ]
 repository:
