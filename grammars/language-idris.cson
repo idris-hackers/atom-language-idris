@@ -57,7 +57,7 @@ patterns:
       comment: 'Block comment'
     }
     {
-      name: 'string.quoted.idris'
+      name: 'string.quoted.double.idris'
       begin: '"'
       beginCaptures:
         0:
@@ -69,8 +69,24 @@ patterns:
       patterns:
         [
           {
-            name: 'constant.character.escape.idris'
-            match: "\\\\\""
+            include: '#escape_characters'
+          }
+        ]
+    }
+    {
+      name: 'string.quoted.single.idris'
+      begin: "'"
+      beginCaptures:
+        0:
+          name: 'punctuation.definition.string.begin.idris'
+      end: "'"
+      endCaptures:
+        0:
+          name: 'punctuation.definition.string.end.idris'
+      patterns:
+        [
+          {
+            include: '#escape_characters'
           }
         ]
     }
@@ -117,6 +133,20 @@ patterns:
     }
   ]
 repository:
-  {
-  }
+  escape_characters:
+    patterns:
+      [
+        {
+          name: 'constant.character.escape.ascii.idris'
+          match: '\\\\(NUL|SOH|STX|ETX|EOT|ENQ|ACK|BEL|BS|HT|LF|VT|FF|CR|SO|SI|DLE|DC1|DC2|DC3|DC4|NAK|SYN|ETB|CAN|EM|SUB|ESC|FS|GS|RS|US|SP|DEL|[abfnrtv\\\\\\"\'\\&])'
+        }
+        {
+          name: 'constant.character.escape.octal.idris'
+          match: '\\\\o[0-7]+|\\\\x[0-9A-Fa-f]+|\\\\[0-9]+'
+        }
+        {
+          name: 'constant.character.escape.control.idris'
+          match: '\\^[A-Z@\\[\\]\\\\\\^_]'
+        }
+      ]
 uuid: '4dd16092-ffa5-4ba4-8075-e5da9f368a72'
