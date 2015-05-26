@@ -2,6 +2,10 @@
 
 ## Next version
 
+### Added
+
+- Better syntax highlighting
+
 ## v0.1.1
 
 ### Added
