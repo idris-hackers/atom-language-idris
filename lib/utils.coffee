@@ -1,5 +1,3 @@
-exec = require('child_process').exec
-
 parseVersion = (vers) ->
   vers.trim().replace('-', '').split('.').map (n) ->
     parseInt n, 10
@@ -22,14 +20,6 @@ versionGreaterEq = (a, b) ->
   zip2(a, b)
     .map ([a, b]) -> a >= b
     .reduce ((acc, xs) -> if !acc then acc else xs), true
-
-execPromise = (command, args) ->
-  promise = new Promise (resolve, reject) ->
-    process = exec command, args
-    process.stdout.on 'data', resolve
-    process.stderr.on 'data', reject
-    process.on 'error', reject
-    process.on 'close', reject
 
 isString = (s) ->
   typeof(s) == 'string' || s instanceof String
@@ -72,7 +62,6 @@ formatSexp = (sexp) ->
 module.exports =
   parseVersion: parseVersion
   versionGreaterEq: versionGreaterEq
-  execPromise: execPromise
   serialize: serialize
   hexLength: hexLength
   formatSexp: formatSexp
