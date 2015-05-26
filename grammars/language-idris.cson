@@ -56,14 +56,12 @@ patterns:
       name: 'string.quoted.idris'
       begin: '"'
       beginCaptures:
-        {
-          0: { name: 'punctuation.definition.string.begin.idris' }
-        }
+        0:
+          name: 'punctuation.definition.string.begin.idris'
       end: '"'
       endCaptures:
-        {
-          0: { name: 'punctuation.definition.string.end.idris' }
-        }
+        0:
+          name: 'punctuation.definition.string.end.idris'
       patterns:
         [
           {
@@ -76,14 +74,12 @@ patterns:
       name: 'keyword.operator.function.infix.idris'
       begin: '`'
       beginCaptures:
-        {
-          0: { name: 'punctuation.definition.entity.idris' }
-        }
+        0:
+          name: 'punctuation.definition.entity.idris'
       end: '`'
       endCaptures:
-        {
-          0: { name: 'punctuation.definition.entity.idris' }
-        }
+        0:
+          name: 'punctuation.definition.entity.idris'
     }
   ]
 repository:
