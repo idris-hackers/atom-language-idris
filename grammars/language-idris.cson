@@ -86,6 +86,10 @@ patterns:
       patterns:
         [
           {
+            name: 'invalid.illegal.idris'
+            match: "\\\\n"
+          }
+          {
             include: '#escape_characters'
           }
         ]
