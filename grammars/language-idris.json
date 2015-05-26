@@ -54,6 +54,17 @@
            "match": "\\\\\""
         }
       ]
+    },
+    {
+      "name": "keyword.operator.function.infix.idris",
+      "begin": "`",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.entity.idris" }
+      },
+      "end": "`",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.entity.idris" }
+      }
     }
   ],
   "repository": {
