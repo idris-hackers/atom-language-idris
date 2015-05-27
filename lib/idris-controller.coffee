@@ -25,7 +25,7 @@ class IdrisController
 
     atom.workspace.observeActivePaneItem @paneChanged
 
-    if activeItem = atom.workspace.getActivePaneItem()
+    if activeItem = atom.workspace.getActiveEditor()
       if activeItem.isModified()
         @idrisFileChanged activeItem
 
