@@ -9,10 +9,11 @@
   "engines": {
     "atom": ">=0.180.0"
   },
-  "author": {
-    "name": "Morten Fangel",
-    "url": "http://sevengoslings.net"
-  },
+  "contributors": [
+    { "name": "Morten Fangel", "url": "http://sevengoslings.net" },
+    { "name": "Nicolas Gagliani", "url": "http://twitter.com/archaeron" },
+    { "name": "Heather", "url": "https://github.com/Heather" }
+  ],
   "consumedServices": {
     "status-bar": {
       "versions": {
