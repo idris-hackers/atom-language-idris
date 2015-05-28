@@ -4,7 +4,10 @@
 
 ### Added
 
+### Fixed
+
 - Better syntax highlighting
+- fixed the parser for the ide-mode lisp
 
 ## v0.1.1
 
