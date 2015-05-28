@@ -1,5 +1,6 @@
 utils = require '../lib/utils'
 parse = require '../lib/parse'
+runP = require('bennu').parse.run
 
 test1 = "(:protocol-version 1 0)"
 list1 = [':protocol-version', 1, 0]
@@ -54,13 +55,13 @@ list4 =
     2
   ]
 
-test5 = """(:return (:ok "\"Z\" : String" ((0 3 ((:name "\"Z\""))))) 5)"""
+test5 = """(:return (:ok "\\"Z\\" : String" ((0 3 ((:name "\\"Z\\""))))) 5)"""
 list5 =
   [
     ":return"
     [
       ":ok"
-      "\"Z\" : String"
+      '"Z" : String'
       [
         [
           0
@@ -68,7 +69,7 @@ list5 =
           [
             [
               ":name"
-              "\"Z\""
+              '"Z"'
             ]
           ]
         ]
@@ -76,6 +77,27 @@ list5 =
     ]
     5
   ]
+
+describe "The sub-parser(s)", ->
+  it "for :True and :False should work.", ->
+    expect(runP(parse.trueP, ':True')).toEqual(true)
+    expect(runP(parse.falseP, ':False')).toEqual(false)
+
+  it "for integers should work.", ->
+    expect(runP(parse.integerP, '2345')).toEqual(2345)
+    expect(runP(parse.integerP, '1')).toEqual(1)
+
+  it "for symbols should work.", ->
+    expect(runP(parse.symbolP, ':sym')).toEqual(':sym')
+
+  it "for string chars should work.", ->
+    expect(runP(parse.stringCharP, 'h')).toEqual('h')
+    expect(runP(parse.stringCharP, '\\"')).toEqual('"')
+
+  it "for strings should work.", ->
+    expect(runP(parse.stringP, '"hello"')).toEqual('hello')
+    expect(runP(parse.stringP, '"\\"Z\\""')).toEqual('"Z"')
+    expect(runP(parse.stringP, '"\\"Z\\" : String"')).toEqual('"Z" : String')
 
 describe "A parser", ->
   it "should parse to the right list.", ->

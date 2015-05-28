@@ -92,8 +92,8 @@ class IdrisController
       @model.stop()
     @statusbar.destroy()
 
-  getWordUnderCursor: ->
-    editor = atom.workspace.getActiveTextEditor()
+  getWordUnderCursor: (editorView) ->
+    editor = editorView.model
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
@@ -120,8 +120,8 @@ class IdrisController
       else
         @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
 
-  getDocsForWord: =>
-    word = @getWordUnderCursor()
+  getDocsForWord: ({target}) =>
+    word = @getWordUnderCursor target
     @model.docsFor word, (err, type, highlightingInfo) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -133,8 +133,8 @@ class IdrisController
           obligation: type
           highlightingInfo: highlightingInfo
 
-  getTypeForWord: =>
-    word = @getWordUnderCursor()
+  getTypeForWord: ({target}) =>
+    word = @getWordUnderCursor target
     @model.getType word, (err, type, highlightingInfo) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -146,15 +146,16 @@ class IdrisController
           obligation: type
           highlightingInfo: highlightingInfo
 
-  doCaseSplit: =>
-    editor = atom.workspace.getActiveTextEditor()
-    line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor()
+  doCaseSplit: ({target}) =>
+    editor = target.model
+    cursor = editor.getLastCursor()
+    line = cursor.getBufferRow()
+    word = @getWordUnderCursor target
     @model.caseSplit line + 1, word, (err, split) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
-        lineRange = editor.getLastCursor().getCurrentLineBufferRange(includeNewline: true)
+        lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
 
   openREPL: =>
@@ -171,10 +172,10 @@ class IdrisController
     @messages.setTitle "REPL"
     @messages.add replView
 
-  doAddClause: ->
+  doAddClause: ({target}) ->
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
-    word = @getWordUnderCursor()
+    word = @getWordUnderCursor target
     @model.addClause line + 1, word, (err, clause) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -187,10 +188,10 @@ class IdrisController
           # the new line
           editor.moveCursorToBeginningOfLine()
 
-  doProofSearch: ->
+  doProofSearch: ({target}) ->
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
-    word = @getWordUnderCursor()
+    word = @getWordUnderCursor target
     @model.proofSearch line + 1, word, (err, res) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message

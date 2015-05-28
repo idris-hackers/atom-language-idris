@@ -4,7 +4,19 @@
 
 ### Added
 
+- Better syntax highlighting
+
+## v0.1.1
+
+### Added
+
 - Type and doc info highlighting https://github.com/idris-hackers/atom-language-idris/pull/9 (@archaeron)
+
+### Fixed
+
+- Ensure that keybindings only work on Idris files (#2)
+- Syntax highlighting for infix functions
+- Fixed a crash when idris was not installed
 
 ## v0.1.0
 

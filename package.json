@@ -1,7 +1,7 @@
 {
   "name": "language-idris",
   "main": "./lib/language-idris",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "A plugin for developing with Idris",
   "repository": "https://github.com/fangel/atom-language-idris",
@@ -9,10 +9,11 @@
   "engines": {
     "atom": ">=0.180.0"
   },
-  "author": {
-    "name": "Morten Fangel",
-    "url": "http://sevengoslings.net"
-  },
+  "contributors": [
+    { "name": "Morten Fangel", "url": "http://sevengoslings.net" },
+    { "name": "Nicolas Gagliani", "url": "http://twitter.com/archaeron" },
+    { "name": "Heather", "url": "https://github.com/Heather" }
+  ],
   "consumedServices": {
     "status-bar": {
       "versions": {

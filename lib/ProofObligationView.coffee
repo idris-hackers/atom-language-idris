@@ -3,19 +3,16 @@ utils = require('./utils')
 highlighter = require './utils/highlighter'
 
 class ProofObligationView extends View
-  constructor: (params) ->
+  initialize: (params) ->
     @obligation = params.obligation
     @highlightingInfo = params.highlightingInfo
-    super arguments
-
-  @content: ->
-    @pre class: 'idris-mode inline-block'
-
-  initialize: ->
     if @highlightingInfo?
       text = highlighter.highlight @obligation, @highlightingInfo
       @html text
     else
       @text @obligation
+
+  @content: ->
+    @pre class: 'idris-mode block'
 
 module.exports = ProofObligationView

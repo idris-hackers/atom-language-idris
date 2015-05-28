@@ -18,8 +18,13 @@ integerP =
 
 # string
 quoteP = text.character '"'
+stringLetterP = parse.token (c) ->
+  c != '"' && c != '\\'
+stringEscapeP = parse.attempt parse.next(text.character('\\'), quoteP)
+stringBackslashP = text.character '\\'
+stringCharP = parse.choice stringLetterP, stringEscapeP, stringBackslashP
 stringP =
-  lang.between(quoteP, quoteP, parse.many(text.noneOf('"')))
+  lang.between(quoteP, quoteP, parse.many(stringCharP))
     .map streamToString
 
 # symbol
@@ -39,4 +44,10 @@ sexpP = (parse.rec (self) ->
     .map(stream.toArray))
 
 module.exports =
+  trueP: trueP
+  falseP: falseP
+  integerP: integerP
+  stringCharP: stringCharP
+  stringP: stringP
+  symbolP: symbolP
   parse: (input) -> parse.run sexpP, input
