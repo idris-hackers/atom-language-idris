@@ -76,22 +76,23 @@ patterns:
     }
     {
       name: 'string.quoted.single.idris'
-      begin: "'"
-      beginCaptures:
-        0:
+      match: "(')(?:(?:\\\\\")|(?:\\\\[0-9]+)|(\\\\o[0-7]+)|(\\\\x[0-9a-fA-F]+)|(?:[^'])|(NUL|SOH|STX|ETX|EOT|ENQ|ACK|BEL|BS|HT|LF|VT|FF|CR|SO|SI|DLE|DC1|DC2|DC3|DC4|NAK|SYN|ETB|CAN|EM|SUB|ESC|FS|GS|RS|US|SP|DEL))(')"
+      captures:
+        1:
           name: 'punctuation.definition.string.begin.idris'
-      end: "'"
-      endCaptures:
-        0:
+        2:
+          name: 'constant.character.escape.octal.idris'
+        3:
+          name: 'constant.character.escape.hexadecimal.idris'
+        4:
+          name: 'constant.character.escape.control.idris'
+        5:
           name: 'punctuation.definition.string.end.idris'
       patterns:
         [
           {
             name: 'invalid.illegal.idris'
             match: "\\\\n"
-          }
-          {
-            include: '#escape_characters'
           }
         ]
     }
