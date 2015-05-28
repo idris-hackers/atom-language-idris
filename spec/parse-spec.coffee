@@ -1,5 +1,6 @@
 utils = require '../lib/utils'
 parse = require '../lib/parse'
+runP = require('bennu').parse.run
 
 test1 = "(:protocol-version 1 0)"
 list1 = [':protocol-version', 1, 0]
@@ -53,6 +54,24 @@ list4 =
     ],
     2
   ]
+
+describe "The sub-parser(s)", ->
+  it "for :True and :False should work.", ->
+    expect(runP(parse.trueP, ':True')).toEqual(true)
+    expect(runP(parse.falseP, ':False')).toEqual(false)
+
+  it "for integers should work.", ->
+    expect(runP(parse.integerP, '2345')).toEqual(2345)
+    expect(runP(parse.integerP, '1')).toEqual(1)
+
+  it "for symbols should work.", ->
+    expect(runP(parse.symbolP, ':sym')).toEqual(':sym')
+
+  it "for strings should work.", ->
+    expect(runP(parse.stringP, '"hello"')).toEqual('hello')
+    expect(runP(parse.stringP, '"\"Z\""')).toEqual('"Z"')
+    expect(runP(parse.stringP, '"\"Z\" : String"')).toEqual('"Z" : String')
+
 
 describe "A parser", ->
   it "should parse to the right list.", ->

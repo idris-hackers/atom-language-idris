@@ -39,4 +39,9 @@ sexpP = (parse.rec (self) ->
     .map(stream.toArray))
 
 module.exports =
+  trueP: trueP
+  falseP: falseP
+  integerP: integerP
+  stringP: stringP
+  symbolP: symbolP
   parse: (input) -> parse.run sexpP, input
