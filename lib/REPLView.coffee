@@ -1,16 +1,18 @@
-{View, TextEditorView, ScrollView} = require('atom-space-pen-views')
+{View, ScrollView} = require('atom-space-pen-views')
 
 class REPLView extends View
 
   @content: ->
+    miniEditor = document.createElement('atom-text-editor')
+
     @div class: "repl", =>
-     @subview 'responseView', new ResponseView
-     @subview 'inputView', new InputView
+      @subview 'responseView', new ResponseView
+      @subview 'inputView', miniEditor
 
   initialize: (params) ->
     @callback  = params.callback
 
-    @inputView.element.addEventListener 'keydown', (keyboardEvent) =>
+    @inputView.addEventListener 'keydown', (keyboardEvent) =>
       key = keyboardEvent.which
       shift = keyboardEvent.shiftKey
       if key == 13 and shift
@@ -39,7 +41,5 @@ class REPLView extends View
 class ResponseView extends ScrollView
   @content: ->
     @div ''
-
-class InputView extends TextEditorView
 
 module.exports = REPLView
