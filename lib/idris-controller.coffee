@@ -103,14 +103,11 @@ class IdrisController
         @messages.show()
         @messages.clear()
         @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
-        i = 0
-        while i < err.warnings.length
-          warning = err.warnings[i]
-          @messages.add new LineMessageView(
-            line: warning[1]
-            character: warning[2]
-            message: warning[3])
-          i++
+        for warning in err.warnings
+          @messages.add new LineMessageView
+            line: warning[1][0]
+            character: warning[1][1]
+            message: warning[3]
       else if progress
         console.log '... ' + progress
         @statusbar.setStatus 'Idris: ' + progress
