@@ -55,6 +55,29 @@ list4 =
     2
   ]
 
+test5 = """(:return (:ok "\\"Z\\" : String" ((0 3 ((:name "\\"Z\\""))))) 5)"""
+list5 =
+  [
+    ":return"
+    [
+      ":ok"
+      '"Z" : String'
+      [
+        [
+          0
+          3
+          [
+            [
+              ":name"
+              '"Z"'
+            ]
+          ]
+        ]
+      ]
+    ]
+    5
+  ]
+
 describe "The sub-parser(s)", ->
   it "for :True and :False should work.", ->
     expect(runP(parse.trueP, ':True')).toEqual(true)
@@ -67,11 +90,14 @@ describe "The sub-parser(s)", ->
   it "for symbols should work.", ->
     expect(runP(parse.symbolP, ':sym')).toEqual(':sym')
 
+  it "for string chars should work.", ->
+    expect(runP(parse.stringCharP, 'h')).toEqual('h')
+    expect(runP(parse.stringCharP, '\\"')).toEqual('"')
+
   it "for strings should work.", ->
     expect(runP(parse.stringP, '"hello"')).toEqual('hello')
-    expect(runP(parse.stringP, '"\"Z\""')).toEqual('"Z"')
-    expect(runP(parse.stringP, '"\"Z\" : String"')).toEqual('"Z" : String')
-
+    expect(runP(parse.stringP, '"\\"Z\\""')).toEqual('"Z"')
+    expect(runP(parse.stringP, '"\\"Z\\" : String"')).toEqual('"Z" : String')
 
 describe "A parser", ->
   it "should parse to the right list.", ->
@@ -79,6 +105,7 @@ describe "A parser", ->
     expect(parse.parse(test2)).toEqual(list2)
     expect(parse.parse(test3)).toEqual(list3)
     expect(parse.parse(test4)).toEqual(list4)
+    expect(parse.parse(test5)).toEqual(list5)
 
   it "should serialize back again.", ->
     expect(utils.formatSexp(list1)).toEqual(test1)
