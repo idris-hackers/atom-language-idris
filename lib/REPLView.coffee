@@ -5,7 +5,7 @@ class REPLView extends View
   @content: ->
     miniEditor = document.createElement('atom-text-editor')
 
-    @div class: "repl", =>
+    @div class: "repl idris", =>
       @subview 'responseView', new ResponseView
       @subview 'inputView', miniEditor
 
@@ -33,10 +33,10 @@ class REPLView extends View
     @callback code
 
   addInputLine: (input) ->
-    @responseView.append "< #{input}<br>"
+    @responseView.append "<span class=\"input-arrow\"><</span> <span class=\"input-code\">#{input}</span><br>"
 
   addCodeLine: (code) ->
-    @responseView.append "> #{code}<br>"
+    @responseView.append "<span class=\"output-arrow\">></span> <span class=\"output-code\">#{code}</span><br>"
 
 class ResponseView extends ScrollView
   @content: ->
