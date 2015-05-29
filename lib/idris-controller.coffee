@@ -158,19 +158,20 @@ class IdrisController
         lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
 
-  openREPL: =>
-    callback = (code) =>
-      @model.interpret code, (err, answer, highlightingInfo) ->
-        highlighted = highlighter.highlight answer, highlightingInfo
-        replView.addInputLine code
-        replView.addCodeLine highlighted
+  openREPL: ({target}) =>
+    if ! @replView?
+      callback = (code) =>
+        @model.interpret code, (err, answer, highlightingInfo) =>
+          highlighted = highlighter.highlight answer, highlightingInfo
+          @replView.addInputLine code
+          @replView.addCodeLine highlighted
 
-    replView = new REPLView callback: callback
+      @replView = new REPLView callback: callback
 
     @messages.show()
     @messages.clear()
     @messages.setTitle "REPL"
-    @messages.add replView
+    @messages.add @replView
 
   doAddClause: ({target}) ->
     editor = atom.workspace.getActiveEditor()
