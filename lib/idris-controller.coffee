@@ -25,9 +25,9 @@ class IdrisController
 
     atom.workspace.observeActivePaneItem @paneChanged
 
-    if activeItem = atom.workspace.getActivePaneItem()
-      if activeItem.isModified()
-        @idrisFileChanged activeItem
+    editor = atom.workspace.getActiveTextEditor()
+    if editor?.isModified()
+      @idrisFileChanged editor
 
   getCommands: ->
     'language-idris:type-of': @getTypeForWord
