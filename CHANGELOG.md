@@ -6,8 +6,17 @@
 
 ### Fixed
 
+## v0.1.2
+
+### Added
+
+### Fixed
+
 - Better syntax highlighting
 - fixed the parser for the ide-mode lisp
+- fixed [#18](https://github.com/idris-hackers/atom-language-idris/issues/18)
+- fixed [#19](https://github.com/idris-hackers/atom-language-idris/issues/19)
+- fixed an issue with the error lines not being clickable in the error panel
 
 ## v0.1.1
 
