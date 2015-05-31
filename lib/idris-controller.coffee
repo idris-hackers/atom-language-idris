@@ -2,6 +2,7 @@ MessagePanelView = require('atom-message-panel').MessagePanelView
 PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./ProofObligationView')
+MetavariablesView = require './MetavariablesView'
 
 class IdrisController
   idrisBuffers: 0
@@ -34,6 +35,7 @@ class IdrisController
     'language-idris:docs-for': @getDocsForWord
     'language-idris:case-split': @doCaseSplit
     'language-idris:add-clause': @doAddClause
+    'language-idris:metavariables': @showMetavariables
     'language-idris:proof-search': @doProofSearch
 
   isIdrisFile: (uri) ->
@@ -167,6 +169,16 @@ class IdrisController
           # And move the cursor to the beginning of
           # the new line
           editor.moveCursorToBeginningOfLine()
+
+  showMetavariables: ({target}) =>
+    @model.metavariables 80, (err, metavariables) =>
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        @messages.show()
+        @messages.clear()
+        @messages.setTitle 'Idris: Metavariables'
+        @messages.add new MetavariablesView metavariables
 
   doProofSearch: ({target}) ->
     editor = atom.workspace.getActiveEditor()
