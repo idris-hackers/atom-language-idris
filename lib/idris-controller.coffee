@@ -154,7 +154,7 @@ class IdrisController
         lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
 
-  doAddClause: ({target}) ->
+  doAddClause: ({target}) =>
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
