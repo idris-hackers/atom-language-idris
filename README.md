@@ -10,12 +10,15 @@ It supports:
  - Showing the types of meta-variables (ctrl-alt-t)
  - Show the doc of a variable (ctrl-alt-d)
 
-It is rather finicky, and doesn't have very good error-handling yet.
-You will probably need to find the config for the module and put in
-the full path for the `idris` executable, because Atom doesn't use
-the search-path of your shell.
+## Usage
 
-## Todo:
+The package should work after installation. The only thing you might need to
+set is the path to the `idris` executable in the config of this package.
+If it doesn't work it's probably a bug.
+
+There is a tutorial on how to use the editor under [`documentation/tutorial.md`](https://github.com/idris-hackers/atom-language-idris/documentation/tutorial).
+
+## Todo
 
  - Add better support for drawing attention to error-messages
  - Improve the syntax-highlighting (the current is base on the Sublime plugin)
@@ -30,4 +33,5 @@ the search-path of your shell.
 ## Development
 
 To work on this plugin you need to clone it into your atom directory
-and rename the folder to `language-atom` or the package settings won't get picked up.
+and rename the folder to `language-idris` or the package settings won't get picked up.
+Then you need an `apm install` from the `language-idris` folder to install the dependencies.
