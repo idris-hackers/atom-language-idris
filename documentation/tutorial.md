@@ -2,14 +2,14 @@
 
 ## First steps
 
-### installation
+### Installation
 
 Install the `language-idris` package from the atom settings.
 The package might tell you that you need to set the path to the `idris` executable
 in the settings.
 
 Create a new file and call it `ops.idr`.
-Paste this code into you new file:
+Paste this code into your new file:
 
 ```idris
 module Ops
@@ -19,7 +19,7 @@ add : Nat -> Nat -> Nat
 add Z     y = y
 add (S k) y = S (add k y)
 
-||| Multiplicate two natural numbers.
+||| Multiply two natural numbers.
 mul : Nat -> Nat -> Nat
 mul Z     y = Z
 mul (S k) y = add y (mul k y)
