@@ -4,9 +4,11 @@
 
 ### Added
 
+- a tutorial that explains how to use this package
+
 ### Fixed
 
-## v0.1.2
+## v0.1.3
 
 ### Added
 
