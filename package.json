@@ -4,7 +4,7 @@
   "version": "0.1.3",
   "private": true,
   "description": "A plugin for developing with Idris",
-  "repository": "https://github.com/fangel/atom-language-idris",
+  "repository": "https://github.com/idris-hackers/atom-language-idris",
   "license": "MIT",
   "engines": {
     "atom": ">=0.180.0"
