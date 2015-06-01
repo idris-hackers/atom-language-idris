@@ -155,7 +155,7 @@ class IdrisController
         editor.setTextInBufferRange lineRange, split
 
   doAddClause: ({target}) =>
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
     @model.addClause line + 1, word, (err, clause) =>
@@ -181,7 +181,7 @@ class IdrisController
         @messages.add new MetavariablesView metavariables
 
   doProofSearch: ({target}) =>
-    editor = atom.workspace.getActiveEditor()
+    editor = atom.workspace.getActiveTextEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
     @model.proofSearch line + 1, word, (err, res) =>
@@ -190,11 +190,11 @@ class IdrisController
       else
         editor.transact ->
           # Move the cursor to the beginning of the word
-          editor.moveCursorToBeginningOfWord()
+          editor.moveToBeginningOfWord()
           # Because the ? in the metavariable isn't part of
           # the word, we move left once, and then select two
           # words
-          editor.moveCursorLeft()
+          editor.moveLeft()
           editor.selectToEndOfWord()
           editor.selectToEndOfWord()
           # And then replace the replacement with the guess..
