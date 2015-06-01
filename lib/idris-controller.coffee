@@ -180,7 +180,7 @@ class IdrisController
         @messages.setTitle 'Idris: Metavariables'
         @messages.add new MetavariablesView metavariables
 
-  doProofSearch: ({target}) ->
+  doProofSearch: ({target}) =>
     editor = atom.workspace.getActiveEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
