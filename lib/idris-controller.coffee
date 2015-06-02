@@ -2,6 +2,7 @@ MessagePanelView = require('atom-message-panel').MessagePanelView
 PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./ProofObligationView')
+MetavariablesView = require './MetavariablesView'
 
 class IdrisController
   idrisBuffers: 0
@@ -34,6 +35,7 @@ class IdrisController
     'language-idris:docs-for': @getDocsForWord
     'language-idris:case-split': @doCaseSplit
     'language-idris:add-clause': @doAddClause
+    'language-idris:metavariables': @showMetavariables
     'language-idris:proof-search': @doProofSearch
 
   isIdrisFile: (uri) ->
@@ -152,8 +154,8 @@ class IdrisController
         lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
         editor.setTextInBufferRange lineRange, split
 
-  doAddClause: ({target}) ->
-    editor = atom.workspace.getActiveEditor()
+  doAddClause: ({target}) =>
+    editor = atom.workspace.getActiveTextEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
     @model.addClause line + 1, word, (err, clause) =>
@@ -168,8 +170,18 @@ class IdrisController
           # the new line
           editor.moveCursorToBeginningOfLine()
 
-  doProofSearch: ({target}) ->
-    editor = atom.workspace.getActiveEditor()
+  showMetavariables: ({target}) =>
+    @model.metavariables 80, (err, metavariables) =>
+      if err
+        @statusbar.setStatus 'Idris: ' + err.message
+      else
+        @messages.show()
+        @messages.clear()
+        @messages.setTitle 'Idris: Metavariables'
+        @messages.add new MetavariablesView metavariables
+
+  doProofSearch: ({target}) =>
+    editor = atom.workspace.getActiveTextEditor()
     line = editor.getCursor(0).getBufferRow()
     word = @getWordUnderCursor target
     @model.proofSearch line + 1, word, (err, res) =>
@@ -178,11 +190,11 @@ class IdrisController
       else
         editor.transact ->
           # Move the cursor to the beginning of the word
-          editor.moveCursorToBeginningOfWord()
+          editor.moveToBeginningOfWord()
           # Because the ? in the metavariable isn't part of
           # the word, we move left once, and then select two
           # words
-          editor.moveCursorLeft()
+          editor.moveLeft()
           editor.selectToEndOfWord()
           editor.selectToEndOfWord()
           # And then replace the replacement with the guess..

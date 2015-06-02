@@ -12,7 +12,7 @@ decorToClasses = (decor) ->
     when ':function' then 'entity name function'
     when ':data' then 'constant'
     when ':keyword' then 'keyword'
-    when ':bound' then ''
+    when ':bound' then 'support function'
     else ''
 
 highlightWord = (word, info) ->

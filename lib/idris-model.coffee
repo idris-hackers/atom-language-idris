@@ -125,7 +125,10 @@ class IdrisModel extends EventEmitter
   addClause: (line, word, callback) ->
     @prepareCommand [':add-clause', line, word], callback
 
-  proofSearch = (line, word, callback) ->
+  metavariables: (width, callback) ->
+    @prepareCommand [':metavariables', width], callback
+
+  proofSearch: (line, word, callback) ->
     @prepareCommand [':proof-search', line, word, []], callback
 
 module.exports = IdrisModel

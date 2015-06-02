@@ -1,5 +1,4 @@
 View = require('atom-space-pen-views').View
-utils = require('./utils')
 highlighter = require './utils/highlighter'
 
 class ProofObligationView extends View
