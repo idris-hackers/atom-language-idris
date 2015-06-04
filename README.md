@@ -16,7 +16,7 @@ The package should work after installation. The only thing you might need to
 set is the path to the `idris` executable in the config of this package.
 If it doesn't work it's probably a bug.
 
-There is a tutorial on how to use the editor under [`documentation/tutorial.md`](https://github.com/idris-hackers/atom-language-idris/documentation/tutorial).
+There is a tutorial on how to use the editor under [`documentation/tutorial.md`](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/tutorial.md).
 
 ## Todo
 
