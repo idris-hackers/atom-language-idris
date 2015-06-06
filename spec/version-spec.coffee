@@ -1,4 +1,4 @@
-utils = require '../lib/utils'
+utils = require '../lib/utils/version'
 
 describe "The version", ->
   it "should parse correctly.", ->

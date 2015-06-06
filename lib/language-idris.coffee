@@ -3,6 +3,7 @@ IdrisController = require './idris-controller'
 IdrisModel = require './idris-model'
 {CompositeDisposable} = require 'atom'
 utils = require './utils'
+version = require './utils/version'
 exec = require('child_process').exec
 
 module.exports =
@@ -28,7 +29,7 @@ module.exports =
     atom.notifications.addWarning warningNoIdris
 
   startIdrisProcesses: (v) =>
-    version = utils.parseVersion v
+    version = version.parseVersion v
     @statusbar = new StatusBarView()
     @model = new IdrisModel(version)
     @controller =

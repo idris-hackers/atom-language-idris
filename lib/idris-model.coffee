@@ -1,6 +1,7 @@
 spawn = require('child_process').spawn
 parse = require './parse'
 utils = require('./utils')
+version = require './utils/version'
 EventEmitter = require('events').EventEmitter
 {Logger} = require './Logger'
 
@@ -19,7 +20,7 @@ class IdrisModel extends EventEmitter
     pathToIdris = atom.config.get("language-idris.pathToIdris")
 
     ideCommand =
-      if utils.versionGreaterEq @version, [0, 9, 16]
+      if version.versionGreaterEq @version, [0, 9, 16]
         '--ide-mode'
       else
         '--ideslave'
