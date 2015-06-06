@@ -1,8 +1,8 @@
 MessagePanelView = require('atom-message-panel').MessagePanelView
 PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
-ProofObligationView = require('./ProofObligationView')
-MetavariablesView = require './MetavariablesView'
+ProofObligationView = require('./proof-obligation-view')
+MetavariablesView = require './metavariables-view'
 
 class IdrisController
   idrisBuffers: 0
