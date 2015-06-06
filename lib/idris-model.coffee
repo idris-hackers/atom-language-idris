@@ -1,6 +1,6 @@
 spawn = require('child_process').spawn
 parse = require './parse'
-utils = require('./utils')
+sexpFormatter = require('./utils/sexp-formatter')
 version = require './utils/version'
 EventEmitter = require('events').EventEmitter
 {Logger} = require './Logger'
@@ -103,7 +103,7 @@ class IdrisModel extends EventEmitter
 
   sendCommand: (cmd) ->
     Logger.logOutgoingCommand cmd
-    @process.stdin.write utils.serialize(cmd)
+    @process.stdin.write sexpFormatter.serialize(cmd)
 
   prepareCommand: (cmd, callback) ->
     id = @getUID()

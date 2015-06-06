@@ -2,7 +2,6 @@ StatusBarView = require './statusbar-view'
 IdrisController = require './idris-controller'
 IdrisModel = require './idris-model'
 {CompositeDisposable} = require 'atom'
-utils = require './utils'
 version = require './utils/version'
 exec = require('child_process').exec
 
