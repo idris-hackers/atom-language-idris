@@ -156,7 +156,7 @@ class IdrisController
 
   doAddClause: ({target}) =>
     editor = atom.workspace.getActiveTextEditor()
-    line = editor.getCursor(0).getBufferRow()
+    line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
     @model.addClause line + 1, word, (err, clause) =>
       if err
@@ -182,7 +182,7 @@ class IdrisController
 
   doProofSearch: ({target}) =>
     editor = atom.workspace.getActiveTextEditor()
-    line = editor.getCursor(0).getBufferRow()
+    line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
     @model.proofSearch line + 1, word, (err, res) =>
       if err
