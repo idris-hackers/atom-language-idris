@@ -4,11 +4,11 @@ A work-in-progress Idris Mode for Atom.
 
 It supports:
 
- - Case-splitting (ctrl-alt-c)
- - Clause-adding (ctrl-alt-a)
- - Proof-search (ctrl-alt-s)
- - Showing the types of meta-variables (ctrl-alt-t)
- - Show the doc of a variable (ctrl-alt-d)
+ - Case-splitting (ctrl-alt-a s)
+ - Clause-adding (ctrl-alt-a a)
+ - Proof-search (ctrl-alt-a p)
+ - Showing the types of variables (ctrl-alt-a t)
+ - Show the doc of a variable (ctrl-alt-a d)
 
 ## Usage
 
