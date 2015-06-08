@@ -1,2 +1,16 @@
 'context-menu':
-  'atom-text-editor, .overlayer': [ ]
+  'atom-text-editor[data-grammar~=\"idris\"]': [
+    {
+      'label': 'Idris'
+      'submenu': [
+        {
+          'label': 'Type search'
+          'command': 'language-idris:type-of'
+        }
+        {
+          'label': 'Docs for'
+          'command': 'language-idris:docs-for'
+        }
+      ]
+    }
+  ]
