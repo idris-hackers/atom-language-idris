@@ -4,9 +4,20 @@
 
 ### Added
 
+### Fixed
+
+## v0.1.4
+
+### Added
+
+- new metavariable view (`Language Idris: Metavariables`)
 - a tutorial that explains how to use this package
+- context menu for `Language Idris: Type Of` and `Language Idris: Docs For`
 
 ### Fixed
+
+- `Language Idris: Proof Search` and `Language Idris: Add Clause`
+- deprecations that now broke the editor because of the dropped API methods
 
 ## v0.1.3
 
