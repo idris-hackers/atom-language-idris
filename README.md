@@ -22,13 +22,9 @@ There is a tutorial on how to use the editor under [`documentation/tutorial.md`]
 
  - Add better support for drawing attention to error-messages
  - Improve the syntax-highlighting (the current is base on the Sublime plugin)
- - Ensure that keybindings only work on Idris files
-   - When Atom supports it, ensure that they only work in the grammar scopes
-     that they should work in.
- - Add support for the missing interactions supported by Idris IDESlave
-   - Proof Clause-adding
-   - Show list of meta-variables
-   - ...
+ - Add autocompletion
+ - Add a REPL
+ - ...
 
 ## Development
 
