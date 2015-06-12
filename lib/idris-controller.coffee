@@ -3,13 +3,16 @@ PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./proof-obligation-view')
 MetavariablesView = require './metavariables-view'
+SourceHighlightHelp = require('./utils/sourceHighlight.coffee')
 
 class IdrisController
   idrisBuffers: 0
   localChanges: undefined
 
+
   constructor: (@statusbar, @model) ->
     @idrisBuffers = 0
+    @semanticMarkers = []
 
     atom.workspace.getTextEditors().forEach (editor) =>
       uri = editor.getURI()
@@ -58,14 +61,14 @@ class IdrisController
     @messages.hide()
     @localChanges = false
     if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
+      @loadFile editor
 
   idrisFileChanged: (editor) ->
     @localChanges = editor.isModified()
     if @localChanges
       @statusbar.setStatus 'Idris: local modifications'
     else if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
+      @loadFile editor
 
   idrisFileClosed: (editor) ->
     @idrisBuffers -= 1
@@ -81,7 +84,7 @@ class IdrisController
       uri = editor.getPath()
       if @isIdrisFile(uri)
         @statusbar.show()
-        @loadFile uri
+        @loadFile editor
       else
         @statusbar.hide()
 
@@ -96,10 +99,18 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
-  loadFile: (uri) ->
+  loadFile: (editor) ->
+    console.log editor
+    uri = editor.getURI()
     console.log 'Loading ' + uri
     @messages.clear()
-    @model.load uri, (err, message, progress) =>
+
+    console.log @semanticMarkers
+    for marker in @semanticMarkers
+      marker.destroy()
+    @semanticMarkers = []
+
+    callback = (err, message, progress) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
         @messages.show()
@@ -115,6 +126,19 @@ class IdrisController
         @statusbar.setStatus 'Idris: ' + progress
       else
         @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
+    @model.load uri, callback, (highlightMsg) =>
+      if atom.config.get('language-idris.semanticHighlighting') && highlightMsg && highlightMsg[0] == ":highlight-source"
+        for [where, what] in highlightMsg[1]
+          {file, start, end} = SourceHighlightHelp.fileLocation(where)
+          semanticClass = SourceHighlightHelp.decoClass(what)
+          if file == editor.getPath()
+            marker = editor.markBufferRange([start, end],
+                                            invalidate: 'never')
+            decoration = editor.decorateMarker(marker,
+                                               type: "highlight",
+                                               class: semanticClass)
+            @semanticMarkers.push(marker)
+
 
   getDocsForWord: ({target}) =>
     word = @getWordUnderCursor target

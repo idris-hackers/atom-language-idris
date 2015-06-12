@@ -10,6 +10,9 @@ module.exports =
     pathToIdris:
       type: 'string'
       default: 'idris'
+    semanticHighlighting:
+      type: 'boolean'
+      default: false
 
   activate: ->
     pathToIdris = atom.config.get "language-idris.pathToIdris"
