@@ -18,9 +18,11 @@ integerP =
 
 # string
 quoteP = text.character '"'
+escapedP = parse.choice(parse.next(text.character('\\'), parse.always('\\')),
+                        parse.next(text.character('"'), parse.always('"')))
 stringLetterP = parse.token (c) ->
   c != '"' && c != '\\'
-stringEscapeP = parse.attempt parse.next(text.character('\\'), quoteP)
+stringEscapeP = parse.attempt parse.next(text.character('\\'), escapedP)
 stringBackslashP = text.character '\\'
 stringCharP = parse.choice stringLetterP, stringEscapeP, stringBackslashP
 stringP =
