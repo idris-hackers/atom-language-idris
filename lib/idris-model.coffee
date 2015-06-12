@@ -10,6 +10,7 @@ class IdrisModel extends EventEmitter
     @buffer = ''
     @process = undefined
     @callbacks = {}
+    @outputCallbacks = {}
     @warnings = {}
     super this
 
@@ -77,12 +78,18 @@ class IdrisModel extends EventEmitter
                 message: ret[1]
                 warnings: @warnings[id]
             delete @callbacks[id]
+            #delete @outputCallbacks[id]
             delete @warnings[id]
         when ':write-string'
           id = params[params.length - 1]
           msg = params[0]
           if @callbacks[id]
             @callbacks[id] undefined, undefined, msg
+        when ':output'
+          id = params[params.length - 1]
+          msg = params[0]
+          if @outputCallbacks[id] && msg[0] == ':ok'
+            @outputCallbacks[id] msg[1]
         when ':warning'
           id = params[params.length - 1]
           warning = params[0]
@@ -105,14 +112,16 @@ class IdrisModel extends EventEmitter
     Logger.logOutgoingCommand cmd
     @process.stdin.write sexpFormatter.serialize(cmd)
 
-  prepareCommand: (cmd, callback) ->
+  prepareCommand: (cmd, callback, outputCallback = null) ->
     id = @getUID()
     @callbacks[id] = callback
+    if outputCallback
+      @outputCallbacks[id] = outputCallback
     @warnings[id] = []
     @sendCommand [cmd, id]
 
-  load: (uri, callback) ->
-    @prepareCommand [':load-file', uri], callback
+  load: (uri, callback, outputCallback) ->
+    @prepareCommand [':load-file', uri], callback, outputCallback
 
   docsFor: (word, callback) ->
     @prepareCommand [':docs-for', word], callback
