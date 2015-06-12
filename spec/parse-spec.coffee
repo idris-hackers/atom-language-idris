@@ -78,6 +78,17 @@ list5 =
     5
   ]
 
+test6 = """(:return (:ok "\\\\__pi_arg => \\\\__pi_arg1 => (__pi_arg1)") 6)"""
+list6 =
+  [
+    ":return"
+    [
+      ":ok"
+      "\\__pi_arg => \\__pi_arg1 => (__pi_arg1)"
+    ]
+    6
+  ]
+
 describe "The sub-parser(s)", ->
   it "for :True and :False should work.", ->
     expect(runP(parse.trueP, ':True')).toEqual(true)
@@ -106,6 +117,7 @@ describe "A parser", ->
     expect(parse.parse(test3)).toEqual(list3)
     expect(parse.parse(test4)).toEqual(list4)
     expect(parse.parse(test5)).toEqual(list5)
+    expect(parse.parse(test6)).toEqual(list6)
 
   it "should serialize back again.", ->
     expect(sexpFormatter.formatSexp(list1)).toEqual(test1)
