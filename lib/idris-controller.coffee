@@ -10,6 +10,7 @@ class IdrisController
 
   constructor: (@statusbar, @model) ->
     @idrisBuffers = 0
+    @errorMarkers = []
 
     atom.workspace.getTextEditors().forEach (editor) =>
       uri = editor.getURI()
@@ -99,6 +100,10 @@ class IdrisController
     uri = editor.getURI()
     console.log 'Loading ' + uri
     @messages.clear()
+
+    for marker in @errorMarkers
+      marker.destroy()
+
     @model.load uri, (err, message, progress) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -110,6 +115,14 @@ class IdrisController
             line: warning[1][0]
             character: warning[1][1]
             message: warning[3]
+
+          startPoint = warning[1]
+          startPoint[0] = startPoint[0] - 1
+          endPoint = warning[2]
+          endPoint[0] = endPoint[0] - 1
+          marker = @markCode editor, [startPoint, endPoint]
+
+          @errorMarkers.push marker
       else if progress
         console.log '... ' + progress
         @statusbar.setStatus 'Idris: ' + progress
@@ -199,5 +212,12 @@ class IdrisController
           editor.selectToEndOfWord()
           # And then replace the replacement with the guess..
           editor.insertText res
+
+  markCode: (editor, range) ->
+    marker = editor.markBufferRange(range, invalidate: 'never')
+    editor.decorateMarker marker,
+      type: 'line-number'
+      class: 'highlight-idris-error'
+    marker
 
 module.exports = IdrisController
