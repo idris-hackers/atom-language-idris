@@ -57,15 +57,15 @@ class IdrisController
     @messages.clear()
     @messages.hide()
     @localChanges = false
-    if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
+    if @isIdrisFile editor.getURI()
+      @loadFile editor
 
   idrisFileChanged: (editor) ->
     @localChanges = editor.isModified()
     if @localChanges
       @statusbar.setStatus 'Idris: local modifications'
-    else if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
+    else if @isIdrisFile editor.getURI()
+      @loadFile editor
 
   idrisFileClosed: (editor) ->
     @idrisBuffers -= 1
@@ -78,10 +78,9 @@ class IdrisController
     @messages.hide()
     editor = atom.workspace.getActiveTextEditor()
     if editor
-      uri = editor.getPath()
-      if @isIdrisFile(uri)
+      if @isIdrisFile editor.getPath()
         @statusbar.show()
-        @loadFile uri
+        @loadFile editor
       else
         @statusbar.hide()
 
@@ -96,7 +95,8 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
-  loadFile: (uri) ->
+  loadFile: (editor) ->
+    uri = editor.getURI()
     console.log 'Loading ' + uri
     @messages.clear()
     @model.load uri, (err, message, progress) =>
