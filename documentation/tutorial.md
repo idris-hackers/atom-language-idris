@@ -27,13 +27,13 @@ mul (S k) y = add y (mul k y)
 
 ### Type info
 
-Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of".
+Select an instance of the `add` function in your code and press `ctrl-alt-a t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of".
 A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
 Now try the same thing with the `mul` function.
 
 ### Show documentation
 
-Another useful command is triggered by selecting a word and pressing `ctrl-alt-d` (or "Language Idris: Docs for" from the command palette). You can try it on `add`, `mul` or `Nat` for instance.
+Another useful command is triggered by selecting a word and pressing `ctrl-alt-a d` (or "Language Idris: Docs for" from the command palette). You can try it on `add`, `mul` or `Nat` for instance.
 
 ## REPL
 
