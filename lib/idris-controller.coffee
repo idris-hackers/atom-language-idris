@@ -3,32 +3,19 @@ PlainMessageView = require('atom-message-panel').PlainMessageView
 LineMessageView = require('atom-message-panel').LineMessageView
 ProofObligationView = require('./proof-obligation-view')
 MetavariablesView = require './metavariables-view'
+StatusBarView = require './statusbar-view'
+{Logger} = require './Logger'
 
 class IdrisController
-  idrisBuffers: 0
-  localChanges: undefined
 
-  constructor: (@statusbar, @model) ->
-    @idrisBuffers = 0
-
-    atom.workspace.getTextEditors().forEach (editor) =>
-      uri = editor.getURI()
-      if @isIdrisFile(uri)
-        console.log editor
-        @idrisFileOpened editor
-
+  constructor: (@model) ->
+    @statusbar = new StatusBarView()
     @statusbar.initialize()
     @messages = new MessagePanelView
       title: 'Idris Messages'
       closeMethod: 'hide'
     @messages.attach()
     @messages.hide()
-
-    atom.workspace.observeActivePaneItem @paneChanged
-
-    editor = atom.workspace.getActiveTextEditor()
-    if editor?.isModified()
-      @idrisFileChanged editor
 
   getCommands: ->
     'language-idris:type-of': @getTypeForWord
@@ -37,56 +24,14 @@ class IdrisController
     'language-idris:add-clause': @doAddClause
     'language-idris:metavariables': @showMetavariables
     'language-idris:proof-search': @doProofSearch
+    'language-idris:typecheck': @typecheckFile
 
   isIdrisFile: (uri) ->
-    if uri? && uri.match?
-      uri.match /\.idr$/
-    else
-      false
-
-  idrisFileOpened: (editor) ->
-    @idrisBuffers += 1
-    if !@model.running()
-      console.log 'Starting Idris IDESlave'
-      @model.start()
-    editor.buffer.onDidDestroy @idrisFileClosed.bind(this, editor)
-    editor.buffer.onDidSave @idrisFileSaved.bind(this, editor)
-    editor.buffer.onDidChange @idrisFileChanged.bind(this, editor)
-
-  idrisFileSaved: (editor) ->
-    @messages.clear()
-    @messages.hide()
-    @localChanges = false
-    if @isIdrisFile editor.getURI()
-      @loadFile editor
-
-  idrisFileChanged: (editor) ->
-    @localChanges = editor.isModified()
-    if @localChanges
-      @statusbar.setStatus 'Idris: local modifications'
-    else if @isIdrisFile editor.getURI()
-      @loadFile editor
-
-  idrisFileClosed: (editor) ->
-    @idrisBuffers -= 1
-    if @idrisBuffers == 0
-      console.log 'Shut down Idris IDESlave'
-      @model.stop()
-
-  paneChanged: =>
-    @messages.clear()
-    @messages.hide()
-    editor = atom.workspace.getActiveTextEditor()
-    if editor
-      if @isIdrisFile editor.getPath()
-        @statusbar.show()
-        @loadFile editor
-      else
-        @statusbar.hide()
+    uri? && uri.match? && uri.match /\.idr$/
 
   destroy: ->
-    if @idrisModel
-      console.log 'Idris: Shutting down!'
+    if @model
+      Logger.logText 'Idris: Shutting down!'
       @model.stop()
     @statusbar.destroy()
 
@@ -95,10 +40,17 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
-  loadFile: (editor) ->
-    uri = editor.getURI()
-    console.log 'Loading ' + uri
-    @messages.clear()
+  dispatchCommand: (packg, command) ->
+    textEditorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
+    atom.commands.dispatch(textEditorElement, "#{packg}:#{command}")
+
+  dispatchIdrisCommand: (command) ->
+    @dispatchCommand 'language-idris', command
+
+  typecheckFile: ({target}) =>
+    # the file needs to be saved for typechecking
+    @dispatchCommand "core", "save"
+    uri = target.model.getURI()
     @model.load uri, (err, message, progress) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -117,6 +69,7 @@ class IdrisController
         @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
 
   getDocsForWord: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     word = @getWordUnderCursor target
     @model.docsFor word, (err, type, highlightingInfo) =>
       if err
@@ -130,6 +83,7 @@ class IdrisController
           highlightingInfo: highlightingInfo
 
   getTypeForWord: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     word = @getWordUnderCursor target
     @model.getType word, (err, type, highlightingInfo) =>
       if err
@@ -143,6 +97,7 @@ class IdrisController
           highlightingInfo: highlightingInfo
 
   doCaseSplit: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     editor = target.model
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
@@ -155,6 +110,7 @@ class IdrisController
         editor.setTextInBufferRange lineRange, split
 
   doAddClause: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     editor = atom.workspace.getActiveTextEditor()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
@@ -171,6 +127,7 @@ class IdrisController
           editor.moveCursorToBeginningOfLine()
 
   showMetavariables: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     @model.metavariables 80, (err, metavariables) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -181,6 +138,7 @@ class IdrisController
         @messages.add new MetavariablesView metavariables
 
   doProofSearch: ({target}) =>
+    @dispatchIdrisCommand 'typecheck'
     editor = atom.workspace.getActiveTextEditor()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
