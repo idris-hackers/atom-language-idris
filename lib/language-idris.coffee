@@ -18,10 +18,6 @@ module.exports =
     @subscriptions = new CompositeDisposable
     @subscriptions.add subscription
 
-  showWarnings: (error) ->
-    warningNoIdris = 'Please put idris into your path or set the right path in the settings of this package.'
-    atom.notifications.addWarning warningNoIdris
-
 
   deactivate: ->
     @subscriptions.dispose()
