@@ -1,6 +1,5 @@
-MessagePanelView = require('atom-message-panel').MessagePanelView
-PlainMessageView = require('atom-message-panel').PlainMessageView
-LineMessageView = require('atom-message-panel').LineMessageView
+{MessagePanelView, PlainMessageView, LineMessageView} =
+  require('atom-message-panel')
 ProofObligationView = require('./proof-obligation-view')
 MetavariablesView = require './metavariables-view'
 StatusBarView = require './statusbar-view'

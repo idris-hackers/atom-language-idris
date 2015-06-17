@@ -1,4 +1,4 @@
-View = require('atom-space-pen-views').View
+{View} = require 'atom-space-pen-views'
 highlighter = require './utils/highlighter'
 
 class MetavariablesView extends View

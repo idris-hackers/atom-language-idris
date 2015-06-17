@@ -1,4 +1,4 @@
-{View} = require('atom-space-pen-views')
+{View} = require 'atom-space-pen-views'
 
 class StatusBarView extends View
   @content: ->

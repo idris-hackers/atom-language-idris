@@ -1,7 +1,5 @@
-parse = require('bennu').parse
-text = require('bennu').text
-lang = require('bennu').lang
-stream = require('nu-stream').stream
+{parse, text, lang} = require 'bennu'
+{stream} = require 'nu-stream'
 
 streamToString = (s) -> stream.toArray(s).join ''
 

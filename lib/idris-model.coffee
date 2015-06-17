@@ -1,4 +1,4 @@
-EventEmitter = require('events').EventEmitter
+{EventEmitter} = require 'events'
 IdrisIdeMode = require './idris-ide-mode'
 {Logger} = require './Logger'
 

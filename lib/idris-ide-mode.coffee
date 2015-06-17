@@ -1,8 +1,8 @@
 {Logger} = require './Logger'
 sexpFormatter = require './utils/sexp-formatter'
 parse = require './parse'
-EventEmitter = require('events').EventEmitter
-spawn = require('child_process').spawn
+{EventEmitter} = require 'events'
+{spawn} = require 'child_process'
 
 class IdrisIdeMode extends EventEmitter
   process: null

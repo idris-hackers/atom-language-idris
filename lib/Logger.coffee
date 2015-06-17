@@ -1,5 +1,5 @@
 fs = require 'fs'
-sexpFormatter = require('./utils/sexp-formatter')
+sexpFormatter = require './utils/sexp-formatter'
 
 class Logger
   logFile: "log.log"
