@@ -17,13 +17,11 @@ class IdrisModel extends EventEmitter
   stop: ->
     @ideModeRef?.stop()
 
-  handleCommand: (id, cmd) =>
+  handleCommand: (cmd) =>
     if cmd.length > 0
-      op = cmd[0]
-      params = cmd.slice 1
+      [op, params..., id] = cmd
       switch op
         when ':return'
-          id = params[params.length - 1]
           ret = params[0]
           if @callbacks[id]
             if ret[0] == ':ok'
@@ -35,12 +33,10 @@ class IdrisModel extends EventEmitter
             delete @callbacks[id]
             delete @warnings[id]
         when ':write-string'
-          id = params[params.length - 1]
           msg = params[0]
           if @callbacks[id]
             @callbacks[id] undefined, undefined, msg
         when ':warning'
-          id = params[params.length - 1]
           warning = params[0]
           @warnings[id].push warning
         when ':set-prompt'
