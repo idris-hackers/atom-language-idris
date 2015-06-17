@@ -1,7 +1,5 @@
 IdrisController = require './idris-controller'
-IdrisModel = require './idris-model'
 {CompositeDisposable} = require 'atom'
-exec = require('child_process').exec
 
 module.exports =
   config:
@@ -10,9 +8,7 @@ module.exports =
       default: 'idris'
 
   activate: ->
-    @model = new IdrisModel()
-    @controller =
-      new IdrisController @model
+    @controller = new IdrisController
 
     subscription = atom.commands.add 'atom-text-editor[data-grammar~="idris"]', @controller.getCommands()
     @subscriptions = new CompositeDisposable

@@ -4,10 +4,11 @@ ProofObligationView = require('./proof-obligation-view')
 MetavariablesView = require './metavariables-view'
 StatusBarView = require './statusbar-view'
 {Logger} = require './Logger'
+IdrisModel = require './idris-model'
 
 class IdrisController
 
-  constructor: (@model) ->
+  constructor: ->
     @statusbar = new StatusBarView()
     @statusbar.initialize()
     @messages = new MessagePanelView
@@ -15,6 +16,7 @@ class IdrisController
       closeMethod: 'hide'
     @messages.attach()
     @messages.hide()
+    @model = new IdrisModel()
 
   getCommands: ->
     'language-idris:type-of': @getTypeForWord
