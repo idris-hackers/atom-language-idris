@@ -65,12 +65,13 @@ class IdrisController
             message: warning[3]
       else if progress
         console.log '... ' + progress
-        @statusbar.setStatus 'Idris: ' + progress
+        #@statusbar.setStatus 'Idris: ' + progress
       else
-        @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
+
+        @statusIndicator.setStatusLoaded()
+        #@statusbar.setStatus 'Idris: ' + JSON.stringify(message)
 
   getDocsForWord: ({target}) =>
-    @dispatchIdrisCommand 'typecheck'
     word = @getWordUnderCursor target
     @model.docsFor word, (err, type, highlightingInfo) =>
       if err
@@ -84,7 +85,6 @@ class IdrisController
           highlightingInfo: highlightingInfo
 
   getTypeForWord: ({target}) =>
-    @dispatchIdrisCommand 'typecheck'
     word = @getWordUnderCursor target
     @model.getType word, (err, type, highlightingInfo) =>
       if err
