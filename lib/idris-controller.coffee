@@ -2,15 +2,13 @@
   require('atom-message-panel')
 ProofObligationView = require('./proof-obligation-view')
 MetavariablesView = require './metavariables-view'
-StatusBarView = require './statusbar-view'
+StatusIndicator = require './status-indicator-view'
 {Logger} = require './Logger'
 IdrisModel = require './idris-model'
 
 class IdrisController
 
   constructor: ->
-    @statusbar = new StatusBarView()
-    @statusbar.initialize()
     @messages = new MessagePanelView
       title: 'Idris Messages'
       closeMethod: 'hide'
@@ -28,7 +26,7 @@ class IdrisController
     'language-idris:typecheck': @typecheckFile
 
   isIdrisFile: (uri) ->
-    uri? && uri.match? && uri.match /\.idr$/
+    uri?.match? /\.idr$/
 
   destroy: ->
     if @model
@@ -128,7 +126,6 @@ class IdrisController
           editor.moveCursorToBeginningOfLine()
 
   showMetavariables: ({target}) =>
-    @dispatchIdrisCommand 'typecheck'
     @model.metavariables 80, (err, metavariables) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
@@ -158,5 +155,12 @@ class IdrisController
           editor.selectToEndOfWord()
           # And then replace the replacement with the guess..
           editor.insertText res
+
+  attachStatusIndicator: (statusBar) ->
+    @statusIndicator = new StatusIndicator
+    @statusIndicator.initialize()
+    statusBar.addLeftTile
+      item: @statusIndicator
+
 
 module.exports = IdrisController

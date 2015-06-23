@@ -28,6 +28,11 @@
     }
   ],
   "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
   },
   "dependencies": {
     "atom-message-panel": ">=0.1.0",

@@ -14,7 +14,9 @@ module.exports =
     @subscriptions = new CompositeDisposable
     @subscriptions.add subscription
 
-
   deactivate: ->
     @subscriptions.dispose()
     this.controller.destroy()
+
+  consumeStatusBar: (statusBar) ->
+    @controller.attachStatusIndicator statusBar
