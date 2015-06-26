@@ -1,8 +1,8 @@
 {MessagePanelView, PlainMessageView, LineMessageView} =
   require('atom-message-panel')
-ProofObligationView = require('./proof-obligation-view')
-MetavariablesView = require './metavariables-view'
-StatusIndicator = require './status-indicator-view'
+ProofObligationView = require('./views/proof-obligation-view')
+MetavariablesView = require './views/metavariables-view'
+StatusIndicator = require './views/status-indicator-view'
 {Logger} = require './Logger'
 IdrisModel = require './idris-model'
 

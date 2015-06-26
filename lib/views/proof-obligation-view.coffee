@@ -1,5 +1,5 @@
 {View} = require 'atom-space-pen-views'
-highlighter = require './utils/highlighter'
+highlighter = require '../utils/highlighter'
 
 class ProofObligationView extends View
   initialize: (params) ->
