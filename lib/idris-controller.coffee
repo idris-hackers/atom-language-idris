@@ -1,7 +1,7 @@
 {MessagePanelView, PlainMessageView, LineMessageView} =
   require('atom-message-panel')
 ProofObligationView = require('./views/proof-obligation-view')
-MetavariablesView = require './views/metavariables-view'
+HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
 {Logger} = require './Logger'
 IdrisModel = require './idris-model'
@@ -21,7 +21,7 @@ class IdrisController
     'language-idris:docs-for': @getDocsForWord
     'language-idris:case-split': @doCaseSplit
     'language-idris:add-clause': @doAddClause
-    'language-idris:metavariables': @showMetavariables
+    'language-idris:holes': @showHoles
     'language-idris:proof-search': @doProofSearch
     'language-idris:typecheck': @typecheckFile
 
@@ -125,15 +125,15 @@ class IdrisController
           # the new line
           editor.moveCursorToBeginningOfLine()
 
-  showMetavariables: ({target}) =>
-    @model.metavariables 80, (err, metavariables) =>
+  showHoles: ({target}) =>
+    @model.holes 80, (err, holes) =>
       if err
         @statusbar.setStatus 'Idris: ' + err.message
       else
         @messages.show()
         @messages.clear()
-        @messages.setTitle 'Idris: Metavariables'
-        @messages.add new MetavariablesView metavariables
+        @messages.setTitle 'Idris: Holes'
+        @messages.add new HolesView holes
 
   doProofSearch: ({target}) =>
     @dispatchIdrisCommand 'typecheck'
@@ -147,7 +147,7 @@ class IdrisController
         editor.transact ->
           # Move the cursor to the beginning of the word
           editor.moveToBeginningOfWord()
-          # Because the ? in the metavariable isn't part of
+          # Because the ? in the Holes isn't part of
           # the word, we move left once, and then select two
           # words
           editor.moveLeft()

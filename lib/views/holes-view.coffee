@@ -1,19 +1,19 @@
 {View} = require 'atom-space-pen-views'
 highlighter = require '../utils/highlighter'
 
-class MetavariablesView extends View
-  initialize: (metavariables) ->
-    html = metavariables
-      .map (metavariable) =>
-        name = metavariable[0]
-        premises = metavariable[1]
-        conclusion = metavariable[2]
-        @prettyprintMetavariable name, premises, conclusion
+class HolesView extends View
+  initialize: (holes) ->
+    html = holes
+      .map (hole) =>
+        name = hole[0]
+        premises = hole[1]
+        conclusion = hole[2]
+        @prettyprintHoles name, premises, conclusion
       .join "\n\n"
 
     @html html
 
-  prettyprintMetavariable: (name, premises, conclusion) ->
+  prettyprintHoles: (name, premises, conclusion) ->
     prettyPremises = @prettyprintPremises premises
     prettyConclusion = @prettyprintConclusion name, conclusion
 
@@ -39,4 +39,4 @@ class MetavariablesView extends View
   @content: ->
     @pre class: 'idris-mode block'
 
-module.exports = MetavariablesView
+module.exports = HolesView
