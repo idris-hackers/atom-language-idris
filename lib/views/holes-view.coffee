@@ -4,10 +4,7 @@ highlighter = require '../utils/highlighter'
 class HolesView extends View
   initialize: (holes) ->
     html = holes
-      .map (hole) =>
-        name = hole[0]
-        premises = hole[1]
-        conclusion = hole[2]
+      .map ([name, premises, conclusion]) =>
         @prettyprintHoles name, premises, conclusion
       .join "\n\n"
 
