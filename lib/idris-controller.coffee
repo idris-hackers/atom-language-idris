@@ -1,6 +1,6 @@
 {MessagePanelView, PlainMessageView, LineMessageView} =
-  require('atom-message-panel')
-ProofObligationView = require('./views/proof-obligation-view')
+  require 'atom-message-panel'
+ProofObligationView = require './views/proof-obligation-view'
 HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
