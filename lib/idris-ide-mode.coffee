@@ -1,4 +1,4 @@
-{Logger} = require './Logger'
+Logger = require './Logger'
 sexpFormatter = require './utils/sexp-formatter'
 parse = require './parse'
 {EventEmitter} = require 'events'

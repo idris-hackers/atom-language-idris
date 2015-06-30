@@ -3,7 +3,7 @@
 ProofObligationView = require('./views/proof-obligation-view')
 HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
-{Logger} = require './Logger'
+Logger = require './Logger'
 IdrisModel = require './idris-model'
 
 class IdrisController

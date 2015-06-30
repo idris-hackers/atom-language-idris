@@ -21,4 +21,4 @@ class Logger
     str = @formatCommand cmd
     @logText "> #{str}"
 
-exports.Logger = new Logger
+module.exports = new Logger

@@ -1,6 +1,6 @@
 {EventEmitter} = require 'events'
 IdrisIdeMode = require './idris-ide-mode'
-{Logger} = require './Logger'
+Logger = require './Logger'
 
 class IdrisModel extends EventEmitter
   requestId: 0
