@@ -6,6 +6,7 @@ module.exports =
     pathToIdris:
       type: 'string'
       default: 'idris'
+      description: 'Path to the idris executable'
 
   activate: ->
     @controller = new IdrisController
