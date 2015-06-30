@@ -35,6 +35,22 @@ describe "The highlighter", ->
           ]
         ]
       ]
-    should1 = '<span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span>'
-
-    expect(highlighter.highlight(code1, info1)).toEqual(should1)
+    should1 =
+      [
+        {
+          classes: ['storage', 'type', 'idris']
+          word: 'Prelude.Nat.Nat'
+        }
+        {
+          classes: []
+          word: ' : '
+        }
+        {
+          classes: ['storage', 'type', 'idris']
+          word: 'Type'
+        }
+      ]
+    should1String = '<span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span>'
+    highlight1 = highlighter.highlight(code1, info1)
+    expect(highlight1).toEqual(should1)
+    expect(highlighter.highlightToString(highlight1)).toEqual(should1String)
