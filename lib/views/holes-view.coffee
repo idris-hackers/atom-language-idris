@@ -1,39 +1,62 @@
-{View} = require 'atom-space-pen-views'
 highlighter = require '../utils/highlighter'
 
-class HolesView extends View
+textNode = (text) ->
+  document.createTextNode text
+
+class HolesView extends HTMLElement
   initialize: (holes) ->
+    @holesContainer = document.createElement 'pre'
+    @holesContainer.classList.add 'idris-mode'
+    @holesContainer.classList.add 'block'
+    @holesContainer.classList.add 'idris-holes-view'
+
+    @appendChild @holesContainer
+    @showHoles holes
+
+  showHoles: (holes) ->
+    @holesContainer.appendChild @prettyprintHoles(holes)
+
+  prettyprintHoles: (holes) ->
     html = holes
       .map ([name, premises, conclusion]) =>
-        @prettyprintHoles name, premises, conclusion
-      .join "\n\n"
+        @prettyprintHole name, premises, conclusion
+    @joinHtmlElements 'div', html
 
-    @html html
-
-  prettyprintHoles: (name, premises, conclusion) ->
+  prettyprintHole: (name, premises, conclusion) ->
     prettyPremises = @prettyprintPremises premises
     prettyConclusion = @prettyprintConclusion name, conclusion
 
-    """#{name}
-    #{prettyPremises}
-    #{prettyConclusion}\n
-    """
+    hole = @joinHtmlElements 'div', [textNode "#{name}"].concat(prettyPremises, prettyConclusion)
+    hole.classList.add 'idris'
+    hole.classList.add  'idris-hole'
+    hole
 
   prettyprintPremises: (premises) ->
-    premises
-      .map (premise) ->
-        name = premise[0]
-        type = highlighter.highlight premise[1], premise[2]
-        "    #{name} : #{type}"
-      .join "\n"
+    html = premises
+      .map ([name, type, highlightInformation]) =>
+        highlight = highlighter.highlight type, highlightInformation
+        type = highlighter.highlightToHtml highlight
+        @joinHtmlElements 'div', [textNode "    #{name} : "].concat(type)
+    @joinHtmlElements 'div', html
 
-  prettyprintConclusion: (name, conclusion) ->
-    highlightedConclusion = highlighter.highlight conclusion[0], conclusion[1]
-    dividerLength = "#{name} : #{conclusion[0]}".length
-    divider = ('-' for _ in [0...dividerLength]).join ''
-    "#{divider}\n#{name} : #{highlightedConclusion}"
+  prettyprintConclusion: (name, [type, highlightInformation]) ->
+    highlight = highlighter.highlight(type, highlightInformation)
+    highlightedConclusion = highlighter.highlightToHtml highlight
+    dividerLength = "#{name} : #{type}".length
+    divider = textNode ('-' for _ in [0...dividerLength]).join('')
 
-  @content: ->
-    @pre class: 'idris-mode block'
+    [
+      divider
+      document.createElement 'br'
+      textNode "#{name} : "
+      highlightedConclusion
+    ]
 
-module.exports = HolesView
+  joinHtmlElements: (containerElem, elems) ->
+    div = document.createElement containerElem
+    elems.forEach (elem) ->
+      div.appendChild elem
+    div
+
+module.exports = HolesView =
+  document.registerElement('idris-holes-view', {prototype: HolesView.prototype})

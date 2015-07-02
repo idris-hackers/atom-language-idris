@@ -55,7 +55,26 @@ highlightToString = (highlights) ->
         "<span class=\"#{classes.join(' ')}\">#{word}</span>"
     .join ''
 
+highlightToHtml = (highlights) ->
+  spans = highlights
+    .map ({classes, word}) ->
+      if classes.length == 0
+        document.createTextNode word
+      else
+        span = document.createElement 'span'
+        classes.forEach (c) ->
+          span.classList.add c
+        span.textContent = word
+        span
+  container = document.createElement 'span'
+  spans.forEach (span) ->
+    container.appendChild span
+  container
+
+
+
 
 module.exports =
   highlight: highlight
   highlightToString: highlightToString
+  highlightToHtml: highlightToHtml

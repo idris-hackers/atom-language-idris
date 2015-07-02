@@ -133,7 +133,9 @@ class IdrisController
         @messages.show()
         @messages.clear()
         @messages.setTitle 'Idris: Holes'
-        @messages.add new HolesView holes
+        holesView = new HolesView
+        holesView.initialize holes
+        @messages.add holesView
 
   doProofSearch: ({target}) =>
     @dispatchIdrisCommand 'typecheck'

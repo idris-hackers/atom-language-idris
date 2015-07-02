@@ -51,6 +51,9 @@ describe "The highlighter", ->
         }
       ]
     should1String = '<span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span>'
+    should1Html = '<span><span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span></span>'
     highlight1 = highlighter.highlight(code1, info1)
     expect(highlight1).toEqual(should1)
     expect(highlighter.highlightToString(highlight1)).toEqual(should1String)
+    html1 = highlighter.highlightToHtml(highlight1)
+    expect(html1.outerHTML).toEqual(should1Html)
