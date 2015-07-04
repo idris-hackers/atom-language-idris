@@ -1,4 +1,5 @@
 highlighter = require '../utils/highlighter'
+dom = require '../utils/dom'
 
 textNode = (text) ->
   document.createTextNode text
@@ -20,24 +21,24 @@ class HolesView extends HTMLElement
     html = holes
       .map ([name, premises, conclusion]) =>
         @prettyprintHole name, premises, conclusion
-    @joinHtmlElements 'div', html
+    dom.joinHtmlElements 'div', html
 
   prettyprintHole: (name, premises, conclusion) ->
     prettyPremises = @prettyprintPremises premises
     prettyConclusion = @prettyprintConclusion name, conclusion
 
-    hole = @joinHtmlElements 'div', [textNode "#{name}"].concat(prettyPremises, prettyConclusion)
+    hole = dom.joinHtmlElements 'div', [textNode "#{name}"].concat(prettyPremises, prettyConclusion)
     hole.classList.add 'idris'
     hole.classList.add  'idris-hole'
     hole
 
   prettyprintPremises: (premises) ->
     html = premises
-      .map ([name, type, highlightInformation]) =>
+      .map ([name, type, highlightInformation]) ->
         highlight = highlighter.highlight type, highlightInformation
         type = highlighter.highlightToHtml highlight
-        @joinHtmlElements 'div', [textNode "    #{name} : "].concat(type)
-    @joinHtmlElements 'div', html
+        dom.joinHtmlElements 'div', [textNode "    #{name} : "].concat(type)
+    dom.joinHtmlElements 'div', html
 
   prettyprintConclusion: (name, [type, highlightInformation]) ->
     highlight = highlighter.highlight(type, highlightInformation)
@@ -51,12 +52,6 @@ class HolesView extends HTMLElement
       textNode "#{name} : "
       highlightedConclusion
     ]
-
-  joinHtmlElements: (containerElem, elems) ->
-    div = document.createElement containerElem
-    elems.forEach (elem) ->
-      div.appendChild elem
-    div
 
 module.exports = HolesView =
   document.registerElement('idris-holes-view', {prototype: HolesView.prototype})
