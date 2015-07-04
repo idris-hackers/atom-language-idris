@@ -55,9 +55,9 @@ module Main
 plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 ```
 
-Now press `ctrl-shift-p` and type "Language Idris: Metavariables" into the command palette.
+Load the file into idris by typecheckiing it by pressing  `ctrl-shift-p` and typing "Language Idris: Typecheck" into the command palette then press `ctrl-shift-p` again and type "Language Idris: Holes".
 
-At the bottom of your window should open a small panel with all metavariables you'll have to prove.
+At the bottom of your window should open a small panel with all holes you'll have to prove.
 Here it should just show:
 ```
 Main.plusAssoc
@@ -144,7 +144,7 @@ with
 plusAssoc (S l) c r = ?plusAssoc_rhs_2
 ```
 
-and the holes view now shows us:
+and after type checking the holes view now shows us:
 
 ```
 Main.plusAssoc_rhs_2
