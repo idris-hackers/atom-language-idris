@@ -6,7 +6,8 @@ class ProofObligationView extends View
     @obligation = params.obligation
     @highlightingInfo = params.highlightingInfo
     if @highlightingInfo?
-      text = highlighter.highlight @obligation, @highlightingInfo
+      highlighting = highlighter.highlight @obligation, @highlightingInfo
+      text = highlighter.highlightToString highlighting
       @html text
     else
       @text @obligation
