@@ -1,8 +1,29 @@
+'menu':
+  [
+    {
+      'label': 'Packages'
+      'submenu':
+        [
+          'label': 'Idris'
+          'submenu':
+            [
+              {
+                'label': 'Typecheck'
+                'command': 'language-idris:typecheck'
+              }
+            ]
+        ]
+    }
+  ]
 'context-menu':
   'atom-text-editor[data-grammar~=\"idris\"]': [
     {
       'label': 'Idris'
       'submenu': [
+        {
+          'label': 'Typecheck'
+          'command': 'language-idris:typecheck'
+        }
         {
           'label': 'Type search'
           'command': 'language-idris:type-of'
