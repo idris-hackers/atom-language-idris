@@ -93,7 +93,82 @@ plusAssoc Z c r = ?plusAssoc_rhs_1
 plusAssoc (S l) c r = ?plusAssoc_rhs_2
 ```
 
-TODO
+After type checking the file again, open the holes view and it will show you both holes:
+
+```
+Main.plusAssoc_rhs_1
+    c : Nat
+    r : Nat
+------------------------------------------
+Main.plusAssoc_rhs_1 : plus c r = plus c r
+
+Main.plusAssoc_rhs_2
+    l : Nat
+    c : Nat
+    r : Nat
+--------------------------------------------------------------------
+Main.plusAssoc_rhs_2 : S (plus l (plus c r)) = S (plus (plus l c) r)
+```
+
+Now you can see, that you need to prove that `plus c r = plus c r` for `Main.plusAssoc_rhs_1`. Idris can insert the code automatically for us. Select `plusAssoc_rhs_1` and press `ctrl+alt+s` ("Language Idris: Proof Search") and Idris will insert `Refl` for you.
+
+Now the file looks like this:
+```idris
+module Main
+
+plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
+plusAssoc Z c r = Refl
+plusAssoc (S l) c r = ?plusAssoc_rhs_2
+```
+
+Only ne hole is left now:
+
+```
+Main.plusAssoc_rhs_2
+    l : Nat
+    c : Nat
+    r : Nat
+--------------------------------------------------------------------
+Main.plusAssoc_rhs_2 : S (plus l (plus c r)) = S (plus (plus l c) r)
+```
+
+Now replace the line
+
+```idris
+plusAssoc (S l) c r = ?plusAssoc_rhs_2
+```
+
+with
+
+```idris
+plusAssoc (S l) c r = ?plusAssoc_rhs_2
+```
+
+and the holes view now shows us:
+
+```
+Main.plusAssoc_rhs_2
+    l : Nat
+    c : Nat
+    r : Nat
+    _rewrite_rule : plus (plus l c) r = plus l (plus c r)
+--------------------------------------------------------------------
+Main.plusAssoc_rhs_2 : S (plus (plus l c) r) = S (plus (plus l c) r)
+```
+
+Now you need to prove that `S (plus (plus l c) r) = S (plus (plus l c) r)` and Idrs can again do this for us.
+
+And you end with the file
+
+```idris
+module Main
+
+plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
+plusAssoc Z c r = Refl
+plusAssoc (S l) c r = rewrite plusAssoc l c r in Refl
+```
+
+and a proof that the addition of natural numbers is associative.
 
 This tutorial is a written version of [David Christiansens](https://twitter.com/d_christiansen) emacs video for Atom.
 https://www.youtube.com/watch?v=0eOY1NxbZHo&list=PLiHLLF-foEexGJu1a0WH_llkQ2gOKqipg
