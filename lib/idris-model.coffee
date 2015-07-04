@@ -1,10 +1,11 @@
 IdrisIdeMode = require './idris-ide-mode'
 Logger = require './Logger'
+Rx = require 'rx-lite'
 
 class IdrisModel
   requestId: 0
   ideModeRef: null
-  callbacks: {}
+  subjects: {}
   warnings: {}
 
   ideMode: ->
@@ -19,57 +20,63 @@ class IdrisModel
   handleCommand: (cmd) =>
     if cmd.length > 0
       [op, params..., id] = cmd
-      switch op
-        when ':return'
-          ret = params[0]
-          if @callbacks[id]
+      if @subjects[id]?
+        subject = @subjects[id]
+        switch op
+          when ':return'
+            ret = params[0]
             if ret[0] == ':ok'
-              @callbacks[id] undefined, ret.slice(1)...
+              subject.onNext
+                responseType: 'return'
+                msg: ret.slice(1)
             else
-              @callbacks[id]
+              subject.onError
                 message: ret[1]
                 warnings: @warnings[id]
-            delete @callbacks[id]
-            delete @warnings[id]
-        when ':write-string'
-          msg = params[0]
-          if @callbacks[id]
-            @callbacks[id] undefined, undefined, msg
-        when ':warning'
-          warning = params[0]
-          @warnings[id].push warning
-        when ':set-prompt'
-          # Ignore
-        else
-          console.log op, params
+            subject.onCompleted()
+            delete @subjects[id]
+          when ':write-string'
+            msg = params[0]
+            subject.onNext
+              responseType: 'write-string'
+              msg: msg
+          when ':warning'
+            warning = params[0]
+            @warnings[id].push warning
+          when ':set-prompt'
+            # Ignore
+          else
+            console.log op, params
 
   getUID: -> ++@requestId
 
-  prepareCommand: (cmd, callback) ->
+  prepareCommand: (cmd) ->
     id = @getUID()
-    @callbacks[id] = callback
+    subject = new Rx.Subject
+    @subjects[id] = subject
     @warnings[id] = []
     @ideMode().send [cmd, id]
+    subject
 
-  load: (uri, callback) ->
-    @prepareCommand [':load-file', uri], callback
+  load: (uri) ->
+    @prepareCommand [':load-file', uri]
 
-  docsFor: (word, callback) ->
-    @prepareCommand [':docs-for', word], callback
+  docsFor: (word) ->
+    @prepareCommand [':docs-for', word]
 
-  getType: (word, callback) ->
-    @prepareCommand [':type-of', word], callback
+  getType: (word) ->
+    @prepareCommand [':type-of', word]
 
-  caseSplit: (line, word, callback) ->
-    @prepareCommand [':case-split', line, word], callback
+  caseSplit: (line, word) ->
+    @prepareCommand [':case-split', line, word]
 
-  addClause: (line, word, callback) ->
-    @prepareCommand [':add-clause', line, word], callback
+  addClause: (line, word) ->
+    @prepareCommand [':add-clause', line, word]
 
-  holes: (width, callback) ->
-    @prepareCommand [':metavariables', width], callback
+  holes: (width) ->
+    @prepareCommand [':metavariables', width]
 
-  proofSearch: (line, word, callback) ->
-    @prepareCommand [':proof-search', line, word, []], callback
+  proofSearch: (line, word) ->
+    @prepareCommand [':proof-search', line, word, []]
 
 module.exports = IdrisModel
