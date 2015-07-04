@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "atom-message-panel": ">=0.1.0",
-    "atom-space-pen-views": "^2.0.3",
     "bennu": "17.3.0",
     "nu-stream": "3.3.1",
     "rx-lite": "2.5.2"
