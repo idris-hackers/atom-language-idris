@@ -1,6 +1,6 @@
 {MessagePanelView, PlainMessageView, LineMessageView} =
   require 'atom-message-panel'
-ProofObligationView = require './views/proof-obligation-view'
+InformationView = require './views/information-view'
 HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
@@ -67,9 +67,11 @@ class IdrisController
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-      @messages.add new ProofObligationView
+      informationView = new InformationView
+      informationView.initialize
         obligation: type
         highlightingInfo: highlightingInfo
+      @messages.add informationView
 
     @model
       .docsFor word
@@ -83,9 +85,11 @@ class IdrisController
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-      @messages.add new ProofObligationView
+      informationView = new InformationView
+      informationView.initialize
         obligation: type
         highlightingInfo: highlightingInfo
+      @messages.add informationView
 
     @model
       .getType word
