@@ -28,7 +28,7 @@ module.exports =
     else
       idrisFileOpened = atom.workspace.getTextEditors().some @isIdrisFile
       if idrisFileOpened
-        @controller = new IdrisController @statusbar
+        @controller = new IdrisController
         if @statusbar
           @controller.attachStatusIndicator @statusbar
         subscription = atom.commands.add 'atom-text-editor[data-grammar~="idris"]', @controller.getCommands()
@@ -48,6 +48,6 @@ module.exports =
     @subscriptions.dispose()
     this.controller.destroy()
 
-  consumeStatusBar: (statusBar) ->
+  consumeStatusBar: (statusbar) ->
     @statusbar = statusbar
-    @controller?.attachStatusIndicator statusBar
+    @controller?.attachStatusIndicator statusbar
