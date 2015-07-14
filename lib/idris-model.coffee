@@ -1,135 +1,82 @@
-spawn = require('child_process').spawn
-parse = require './parse'
-sexpFormatter = require('./utils/sexp-formatter')
-version = require './utils/version'
-EventEmitter = require('events').EventEmitter
-{Logger} = require './Logger'
+IdrisIdeMode = require './idris-ide-mode'
+Logger = require './Logger'
+Rx = require 'rx-lite'
 
-class IdrisModel extends EventEmitter
-  constructor: (@version) ->
-    @buffer = ''
-    @process = undefined
-    @callbacks = {}
-    @warnings = {}
-    super this
-
-  process: undefined
+class IdrisModel
   requestId: 0
+  ideModeRef: null
+  subjects: {}
+  warnings: {}
 
-  start: ->
-    pathToIdris = atom.config.get("language-idris.pathToIdris")
-
-    ideCommand =
-      if version.versionGreaterEq @version, [0, 9, 16]
-        '--ide-mode'
-      else
-        '--ideslave'
-
-    @process = spawn pathToIdris, [ideCommand]
-    @process.on 'exit', @exited.bind(this)
-    @process.on 'error', @exited.bind(this)
-    @process.stdout.setEncoding('utf8').on 'data', @stdout
+  ideMode: ->
+    if !@ideModeRef
+      @ideModeRef = new IdrisIdeMode
+      @ideModeRef.on 'message', @handleCommand
+    @ideModeRef
 
   stop: ->
-    if @process?
-      @process.kill()
+    @ideModeRef?.stop()
 
-  stdout: (data) =>
-    console.log "Data", data
-    @buffer += data
-    while @buffer.length > 6
-      @buffer = @buffer.trimLeft().replace /\r\n/g, "\n"
-      # We have 6 chars, which is the length of the command
-      len = parseInt(@buffer.substr(0, 6), 16)
-      if @buffer.length >= 6 + len
-        # We also have the length of the command in the buffer, so
-        # let's read in the command
-        cmd = @buffer.substr(6, len).trim()
-        Logger.logIncomingCommand cmd
-        # Remove the length + command from the buffer
-        @buffer = @buffer.substr(6 + len)
-        # And then we can try to parse to command..
-        try
-          obj = parse.parse(cmd.trim())
-
-          @handleCommand obj
-        catch e
-          console.log cmd.trim()
-          console.log e.toString()
-      else
-        # We didn't have the entire command, so let's break the
-        # while-loop and wait for the next data-event
-        break
-
-  handleCommand: (cmd) ->
+  handleCommand: (cmd) =>
     if cmd.length > 0
-      op = cmd[0]
-      params = cmd.slice 1
-      switch op
-        when ':return'
-          id = params[params.length - 1]
-          ret = params[0]
-          if @callbacks[id]
+      [op, params..., id] = cmd
+      if @subjects[id]?
+        subject = @subjects[id]
+        switch op
+          when ':return'
+            ret = params[0]
             if ret[0] == ':ok'
-              @callbacks[id] undefined, ret.slice(1)...
+              subject.onNext
+                responseType: 'return'
+                msg: ret.slice(1)
             else
-              @callbacks[id]
+              subject.onError
                 message: ret[1]
                 warnings: @warnings[id]
-            delete @callbacks[id]
-            delete @warnings[id]
-        when ':write-string'
-          id = params[params.length - 1]
-          msg = params[0]
-          if @callbacks[id]
-            @callbacks[id] undefined, undefined, msg
-        when ':warning'
-          id = params[params.length - 1]
-          warning = params[0]
-          @warnings[id].push warning
-        when ':set-prompt'
-          # Ignore
-        else
-          console.log op, params
-
-  exited: ->
-    console.log 'Exited'
-    @process = undefined
-
-  running: ->
-    ! !@process
+            subject.onCompleted()
+            delete @subjects[id]
+          when ':write-string'
+            msg = params[0]
+            subject.onNext
+              responseType: 'write-string'
+              msg: msg
+          when ':warning'
+            warning = params[0]
+            @warnings[id].push warning
+          when ':set-prompt'
+            # Ignore
+          else
+            console.log op, params
 
   getUID: -> ++@requestId
 
-  sendCommand: (cmd) ->
-    Logger.logOutgoingCommand cmd
-    @process.stdin.write sexpFormatter.serialize(cmd)
-
-  prepareCommand: (cmd, callback) ->
+  prepareCommand: (cmd) ->
     id = @getUID()
-    @callbacks[id] = callback
+    subject = new Rx.Subject
+    @subjects[id] = subject
     @warnings[id] = []
-    @sendCommand [cmd, id]
+    @ideMode().send [cmd, id]
+    subject
 
-  load: (uri, callback) ->
-    @prepareCommand [':load-file', uri], callback
+  load: (uri) ->
+    @prepareCommand [':load-file', uri]
 
-  docsFor: (word, callback) ->
-    @prepareCommand [':docs-for', word], callback
+  docsFor: (word) ->
+    @prepareCommand [':docs-for', word]
 
-  getType: (word, callback) ->
-    @prepareCommand [':type-of', word], callback
+  getType: (word) ->
+    @prepareCommand [':type-of', word]
 
-  caseSplit: (line, word, callback) ->
-    @prepareCommand [':case-split', line, word], callback
+  caseSplit: (line, word) ->
+    @prepareCommand [':case-split', line, word]
 
-  addClause: (line, word, callback) ->
-    @prepareCommand [':add-clause', line, word], callback
+  addClause: (line, word) ->
+    @prepareCommand [':add-clause', line, word]
 
-  metavariables: (width, callback) ->
-    @prepareCommand [':metavariables', width], callback
+  holes: (width) ->
+    @prepareCommand [':metavariables', width]
 
-  proofSearch: (line, word, callback) ->
-    @prepareCommand [':proof-search', line, word, []], callback
+  proofSearch: (line, word) ->
+    @prepareCommand [':proof-search', line, word, []]
 
 module.exports = IdrisModel

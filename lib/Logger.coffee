@@ -1,5 +1,5 @@
 fs = require 'fs'
-sexpFormatter = require('./utils/sexp-formatter')
+sexpFormatter = require './utils/sexp-formatter'
 
 class Logger
   logFile: "log.log"
@@ -21,4 +21,4 @@ class Logger
     str = @formatCommand cmd
     @logText "> #{str}"
 
-exports.Logger = new Logger
+module.exports = new Logger

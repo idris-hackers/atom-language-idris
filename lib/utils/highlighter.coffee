@@ -8,34 +8,73 @@ highlightInfoListToOb = (list) ->
 
 decorToClasses = (decor) ->
   switch decor
-    when ':type' then 'storage type'
-    when ':function' then 'entity name function'
-    when ':data' then 'constant'
-    when ':keyword' then 'keyword'
-    when ':bound' then 'support function'
-    else ''
+    when ':type' then ['storage', 'type']
+    when ':function' then ['entity', 'name', 'function']
+    when ':data' then ['constant']
+    when ':keyword' then ['keyword']
+    when ':bound' then ['support', 'function']
+    else []
 
 highlightWord = (word, info) ->
-  "<span class=\"#{decorToClasses info.info.decor} idris\">#{word}</span>"
+  classes: decorToClasses(info.info.decor).concat 'idris'
+  word: word
 
 highlight = (code, highlightingInfo) ->
   highlighted = highlightingInfo
-    .map (i) ->
-      start: i[0]
-      length: i[1]
-      info: highlightInfoListToOb i[2]
+    .map ([start, length, info]) ->
+      start: start
+      length: length
+      info: highlightInfoListToOb info
     .filter (i) ->
       i.info.decor?
     .reduce (([position, text], info) ->
       newPosition = info.start + info.length
-      unhighlightedText = code.slice(position, info.start)
+      unhighlightedText =
+        classes: []
+        word: code.slice(position, info.start)
       highlightedWord = highlightWord code.slice(info.start, newPosition), info
-      newText = text + unhighlightedText + highlightedWord
+      newText = text.concat unhighlightedText, highlightedWord
 
       [newPosition, newText]
-    ), [0, '']
+    ), [0, []]
+
   [position, text] = highlighted
-  text + code.slice(position)
+  rest =
+    classes: []
+    word: code.slice(position)
+  higlightedWords = text.concat rest
+  higlightedWords.filter (higlightedWord) ->
+    higlightedWord.word != ''
+
+highlightToString = (highlights) ->
+  highlights
+    .map ({classes, word}) ->
+      if classes.length == 0
+        word
+      else
+        "<span class=\"#{classes.join(' ')}\">#{word}</span>"
+    .join ''
+
+highlightToHtml = (highlights) ->
+  spans = highlights
+    .map ({classes, word}) ->
+      if classes.length == 0
+        document.createTextNode word
+      else
+        span = document.createElement 'span'
+        classes.forEach (c) ->
+          span.classList.add c
+        span.textContent = word
+        span
+  container = document.createElement 'span'
+  spans.forEach (span) ->
+    container.appendChild span
+  container
+
+
+
 
 module.exports =
   highlight: highlight
+  highlightToString: highlightToString
+  highlightToHtml: highlightToHtml
