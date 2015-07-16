@@ -8,22 +8,14 @@ IdrisModel = require './idris-model'
 
 class IdrisController
 
-  constructor: ->
-    @messages = new MessagePanelView
-      title: 'Idris Messages'
-      closeMethod: 'hide'
-    @messages.attach()
-    @messages.hide()
-    @model = new IdrisModel()
-
   getCommands: ->
-    'language-idris:type-of': @getTypeForWord
-    'language-idris:docs-for': @getDocsForWord
-    'language-idris:case-split': @doCaseSplit
-    'language-idris:add-clause': @doAddClause
-    'language-idris:holes': @showHoles
-    'language-idris:proof-search': @doProofSearch
-    'language-idris:typecheck': @typecheckFile
+    'language-idris:type-of': @runCommand @getTypeForWord
+    'language-idris:docs-for': @runCommand @getDocsForWord
+    'language-idris:case-split': @runCommand @doCaseSplit
+    'language-idris:add-clause': @runCommand @doAddClause
+    'language-idris:holes': @runCommand @showHoles
+    'language-idris:proof-search': @runCommand @doProofSearch
+    'language-idris:typecheck': @runCommand @typecheckFile
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -39,12 +31,21 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
-  dispatchCommand: (packg, command) ->
-    textEditorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
-    atom.commands.dispatch(textEditorElement, "#{packg}:#{command}")
+  initialize: ->
+    if !@model
+      @model = new IdrisModel
+      @messages = new MessagePanelView
+        title: 'Idris Messages'
+        closeMethod: 'hide'
+      @messages.attach()
+      @messages.hide()
 
-  dispatchIdrisCommand: (command) ->
-    @dispatchCommand 'language-idris', command
+  runCommand:
+    (command) =>
+      (args) =>
+        @initialize()
+        command args
+
 
   typecheckFile: ({target}) =>
     # the file needs to be saved for typechecking
