@@ -4,6 +4,7 @@ A work-in-progress Idris Mode for Atom.
 
 It supports:
 
+ - Typechecking
  - Case-splitting (ctrl-alt-c)
  - Clause-adding (ctrl-alt-a)
  - Proof-search (ctrl-alt-s)
@@ -21,7 +22,7 @@ There is a tutorial on how to use the editor under [`documentation/tutorial.md`]
 ## Todo
 
  - Add better support for drawing attention to error-messages
- - Improve the syntax-highlighting (the current is base on the Sublime plugin)
+ - Improve the syntax-highlighting (the current is based on the Sublime plugin)
  - Add autocompletion
  - Add a REPL
  - ...

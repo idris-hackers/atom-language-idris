@@ -30,6 +30,10 @@ mul Z     y = Z
 mul (S k) y = add y (mul k y)
 ```
 
+### Typecheck
+
+Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`.
+
 ### Type info
 
 Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of".
