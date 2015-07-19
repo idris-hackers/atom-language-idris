@@ -16,6 +16,7 @@ class IdrisController
     'language-idris:holes': @runCommand @showHoles
     'language-idris:proof-search': @runCommand @doProofSearch
     'language-idris:typecheck': @runCommand @typecheckFile
+    'language-idris:print-definition': @runCommand @printDefinition
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -174,6 +175,24 @@ class IdrisController
       .load uri
       .filter ({responseType}) -> responseType == 'return'
       .flatMap => @model.proofSearch line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  printDefinition: ({target}) =>
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) =>
+      [type, highlightingInfo] = msg
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle 'Idris: Definition of <tt>' + word + '</tt>', true
+      informationView = new InformationView
+      informationView.initialize
+        obligation: type
+        highlightingInfo: highlightingInfo
+      @messages.add informationView
+
+    @model
+      .printDefinition word
       .subscribe successHandler, @displayErrors
 
   displayErrors: (err) =>

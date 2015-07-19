@@ -79,4 +79,7 @@ class IdrisModel
   proofSearch: (line, word) ->
     @prepareCommand [':proof-search', line, word, []]
 
+  printDefinition: (name) ->
+    @prepareCommand [':print-definition', name]
+
 module.exports = IdrisModel

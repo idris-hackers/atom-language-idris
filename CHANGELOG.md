@@ -4,6 +4,8 @@
 
 ### Added
 
+- `print-definition` to show the definition of the selected word
+
 ### Fixed
 
 ## v0.2.0
