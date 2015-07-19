@@ -4,7 +4,14 @@
 
 ### Added
 
+- status indicator that shows if a file is loaded or dirty
+- metavariables are now called holes
+
 ### Fixed
+
+- fixed bug in the parser when there where backslashes in the answer [#32](https://github.com/idris-hackers/atom-language-idris/issues/32) (@david-christiansen)
+- Program not loaded before running interactive editing commands [#34](https://github.com/idris-hackers/atom-language-idris/issues/34)
+- faster startup [#28](https://github.com/idris-hackers/atom-language-idris/issues/28)
 
 ## v0.1.4
 
