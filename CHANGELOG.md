@@ -4,6 +4,12 @@
 
 ### Added
 
+### Fixed
+
+## v0.2.0
+
+### Added
+
 - status indicator that shows if a file is loaded or dirty
 - metavariables are now called holes
 
