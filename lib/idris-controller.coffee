@@ -5,6 +5,7 @@ HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
 IdrisModel = require './idris-model'
+Ipkg = require './utils/ipkg'
 
 class IdrisController
 
@@ -33,6 +34,7 @@ class IdrisController
     editor.getTextInBufferRange cursorPosition
 
   initialize: ->
+    ipkgFile = Ipkg.readIpkgFile atom.project
     if !@model
       @model = new IdrisModel
       @messages = new MessagePanelView
