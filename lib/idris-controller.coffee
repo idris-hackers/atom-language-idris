@@ -13,6 +13,8 @@ class IdrisController
     'language-idris:docs-for': @runCommand @getDocsForWord
     'language-idris:case-split': @runCommand @doCaseSplit
     'language-idris:add-clause': @runCommand @doAddClause
+    'language-idris:make-with': @runCommand @doMakeWith
+    'language-idris:make-case': @runCommand @doMakeCase
     'language-idris:holes': @runCommand @showHoles
     'language-idris:proof-search': @runCommand @doProofSearch
     'language-idris:typecheck': @runCommand @typecheckFile
@@ -135,6 +137,55 @@ class IdrisController
       .load uri
       .filter ({responseType}) -> responseType == 'return'
       .flatMap => @model.addClause line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeWith: ({target}) =>
+    editor = target.model
+    editor.save()
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    editor.moveToBeginningOfLine()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new with block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeWith line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeCase: ({target}) =>
+    editor = target.model
+    editor.save()
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new case block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeCase line + 1, word
       .subscribe successHandler, @displayErrors
 
   showHoles: ({target}) =>

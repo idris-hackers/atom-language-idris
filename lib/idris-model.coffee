@@ -70,6 +70,12 @@ class IdrisModel
   caseSplit: (line, word) ->
     @prepareCommand [':case-split', line, word]
 
+  makeWith: (line, word) ->
+    @prepareCommand [':make-with', line, word]
+
+  makeCase: (line, word) ->
+    @prepareCommand [':make-case', line, word]
+
   addClause: (line, word) ->
     @prepareCommand [':add-clause', line, word]
 
