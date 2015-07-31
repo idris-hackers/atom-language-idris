@@ -82,6 +82,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({target}) =>
+    target.model.save()
     word = @getWordUnderCursor target
 
     successHandler = ({responseType, msg}) =>
@@ -101,6 +102,7 @@ class IdrisController
 
   doCaseSplit: ({target}) =>
     editor = target.model
+    editor.save()
     uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
@@ -119,6 +121,7 @@ class IdrisController
 
   doAddClause: ({target}) =>
     editor = target.model
+    editor.save()
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
@@ -204,6 +207,7 @@ class IdrisController
 
   doProofSearch: ({target}) =>
     editor = target.model
+    editor.save()
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
