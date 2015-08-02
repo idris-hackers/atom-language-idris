@@ -14,6 +14,7 @@ class IdrisController
     'language-idris:case-split': @runCommand @doCaseSplit
     'language-idris:add-clause': @runCommand @doAddClause
     'language-idris:make-with': @runCommand @doMakeWith
+    'language-idris:make-lemma': @runCommand @doMakeLemma
     'language-idris:make-case': @runCommand @doMakeCase
     'language-idris:holes': @runCommand @showHoles
     'language-idris:proof-search': @runCommand @doProofSearch
@@ -82,7 +83,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({target}) =>
-    target.model.save()
+    @typecheckFile {target}
     word = @getWordUnderCursor target
 
     successHandler = ({responseType, msg}) =>
@@ -102,7 +103,7 @@ class IdrisController
 
   doCaseSplit: ({target}) =>
     editor = target.model
-    editor.save()
+    @typecheckFile {target}
     uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
@@ -121,7 +122,7 @@ class IdrisController
 
   doAddClause: ({target}) =>
     editor = target.model
-    editor.save()
+    @typecheckFile {target}
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
@@ -144,7 +145,7 @@ class IdrisController
 
   doMakeWith: ({target}) =>
     editor = target.model
-    editor.save()
+    @typecheckFile {target}
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     editor.moveToBeginningOfLine()
@@ -167,9 +168,58 @@ class IdrisController
       .flatMap => @model.makeWith line + 1, word
       .subscribe successHandler, @displayErrors
 
+  doMakeLemma: ({target}) =>
+    editor = target.model
+    @typecheckFile {target}
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [lemty, param1, param2] = msg
+      editor.transact ->
+        if lemty == ':metavariable-lemma'
+          # Move the cursor to the beginning of the word
+          editor.moveToBeginningOfWord()
+          # Because the ? in the Holes isn't part of
+          # the word, we move left once, and then select two
+          # words
+          editor.moveLeft()
+          editor.selectToEndOfWord()
+          editor.selectToEndOfWord()
+          # And then replace the replacement with the lemma call..
+          editor.insertText param1[1]
+
+          # Now move to the previous blank line and insert the type
+          # of the lemma
+          editor.moveToBeginningOfLine()
+          line = editor.getLastCursor().getBufferRow()
+
+          # I tried to make this a function but failed to find out how
+          # to call it and gave up...
+          while(line > 0)
+            editor.moveToBeginningOfLine()
+            editor.selectToEndOfLine()
+            contents = editor.getSelectedText()
+            if contents == ''
+              break
+            editor.moveUp()
+            line--
+
+          editor.insertNewlineBelow()
+          editor.insertText param2[1]
+          editor.insertNewlineBelow()
+
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeLemma line + 1, word
+      .subscribe successHandler, @displayErrors
+
   doMakeCase: ({target}) =>
     editor = target.model
-    editor.save()
+    @typecheckFile {target}
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
