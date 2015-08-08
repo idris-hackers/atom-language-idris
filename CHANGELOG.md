@@ -4,7 +4,14 @@
 
 ### Added
 
+### Fixed
+
+## v0.2.1
+
+### Added
+
 - `print-definition` to show the definition of the selected word
+- add error messages when the compiler crashes/can't be found
 
 ### Fixed
 
