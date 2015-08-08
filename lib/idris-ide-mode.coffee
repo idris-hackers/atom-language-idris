@@ -14,6 +14,9 @@ class IdrisIdeMode extends EventEmitter
     @process = spawn pathToIdris, ['--ide-mode']
     @process.on 'exit', @stopped
     @process.on 'error', @stopped
+    @process.on 'close', @stopped
+    @process.on 'disconnect', @stopped
+
     @process.stdout.setEncoding('utf8').on 'data', @stdout
 
   send: (cmd) ->
@@ -24,8 +27,20 @@ class IdrisIdeMode extends EventEmitter
     @process?.kill()
     @stopped()
 
-  stopped: =>
-    Logger.logText 'Exited'
+  stopped: (error, signal) =>
+    e =
+      if error
+        if error.code == 'ENOENT'
+          short: "Couldn't find idris executable"
+          long: "Couldn't find idris executable at \"#{error.path}\""
+        else
+          short: error.code
+          long: error.message
+      else
+        short: signal
+        long: "Process exited with signal #{signal}"
+
+    atom.notifications.addError e.short, detail: e.long
     @process = null
 
   running: ->
