@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v.0.2.2
+
+### Added
+
+### Fixed
+
+- fix the new error messages
+
 ## v0.2.1
 
 ### Added

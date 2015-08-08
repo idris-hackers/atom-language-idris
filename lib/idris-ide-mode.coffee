@@ -12,10 +12,10 @@ class IdrisIdeMode extends EventEmitter
   constructor: ->
     pathToIdris = atom.config.get("language-idris.pathToIdris")
     @process = spawn pathToIdris, ['--ide-mode']
-    @process.on 'exit', @stopped
-    @process.on 'error', @stopped
-    @process.on 'close', @stopped
-    @process.on 'disconnect', @stopped
+    @process.on 'error', @error
+    @process.on 'exit', @exited
+    @process.on 'close', @exited
+    @process.on 'disconnect', @exited
 
     @process.stdout.setEncoding('utf8').on 'data', @stdout
 
@@ -25,23 +25,26 @@ class IdrisIdeMode extends EventEmitter
 
   stop: ->
     @process?.kill()
-    @stopped()
 
-  stopped: (error, signal) =>
+  error: (error) ->
     e =
-      if error
-        if error.code == 'ENOENT'
-          short: "Couldn't find idris executable"
-          long: "Couldn't find idris executable at \"#{error.path}\""
-        else
-          short: error.code
-          long: error.message
+      if error.code == 'ENOENT'
+        short: "Couldn't find idris executable"
+        long: "Couldn't find idris executable at \"#{error.path}\""
       else
-        short: signal
-        long: "Process exited with signal #{signal}"
+        short: error.code
+        long: error.message
 
     atom.notifications.addError e.short, detail: e.long
-    @process = null
+
+  exited: (code, signal) ->
+    short = "The idris compiler was closed or crashed"
+    long =
+      if signal
+        "It was closed with the signal: #{signal}"
+      else
+        "It (probably) crashed with the error code: #{code}"
+    atom.notifications.addError short, detail: long
 
   running: ->
     !!@process
