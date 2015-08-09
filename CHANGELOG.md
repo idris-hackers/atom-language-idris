@@ -4,9 +4,13 @@
 
 ### Added
 
+- make-with (@edwinb)
+- make-case (@edwinb)
+
 ### Fixed
 
 - Uncaught Error: Can't save buffer with no file path [#47](https://github.com/idris-hackers/atom-language-idris/issues/47)
+- save files before executing a command (@edwinb)
 
 ## v.0.2.2
 
