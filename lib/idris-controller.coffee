@@ -47,10 +47,15 @@ class IdrisController
         @initialize()
         command args
 
+  saveFile: (editor) ->
+    if editor.getURI()
+      editor.save()
+    else
+      atom.workspace.saveActivePaneItemAs()
 
   typecheckFile: ({target}) =>
     # the file needs to be saved for typechecking
-    target.model.save()
+    @saveFile target.model
     uri = target.model.getURI()
 
     successHandler = ({responseType, msg}) =>
