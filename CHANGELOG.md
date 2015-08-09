@@ -12,6 +12,7 @@
 
 - Uncaught Error: Can't save buffer with no file path [#47](https://github.com/idris-hackers/atom-language-idris/issues/47)
 - save files before executing a command (@edwinb)
+- The Idris Errors panel should tell me if typechecking went successfully [#43](https://github.com/idris-hackers/atom-language-idris/issues/43) (@edwinb)
 
 ## v.0.2.2
 
