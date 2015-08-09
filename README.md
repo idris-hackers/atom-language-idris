@@ -12,6 +12,7 @@ It supports:
  - Show the doc for a variable (ctrl-alt-d)
  - make with (ctrl-alt-w)
  - make case (ctrl-alt-m)
+ - make lemma (ctrl-alt-l)
 
 ## Usage
 

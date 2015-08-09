@@ -6,6 +6,7 @@
 
 - make-with (@edwinb)
 - make-case (@edwinb)
+- make-lemma (@edwinb)
 
 ### Fixed
 
