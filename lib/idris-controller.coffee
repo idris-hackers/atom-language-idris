@@ -32,7 +32,9 @@ class IdrisController
 
   getWordUnderCursor: (editorView) ->
     editor = editorView.model
-    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
+    options =
+      wordRegex: /^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+/g
+    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
     editor.getTextInBufferRange cursorPosition
 
   initialize: ->
