@@ -252,6 +252,10 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   showHoles: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+
     successHandler = ({responseType, msg}) =>
       [holes] = msg
       @messages.show()
@@ -262,7 +266,9 @@ class IdrisController
       @messages.add holesView
 
     @model
-      .holes 80
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.holes 80
       .subscribe successHandler, @displayErrors
 
   doProofSearch: ({target}) =>
