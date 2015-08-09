@@ -4,6 +4,12 @@
 
 ### Added
 
+### Fixed
+
+## v.0.2.3
+
+### Added
+
 - make-with (@edwinb)
 - make-case (@edwinb)
 - make-lemma (@edwinb)
