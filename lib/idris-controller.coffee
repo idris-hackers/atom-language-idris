@@ -91,7 +91,8 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({target}) =>
-    @saveFile target.model
+    editor = target.model
+    @saveFile editor
     uri = editor.getURI()
     word = @getWordUnderCursor target
 
@@ -108,7 +109,8 @@ class IdrisController
 
     @model
       .load uri
-      .getType word
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.getType word
       .subscribe successHandler, @displayErrors
 
   doCaseSplit: ({target}) =>
@@ -180,7 +182,7 @@ class IdrisController
 
   doMakeLemma: ({target}) =>
     editor = target.model
-    @typecheckFile {target}
+    @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target

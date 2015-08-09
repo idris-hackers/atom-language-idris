@@ -8,11 +8,12 @@ It supports:
  - Case-splitting (ctrl-alt-c)
  - Clause-adding (ctrl-alt-a)
  - Proof-search (ctrl-alt-s)
- - Showing the types of meta-variables (ctrl-alt-t)
+ - Showing the types of a variable (ctrl-alt-t)
  - Show the doc for a variable (ctrl-alt-d)
- - make with (ctrl-alt-w)
- - make case (ctrl-alt-m)
- - make lemma (ctrl-alt-l)
+ - make-with (ctrl-alt-w)
+ - make-case (ctrl-alt-m)
+ - make-lemma (ctrl-alt-l)
+ - Showing holes
 
 ## Usage
 
