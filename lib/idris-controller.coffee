@@ -64,6 +64,7 @@ class IdrisController
     successHandler = ({responseType, msg}) =>
       @statusIndicator.setStatusLoaded()
       @messages.clear()
+      @messages.show()
       @messages.setTitle 'Idris: File loaded successfully'
 
     @model
