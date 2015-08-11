@@ -1,3 +1,6 @@
+# Applies the highlighting we get from the idris compiler to our source code.
+# http://docs.idris-lang.org/en/latest/reference/ide-protocol.html#output-highlighting
+
 highlightInfoListToOb = (list) ->
   obj = {}
   for x in list
@@ -6,6 +9,8 @@ highlightInfoListToOb = (list) ->
     obj[key] = value
   obj
 
+# Use the right CSS classes, so that we can use the
+# syntax highlighting built into atom.
 decorToClasses = (decor) ->
   switch decor
     when ':type' then ['storage', 'type']
@@ -19,6 +24,8 @@ highlightWord = (word, info) ->
   classes: decorToClasses(info.info.decor).concat 'idris'
   word: word
 
+# Build highlighting information that we can then pass to one
+# of our serializers.
 highlight = (code, highlightingInfo) ->
   highlighted = highlightingInfo
     .map ([start, length, info]) ->
@@ -46,6 +53,7 @@ highlight = (code, highlightingInfo) ->
   higlightedWords.filter (higlightedWord) ->
     higlightedWord.word != ''
 
+# Applies the highlighting and returns the result as an html-string.
 highlightToString = (highlights) ->
   highlights
     .map ({classes, word}) ->
@@ -55,6 +63,7 @@ highlightToString = (highlights) ->
         "<span class=\"#{classes.join(' ')}\">#{word}</span>"
     .join ''
 
+# Applies the highlighting and returns the result as a DOM-objects.
 highlightToHtml = (highlights) ->
   spans = highlights
     .map ({classes, word}) ->
@@ -70,8 +79,6 @@ highlightToHtml = (highlights) ->
   spans.forEach (span) ->
     container.appendChild span
   container
-
-
 
 
 module.exports =
