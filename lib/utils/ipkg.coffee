@@ -2,28 +2,39 @@ path = require 'path'
 fs = require 'fs'
 Rx = require 'rx-lite'
 
-readIpkgFile = (project) ->
+findIpkgFile = (project) ->
   directory = project.getDirectories()[0].path
-  dir = Rx.Observable.fromNodeCallback fs.readdir
+  readDir = Rx.Observable.fromNodeCallback fs.readdir
 
-  success = (files) ->
-    console.log "success"
-
-  r = dir directory
+  r = readDir directory
   r
-    .flatMap (files) ->
-      ipkgs = files
+    .map (files) ->
+      files
         .map (file) ->
           file: file
+          path: path.join directory, file
           ext: path.extname file
         .filter (file) ->
           file.ext == '.ipkg'
-      if ipkgs.lenght > 0
-        Rx.Observable.return ipkgs[0]
-      else
-        Rx.Observable.throw new Error 'no ipkg files'
 
-    .subscribe success, ((a) -> console.log(a))
+parseIpkgFile = (ipkgFile) ->
+  []
+
+readIpkgFile = (ipkgFile) ->
+  readFile = Rx.Observable.fromNodeCallback fs.readFile
+  file = readFile ipkgFile.path,
+    encoding: 'utf8'
+  file.map parseIpkgFile
+
+compilerOptions = (project) ->
+  ipkgFilesObserver = findIpkgFile project
+  ipkgFilesObserver.flatMap (ipkgFiles) ->
+    if ipkgFiles.length
+      readIpkgFile ipkgFiles[0]
+    else
+      Rx.Observable.return []
 
 module.exports =
+  findIpkgFile: findIpkgFile
   readIpkgFile: readIpkgFile
+  compilerOptions: compilerOptions

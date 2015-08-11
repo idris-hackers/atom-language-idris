@@ -34,7 +34,7 @@ class IdrisController
     editor.getTextInBufferRange cursorPosition
 
   initialize: ->
-    ipkgFile = Ipkg.readIpkgFile atom.project
+    compilerOptions = Ipkg.compilerOptions atom.project
     if !@model
       @model = new IdrisModel
       @messages = new MessagePanelView
