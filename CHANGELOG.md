@@ -6,7 +6,16 @@
 
 ### Fixed
 
-## v.0.2.3
+## v0.2.4
+
+### Added
+
+### Fixed
+
+- Uncaught ReferenceError: editor is not defined [#49](https://github.com/idris-hackers/atom-language-idris/issues/49)
+- Error when searching for type, documentation [#37](https://github.com/idris-hackers/atom-language-idris/issues/37)
+
+## v0.2.3
 
 ### Added
 
@@ -20,7 +29,7 @@
 - save files before executing a command (@edwinb)
 - The Idris Errors panel should tell me if typechecking went successfully [#43](https://github.com/idris-hackers/atom-language-idris/issues/43) (@edwinb)
 
-## v.0.2.2
+## v0.2.2
 
 ### Added
 
