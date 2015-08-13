@@ -3,6 +3,7 @@ fs = require 'fs'
 Rx = require 'rx-lite'
 
 optionsRegexp = /opts\s*=\s*\"([^\"]*)\"/
+sourcedirRegexp = /sourcedir\s*=\s*([a-zA-Z/0-9]+)/
 
 # Find all ipkg-files in a directory and returns
 # an observable of an array of files
@@ -16,31 +17,42 @@ findIpkgFile = (project) ->
       files
         .map (file) ->
           file: file
+          directory: directory
           path: path.join directory, file
           ext: path.extname file
         .filter (file) ->
           file.ext == '.ipkg'
 
-parseIpkgFile = (ipkgFile) ->
-  matches = ipkgFile.match optionsRegexp
-  if matches
-    [matches[1]]
-  else
-    []
+parseIpkgFile = (fileInfo) ->
+  (fileContents) ->
+    optionsMatches = fileContents.match optionsRegexp
+    sourcedirMatches = fileContents.match sourcedirRegexp
+
+    compilerOptions = {}
+    if optionsMatches
+      compilerOptions.options = optionsMatches[1]
+    if sourcedirMatches
+      compilerOptions.sourcedir = sourcedirMatches[1]
+      compilerOptions.src = path.join fileInfo.directory, sourcedirMatches[1]
+
+    compilerOptions
 
 readIpkgFile = (ipkgFile) ->
   readFile = Rx.Observable.fromNodeCallback fs.readFile
-  file = readFile ipkgFile.path,
+  readFile ipkgFile.path,
     encoding: 'utf8'
-  file.map parseIpkgFile
 
+# Find the ipkg file in the top directory of the project and return
+# the compiler options in it.
 compilerOptions = (project) ->
   ipkgFilesObserver = findIpkgFile project
   ipkgFilesObserver.flatMap (ipkgFiles) ->
     if ipkgFiles.length
-      readIpkgFile ipkgFiles[0]
+      ipkgFile = ipkgFiles[0]
+      readIpkgFile(ipkgFile)
+        .map parseIpkgFile(ipkgFile)
     else
-      Rx.Observable.return []
+      Rx.Observable.return {}
 
 module.exports =
   findIpkgFile: findIpkgFile

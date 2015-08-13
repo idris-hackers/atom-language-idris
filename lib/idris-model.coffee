@@ -7,15 +7,20 @@ class IdrisModel
   ideModeRef: null
   subjects: {}
   warnings: {}
+  compilerOptions: {}
 
-  ideMode: ->
+  ideMode: (compilerOptions) ->
     if !@ideModeRef
       @ideModeRef = new IdrisIdeMode
       @ideModeRef.on 'message', @handleCommand
+    @ideModeRef.start compilerOptions
     @ideModeRef
 
   stop: ->
     @ideModeRef?.stop()
+
+  setCompilerOptions: (options) ->
+    @compilerOptions = options
 
   handleCommand: (cmd) =>
     if cmd.length > 0
@@ -55,7 +60,7 @@ class IdrisModel
     subject = new Rx.Subject
     @subjects[id] = subject
     @warnings[id] = []
-    @ideMode().send [cmd, id]
+    @ideMode(@compilerOptions).send [cmd, id]
     subject
 
   load: (uri) ->

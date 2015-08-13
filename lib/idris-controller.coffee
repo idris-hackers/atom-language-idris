@@ -33,8 +33,7 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
     editor.getTextInBufferRange cursorPosition
 
-  initialize: ->
-    compilerOptions = Ipkg.compilerOptions atom.project
+  initialize: (compilerOptions) ->
     if !@model
       @model = new IdrisModel
       @messages = new MessagePanelView
@@ -42,12 +41,20 @@ class IdrisController
         closeMethod: 'hide'
       @messages.attach()
       @messages.hide()
+    @model.setCompilerOptions compilerOptions
 
   runCommand:
     (command) =>
       (args) =>
-        @initialize()
-        command args
+        compilerOptions = Ipkg.compilerOptions atom.project
+        compilerOptions.subscribe ((options) =>
+          console.log "Compiler Options:", options
+          @initialize options
+          command args
+        ), (() ->
+          @initialize {}
+          command args
+        )
 
 
   typecheckFile: ({target}) =>
