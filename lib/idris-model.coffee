@@ -31,9 +31,15 @@ class IdrisModel
           when ':return'
             ret = params[0]
             if ret[0] == ':ok'
-              subject.onNext
-                responseType: 'return'
-                msg: ret.slice(1)
+              okparams = ret[1]
+              if okparams[0] == ':metavariable-lemma'
+                subject.onNext
+                  responseType: 'return'
+                  msg: okparams
+              else
+                subject.onNext
+                  responseType: 'return'
+                  msg: ret.slice(1)
             else
               subject.onError
                 message: ret[1]
@@ -74,6 +80,15 @@ class IdrisModel
 
   caseSplit: (line, word) ->
     @prepareCommand [':case-split', line, word]
+
+  makeWith: (line, word) ->
+    @prepareCommand [':make-with', line, word]
+
+  makeLemma: (line, word) ->
+    @prepareCommand [':make-lemma', line, word]
+
+  makeCase: (line, word) ->
+    @prepareCommand [':make-case', line, word]
 
   addClause: (line, word) ->
     @prepareCommand [':add-clause', line, word]

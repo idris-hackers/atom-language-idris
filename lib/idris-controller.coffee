@@ -14,6 +14,9 @@ class IdrisController
     'language-idris:docs-for': @runCommand @getDocsForWord
     'language-idris:case-split': @runCommand @doCaseSplit
     'language-idris:add-clause': @runCommand @doAddClause
+    'language-idris:make-with': @runCommand @doMakeWith
+    'language-idris:make-lemma': @runCommand @doMakeLemma
+    'language-idris:make-case': @runCommand @doMakeCase
     'language-idris:holes': @runCommand @showHoles
     'language-idris:proof-search': @runCommand @doProofSearch
     'language-idris:typecheck': @runCommand @typecheckFile
@@ -30,7 +33,9 @@ class IdrisController
 
   getWordUnderCursor: (editorView) ->
     editor = editorView.model
-    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
+    options =
+      wordRegex: /^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+/g
+    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
     editor.getTextInBufferRange cursorPosition
 
   initialize: (compilerOptions) ->
@@ -56,14 +61,22 @@ class IdrisController
           command args
         )
 
+  saveFile: (editor) ->
+    if editor.getURI()
+      editor.save()
+    else
+      atom.workspace.saveActivePaneItemAs()
 
   typecheckFile: ({target}) =>
     # the file needs to be saved for typechecking
-    target.model.save()
+    @saveFile target.model
     uri = target.model.getURI()
 
     successHandler = ({responseType, msg}) =>
       @statusIndicator.setStatusLoaded()
+      @messages.clear()
+      @messages.show()
+      @messages.setTitle 'Idris: File loaded successfully'
 
     @model
       .load uri
@@ -89,6 +102,9 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
     word = @getWordUnderCursor target
 
     successHandler = ({responseType, msg}) =>
@@ -103,11 +119,14 @@ class IdrisController
       @messages.add informationView
 
     @model
-      .getType word
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.getType word
       .subscribe successHandler, @displayErrors
 
   doCaseSplit: ({target}) =>
     editor = target.model
+    @saveFile editor
     uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
@@ -126,6 +145,7 @@ class IdrisController
 
   doAddClause: ({target}) =>
     editor = target.model
+    @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
@@ -146,7 +166,109 @@ class IdrisController
       .flatMap => @model.addClause line + 1, word
       .subscribe successHandler, @displayErrors
 
+  doMakeWith: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    editor.moveToBeginningOfLine()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new with block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeWith line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeLemma: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [lemty, param1, param2] = msg
+      editor.transact ->
+        if lemty == ':metavariable-lemma'
+          # Move the cursor to the beginning of the word
+          editor.moveToBeginningOfWord()
+          # Because the ? in the Holes isn't part of
+          # the word, we move left once, and then select two
+          # words
+          editor.moveLeft()
+          editor.selectToEndOfWord()
+          editor.selectToEndOfWord()
+          # And then replace the replacement with the lemma call..
+          editor.insertText param1[1]
+
+          # Now move to the previous blank line and insert the type
+          # of the lemma
+          editor.moveToBeginningOfLine()
+          line = editor.getLastCursor().getBufferRow()
+
+          # I tried to make this a function but failed to find out how
+          # to call it and gave up...
+          while(line > 0)
+            editor.moveToBeginningOfLine()
+            editor.selectToEndOfLine()
+            contents = editor.getSelectedText()
+            if contents == ''
+              break
+            editor.moveUp()
+            line--
+
+          editor.insertNewlineBelow()
+          editor.insertText param2[1]
+          editor.insertNewlineBelow()
+
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeLemma line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeCase: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new case block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeCase line + 1, word
+      .subscribe successHandler, @displayErrors
+
   showHoles: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+
     successHandler = ({responseType, msg}) =>
       [holes] = msg
       @messages.show()
@@ -157,11 +279,14 @@ class IdrisController
       @messages.add holesView
 
     @model
-      .holes 80
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.holes 80
       .subscribe successHandler, @displayErrors
 
   doProofSearch: ({target}) =>
     editor = target.model
+    @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
