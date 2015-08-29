@@ -20,6 +20,7 @@ class IdrisController
     'language-idris:proof-search': @runCommand @doProofSearch
     'language-idris:typecheck': @runCommand @typecheckFile
     'language-idris:print-definition': @runCommand @printDefinition
+    'language-idris:stop-compiler': @stopCompiler
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -45,6 +46,9 @@ class IdrisController
         closeMethod: 'hide'
       @messages.attach()
       @messages.hide()
+
+  stopCompiler: =>
+    @model?.stop()
 
   runCommand:
     (command) =>
