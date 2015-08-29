@@ -9,15 +9,16 @@ class IdrisIdeMode extends EventEmitter
   buffer: ''
   idrisBuffers: 0
 
-  constructor: ->
-    pathToIdris = atom.config.get("language-idris.pathToIdris")
-    @process = spawn pathToIdris, ['--ide-mode']
-    @process.on 'error', @error
-    @process.on 'exit', @exited
-    @process.on 'close', @exited
-    @process.on 'disconnect', @exited
+  start: ->
+    if (not @process?) || @process.killed
+      pathToIdris = atom.config.get("language-idris.pathToIdris")
+      @process = spawn pathToIdris, ['--ide-mode']
+      @process.on 'error', @error
+      @process.on 'exit', @exited
+      @process.on 'close', @exited
+      @process.on 'disconnect', @exited
 
-    @process.stdout.setEncoding('utf8').on 'data', @stdout
+      @process.stdout.setEncoding('utf8').on 'data', @stdout
 
   send: (cmd) ->
     Logger.logOutgoingCommand cmd
