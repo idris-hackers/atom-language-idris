@@ -345,10 +345,15 @@ class IdrisController
         message: warning[3]
 
   attachStatusIndicator: (statusBar) ->
-    @statusIndicator = new StatusIndicator
-    @statusIndicator.initialize()
-    statusBar.addLeftTile
-      item: @statusIndicator
+    if not @statusIndicator
+      @statusIndicator = new StatusIndicator
+      @statusIndicator.initialize()
+      statusBar.addLeftTile
+        item: @statusIndicator
+
+  detachStatusIndicator: ->
+    @statusIndicator?.remove()
+    @statusIndicator = null
 
 
 module.exports = IdrisController

@@ -20,4 +20,11 @@ module.exports =
     this.controller.destroy()
 
   consumeStatusBar: (statusBar) ->
-    @controller.attachStatusIndicator statusBar
+    subscription = atom.workspace.observeActivePaneItem (paneItem) =>
+      if paneItem
+        grammar = paneItem.getGrammar().name
+        if grammar == 'Idris'
+          @controller?.attachStatusIndicator statusBar
+        else
+          @controller?.detachStatusIndicator statusBar
+    @subscriptions?.add? subscription
