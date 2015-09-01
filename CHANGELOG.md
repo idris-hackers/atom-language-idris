@@ -6,6 +6,8 @@
 
 ### Fixed
 
+- Status message should appear only in idris projects [#52](https://github.com/idris-hackers/atom-language-idris/issues/52) many thanks to @jeremy-w
+
 ## v0.2.4
 
 ### Added
