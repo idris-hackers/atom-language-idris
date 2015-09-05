@@ -21,7 +21,7 @@ module.exports =
 
   consumeStatusBar: (statusBar) ->
     subscription = atom.workspace.observeActivePaneItem (paneItem) =>
-      if paneItem
+      if paneItem && paneItem.getGrammar?
         grammar = paneItem.getGrammar().name
         if grammar == 'Idris'
           @controller?.attachStatusIndicator statusBar
