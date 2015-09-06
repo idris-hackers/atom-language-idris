@@ -1,6 +1,7 @@
 IdrisIdeMode = require './idris-ide-mode'
 Logger = require './Logger'
 Rx = require 'rx-lite'
+JS = require './utils/js'
 
 class IdrisModel
   requestId: 0
@@ -8,12 +9,15 @@ class IdrisModel
   subjects: {}
   warnings: {}
   compilerOptions: {}
+  oldCompilerOptions: {}
 
   ideMode: (compilerOptions) ->
-    if !@ideModeRef
+    a = !JS.objectEqual(@oldCompilerOptions, compilerOptions)
+    if !@ideModeRef || !JS.objectEqual(@oldCompilerOptions, compilerOptions)
       @ideModeRef = new IdrisIdeMode
       @ideModeRef.on 'message', @handleCommand
-    @ideModeRef.start compilerOptions
+      @ideModeRef.start compilerOptions
+      @oldCompilerOptions = compilerOptions
     @ideModeRef
 
   stop: ->
