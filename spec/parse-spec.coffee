@@ -1,4 +1,4 @@
-utils = require '../lib/utils'
+sexpFormatter = require '../lib/utils/sexp-formatter'
 parse = require '../lib/parse'
 runP = require('bennu').parse.run
 
@@ -78,6 +78,17 @@ list5 =
     5
   ]
 
+test6 = """(:return (:ok "\\\\__pi_arg => \\\\__pi_arg1 => (__pi_arg1)") 6)"""
+list6 =
+  [
+    ":return"
+    [
+      ":ok"
+      "\\__pi_arg => \\__pi_arg1 => (__pi_arg1)"
+    ]
+    6
+  ]
+
 describe "The sub-parser(s)", ->
   it "for :True and :False should work.", ->
     expect(runP(parse.trueP, ':True')).toEqual(true)
@@ -106,13 +117,14 @@ describe "A parser", ->
     expect(parse.parse(test3)).toEqual(list3)
     expect(parse.parse(test4)).toEqual(list4)
     expect(parse.parse(test5)).toEqual(list5)
+    expect(parse.parse(test6)).toEqual(list6)
 
   it "should serialize back again.", ->
-    expect(utils.formatSexp(list1)).toEqual(test1)
-    expect(utils.formatSexp(list2)).toEqual(test2)
-    expect(utils.formatSexp(list3)).toEqual(test3)
-    expect(utils.formatSexp(list4)).toEqual(test4)
+    expect(sexpFormatter.formatSexp(list1)).toEqual(test1)
+    expect(sexpFormatter.formatSexp(list2)).toEqual(test2)
+    expect(sexpFormatter.formatSexp(list3)).toEqual(test3)
+    expect(sexpFormatter.formatSexp(list4)).toEqual(test4)
 
   it "should serialize common commands.", ->
     loadFile = [[':load-file', "idris.idr"], 1]
-    expect(utils.formatSexp(loadFile)).toEqual '((:load-file "idris.idr") 1)'
+    expect(sexpFormatter.formatSexp(loadFile)).toEqual '((:load-file "idris.idr") 1)'

@@ -1,7 +1,5 @@
-parse = require('bennu').parse
-text = require('bennu').text
-lang = require('bennu').lang
-stream = require('nu-stream').stream
+{parse, text, lang} = require 'bennu'
+{stream} = require 'nu-stream'
 
 streamToString = (s) -> stream.toArray(s).join ''
 
@@ -18,9 +16,11 @@ integerP =
 
 # string
 quoteP = text.character '"'
+escapedP = parse.choice(parse.next(text.character('\\'), parse.always('\\')),
+                        parse.next(text.character('"'), parse.always('"')))
 stringLetterP = parse.token (c) ->
   c != '"' && c != '\\'
-stringEscapeP = parse.attempt parse.next(text.character('\\'), quoteP)
+stringEscapeP = parse.attempt parse.next(text.character('\\'), escapedP)
 stringBackslashP = text.character '\\'
 stringCharP = parse.choice stringLetterP, stringEscapeP, stringBackslashP
 stringP =

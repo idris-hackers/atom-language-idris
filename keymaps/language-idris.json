@@ -5,6 +5,10 @@
     "ctrl-alt-a": "language-idris:add-clause",
     "ctrl-alt-s": "language-idris:proof-search",
     "ctrl-alt-d": "language-idris:docs-for",
-    "ctrl-alt-enter": "language-idris:open-repl"
+    "ctrl-alt-enter": "language-idris:open-repl",
+    "ctrl-alt-w": "language-idris:make-with",
+    "ctrl-alt-l": "language-idris:make-lemma",
+    "ctrl-alt-r": "language-idris:typecheck",
+    "ctrl-alt-m": "language-idris:make-case"
   }
 }

@@ -1,162 +1,335 @@
-MessagePanelView = require('atom-message-panel').MessagePanelView
-PlainMessageView = require('atom-message-panel').PlainMessageView
-LineMessageView = require('atom-message-panel').LineMessageView
-ProofObligationView = require('./ProofObligationView')
+{MessagePanelView, PlainMessageView, LineMessageView} =
+  require 'atom-message-panel'
+InformationView = require './views/information-view'
+HolesView = require './views/holes-view'
+StatusIndicator = require './views/status-indicator-view'
+Logger = require './Logger'
+IdrisModel = require './idris-model'
+Ipkg = require './utils/ipkg'
 REPLView = require './REPLView'
-highlighter = require './utils/highlighter'
 
 class IdrisController
-  idrisBuffers: 0
-  localChanges: undefined
-
-  constructor: (@statusbar, @model) ->
-    @idrisBuffers = 0
-
-    atom.workspace.getTextEditors().forEach (editor) =>
-      uri = editor.getURI()
-      if @isIdrisFile(uri)
-        console.log editor
-        @idrisFileOpened editor
-
-    @statusbar.initialize()
-    @messages = new MessagePanelView
-      title: 'Idris Messages'
-      closeMethod: 'hide'
-    @messages.attach()
-    @messages.hide()
-
-    atom.workspace.observeActivePaneItem @paneChanged
-
-    if activeItem = atom.workspace.getActivePaneItem()
-      if activeItem.isModified()
-        @idrisFileChanged activeItem
 
   getCommands: ->
-    'language-idris:type-of': @getTypeForWord
-    'language-idris:docs-for': @getDocsForWord
-    'language-idris:case-split': @doCaseSplit
-    'language-idris:add-clause': @doAddClause
-    'language-idris:proof-search': @doProofSearch
-    'language-idris:open-repl': @openREPL
+    'language-idris:type-of': @runCommand @getTypeForWord
+    'language-idris:docs-for': @runCommand @getDocsForWord
+    'language-idris:case-split': @runCommand @doCaseSplit
+    'language-idris:add-clause': @runCommand @doAddClause
+    'language-idris:make-with': @runCommand @doMakeWith
+    'language-idris:make-lemma': @runCommand @doMakeLemma
+    'language-idris:make-case': @runCommand @doMakeCase
+    'language-idris:holes': @runCommand @showHoles
+    'language-idris:proof-search': @runCommand @doProofSearch
+    'language-idris:typecheck': @runCommand @typecheckFile
+    'language-idris:print-definition': @runCommand @printDefinition
+    'language-idris:open-repl': @runCommand @openREPL
 
   isIdrisFile: (uri) ->
-    if uri? && uri.match?
-      uri.match /\.idr$/
-    else
-      false
-
-  idrisFileOpened: (editor) ->
-    @idrisBuffers += 1
-    if !@model.running()
-      console.log 'Starting Idris IDESlave'
-      @model.start()
-    editor.buffer.onDidDestroy @idrisFileClosed.bind(this, editor)
-    editor.buffer.onDidSave @idrisFileSaved.bind(this, editor)
-    editor.buffer.onDidChange @idrisFileChanged.bind(this, editor)
-
-  idrisFileSaved: (editor) ->
-    @messages.clear()
-    @messages.hide()
-    @localChanges = false
-    if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
-
-  idrisFileChanged: (editor) ->
-    @localChanges = editor.isModified()
-    if @localChanges
-      @statusbar.setStatus 'Idris: local modifications'
-    else if @isIdrisFile(editor.getURI())
-      @loadFile editor.getURI()
-
-  idrisFileClosed: (editor) ->
-    @idrisBuffers -= 1
-    if @idrisBuffers == 0
-      console.log 'Shut down Idris IDESlave'
-      @model.stop()
-
-  paneChanged: =>
-    @messages.clear()
-    @messages.hide()
-    editor = atom.workspace.getActiveTextEditor()
-    if editor
-      uri = editor.getPath()
-      if @isIdrisFile(uri)
-        @statusbar.show()
-        @loadFile uri
-      else
-        @statusbar.hide()
+    uri?.match? /\.idr$/
 
   destroy: ->
-    if @idrisModel
-      console.log 'Idris: Shutting down!'
+    if @model
+      Logger.logText 'Idris: Shutting down!'
       @model.stop()
     @statusbar.destroy()
 
   getWordUnderCursor: (editorView) ->
     editor = editorView.model
-    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange()
+    options =
+      wordRegex: /^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+/g
+    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
     editor.getTextInBufferRange cursorPosition
 
-  loadFile: (uri) ->
-    console.log 'Loading ' + uri
-    @messages.clear()
-    @model.load uri, (err, message, progress) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-        @messages.show()
-        @messages.clear()
-        @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
-        i = 0
-        while i < err.warnings.length
-          warning = err.warnings[i]
-          @messages.add new LineMessageView(
-            line: warning[1]
-            character: warning[2]
-            message: warning[3])
-          i++
-      else if progress
-        console.log '... ' + progress
-        @statusbar.setStatus 'Idris: ' + progress
-      else
-        @statusbar.setStatus 'Idris: ' + JSON.stringify(message)
+  initialize: (compilerOptions) ->
+    if !@model
+      @model = new IdrisModel
+      @messages = new MessagePanelView
+        title: 'Idris Messages'
+        closeMethod: 'hide'
+      @messages.attach()
+      @messages.hide()
+    @model.setCompilerOptions compilerOptions
+
+  runCommand:
+    (command) =>
+      (args) =>
+        compilerOptions = Ipkg.compilerOptions atom.project
+        compilerOptions.subscribe ((options) =>
+          console.log "Compiler Options:", options
+          @initialize options
+          command args
+        ), (() ->
+          @initialize {}
+          command args
+        )
+
+  saveFile: (editor) ->
+    if editor.getURI()
+      editor.save()
+    else
+      atom.workspace.saveActivePaneItemAs()
+
+  typecheckFile: ({target}) =>
+    # the file needs to be saved for typechecking
+    @saveFile target.model
+    uri = target.model.getURI()
+
+    successHandler = ({responseType, msg}) =>
+      @statusIndicator.setStatusLoaded()
+      @messages.clear()
+      @messages.show()
+      @messages.setTitle 'Idris: File loaded successfully'
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .subscribe successHandler, @displayErrors
 
   getDocsForWord: ({target}) =>
     word = @getWordUnderCursor target
-    @model.docsFor word, (err, type, highlightingInfo) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-      else
-        @messages.show()
-        @messages.clear()
-        @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-        @messages.add new ProofObligationView
-          obligation: type
-          highlightingInfo: highlightingInfo
+
+    successHandler = ({responseType, msg}) =>
+      [type, highlightingInfo] = msg
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      informationView = new InformationView
+      informationView.initialize
+        obligation: type
+        highlightingInfo: highlightingInfo
+      @messages.add informationView
+
+    @model
+      .docsFor word
+      .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
     word = @getWordUnderCursor target
-    @model.getType word, (err, type, highlightingInfo) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-      else
-        @messages.show()
-        @messages.clear()
-        @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
-        @messages.add new ProofObligationView
-          obligation: type
-          highlightingInfo: highlightingInfo
+
+    successHandler = ({responseType, msg}) =>
+      [type, highlightingInfo] = msg
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      informationView = new InformationView
+      informationView.initialize
+        obligation: type
+        highlightingInfo: highlightingInfo
+      @messages.add informationView
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.getType word
+      .subscribe successHandler, @displayErrors
 
   doCaseSplit: ({target}) =>
     editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
     word = @getWordUnderCursor target
-    @model.caseSplit line + 1, word, (err, split) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-      else
-        lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
-        editor.setTextInBufferRange lineRange, split
+
+    successHandler = ({responseType, msg}) ->
+      [split] = msg
+      lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
+      editor.setTextInBufferRange lineRange, split
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.caseSplit line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doAddClause: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Insert a newline and the new clause
+        editor.insertNewlineBelow()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.addClause line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeWith: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    editor.moveToBeginningOfLine()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new with block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeWith line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeLemma: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [lemty, param1, param2] = msg
+      editor.transact ->
+        if lemty == ':metavariable-lemma'
+          # Move the cursor to the beginning of the word
+          editor.moveToBeginningOfWord()
+          # Because the ? in the Holes isn't part of
+          # the word, we move left once, and then select two
+          # words
+          editor.moveLeft()
+          editor.selectToEndOfWord()
+          editor.selectToEndOfWord()
+          # And then replace the replacement with the lemma call..
+          editor.insertText param1[1]
+
+          # Now move to the previous blank line and insert the type
+          # of the lemma
+          editor.moveToBeginningOfLine()
+          line = editor.getLastCursor().getBufferRow()
+
+          # I tried to make this a function but failed to find out how
+          # to call it and gave up...
+          while(line > 0)
+            editor.moveToBeginningOfLine()
+            editor.selectToEndOfLine()
+            contents = editor.getSelectedText()
+            if contents == ''
+              break
+            editor.moveUp()
+            line--
+
+          editor.insertNewlineBelow()
+          editor.insertText param2[1]
+          editor.insertNewlineBelow()
+
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeLemma line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doMakeCase: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [clause] = msg
+      editor.transact ->
+        # Delete old line, insert the new case block
+        editor.deleteLine()
+        editor.insertText clause
+        # And move the cursor to the beginning of
+        # the new line
+        editor.moveToBeginningOfLine()
+        editor.moveUp()
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.makeCase line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  showHoles: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+
+    successHandler = ({responseType, msg}) =>
+      [holes] = msg
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle 'Idris: Holes'
+      holesView = new HolesView
+      holesView.initialize holes
+      @messages.add holesView
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.holes 80
+      .subscribe successHandler, @displayErrors
+
+  doProofSearch: ({target}) =>
+    editor = target.model
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) ->
+      [res] = msg
+      editor.transact ->
+        # Move the cursor to the beginning of the word
+        editor.moveToBeginningOfWord()
+        # Because the ? in the Holes isn't part of
+        # the word, we move left once, and then select two
+        # words
+        editor.moveLeft()
+        editor.selectToEndOfWord()
+        editor.selectToEndOfWord()
+        # And then replace the replacement with the guess..
+        editor.insertText res
+
+    @model
+      .load uri
+      .filter ({responseType}) -> responseType == 'return'
+      .flatMap => @model.proofSearch line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  printDefinition: ({target}) =>
+    word = @getWordUnderCursor target
+
+    successHandler = ({responseType, msg}) =>
+      [type, highlightingInfo] = msg
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle 'Idris: Definition of <tt>' + word + '</tt>', true
+      informationView = new InformationView
+      informationView.initialize
+        obligation: type
+        highlightingInfo: highlightingInfo
+      @messages.add informationView
+
+    @model
+      .printDefinition word
+      .subscribe successHandler, @displayErrors
 
   openREPL: ({target}) =>
     if ! @replView?
@@ -173,40 +346,31 @@ class IdrisController
     @messages.setTitle "REPL"
     @messages.add @replView
 
-  doAddClause: ({target}) ->
-    editor = atom.workspace.getActiveEditor()
-    line = editor.getCursor(0).getBufferRow()
-    word = @getWordUnderCursor target
-    @model.addClause line + 1, word, (err, clause) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-      else
-        editor.transact ->
-          # Insert a newline and the new clause
-          editor.insertNewlineBelow()
-          editor.insertText clause
-          # And move the cursor to the beginning of
-          # the new line
-          editor.moveCursorToBeginningOfLine()
+  displayErrors: (err) =>
+    @messages.show()
+    @messages.clear()
+    @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
 
-  doProofSearch: ({target}) ->
-    editor = atom.workspace.getActiveEditor()
-    line = editor.getCursor(0).getBufferRow()
-    word = @getWordUnderCursor target
-    @model.proofSearch line + 1, word, (err, res) =>
-      if err
-        @statusbar.setStatus 'Idris: ' + err.message
-      else
-        editor.transact ->
-          # Move the cursor to the beginning of the word
-          editor.moveCursorToBeginningOfWord()
-          # Because the ? in the metavariable isn't part of
-          # the word, we move left once, and then select two
-          # words
-          editor.moveCursorLeft()
-          editor.selectToEndOfWord()
-          editor.selectToEndOfWord()
-          # And then replace the replacement with the guess..
-          editor.insertText res
+    @messages.add new PlainMessageView
+      message: err.message
+      className: 'idris-error'
+
+    for warning in err.warnings
+      @messages.add new LineMessageView
+        line: warning[1][0]
+        character: warning[1][1]
+        message: warning[3]
+
+  attachStatusIndicator: (statusBar) ->
+    if not @statusIndicator
+      @statusIndicator = new StatusIndicator
+      @statusIndicator.initialize()
+      statusBar.addLeftTile
+        item: @statusIndicator
+
+  detachStatusIndicator: ->
+    @statusIndicator?.remove()
+    @statusIndicator = null
+
 
 module.exports = IdrisController

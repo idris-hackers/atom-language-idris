@@ -1,18 +1,35 @@
 {
   "name": "language-idris",
   "main": "./lib/language-idris",
-  "version": "0.1.1",
+  "version": "0.2.4",
   "private": true,
   "description": "A plugin for developing with Idris",
-  "repository": "https://github.com/fangel/atom-language-idris",
+  "repository": "https://github.com/idris-hackers/atom-language-idris",
   "license": "MIT",
   "engines": {
     "atom": ">=0.180.0"
   },
   "contributors": [
-    { "name": "Morten Fangel", "url": "http://sevengoslings.net" },
-    { "name": "Nicolas Gagliani", "url": "http://twitter.com/archaeron" },
-    { "name": "Heather", "url": "https://github.com/Heather" }
+    {
+      "name": "Morten Fangel",
+      "url": "http://sevengoslings.net"
+    },
+    {
+      "name": "Nicolas Gagliani",
+      "url": "http://twitter.com/archaeron"
+    },
+    {
+      "name": "Heather",
+      "url": "https://github.com/Heather"
+    },
+    {
+      "name": "David Christiansen",
+      "url": "http://www.davidchristiansen.dk"
+    },
+    {
+      "name": "Edwin Brady",
+      "url": "https://edwinb.wordpress.com/"
+    }
   ],
   "consumedServices": {
     "status-bar": {
@@ -23,8 +40,8 @@
   },
   "dependencies": {
     "atom-message-panel": ">=0.1.0",
-    "atom-space-pen-views": "^2.0.3",
     "bennu": "17.3.0",
-    "nu-stream": "3.3.1"
+    "nu-stream": "3.3.1",
+    "rx-lite": "2.5.2"
   }
 }
