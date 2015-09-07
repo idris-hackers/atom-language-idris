@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add a means of setting the Idris -p option [#29](https://github.com/idris-hackers/atom-language-idris/issues/29)
+
 ### Fixed
 
 - Status message should appear only in idris projects [#52](https://github.com/idris-hackers/atom-language-idris/issues/52) many thanks to @jeremy-w

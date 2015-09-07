@@ -14,6 +14,7 @@ It supports:
  - make-case (ctrl-alt-m)
  - make-lemma (ctrl-alt-l)
  - Showing holes
+ - ipkg highlighting
 
 ## Usage
 
@@ -36,3 +37,6 @@ There is a tutorial on how to use the editor under [`documentation/tutorial.md`]
 To work on this plugin you need to clone it into your atom directory
 and rename the folder to `language-idris` or the package settings won't get picked up.
 Then you need an `apm install` from the `language-idris` folder to install the dependencies.
+
+Or you can execute `apm dev language-idris`. This will install the package in a separate directory and you need to start
+Atom in dev-mode to load the development packages.
