@@ -1,4 +1,5 @@
 highlighter = require '../utils/highlighter'
+dom = require '../utils/dom'
 
 class InformationView extends HTMLElement
   initialize: (params) ->
@@ -8,7 +9,7 @@ class InformationView extends HTMLElement
     if @highlightingInfo?
       highlighting = highlighter.highlight @obligation, @highlightingInfo
       info = highlighter.highlightToHtml highlighting
-      pre = document.createElement 'pre'
+      pre = dom.createCodeElement()
       pre.appendChild info
       @appendChild pre
     else
