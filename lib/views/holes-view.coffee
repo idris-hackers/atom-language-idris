@@ -6,6 +6,7 @@ textNode = (text) ->
 
 class HolesView extends HTMLElement
   initialize: (holes) ->
+    @classList.add 'idris-panel'
     @holesContainer = document.createElement 'pre'
     @holesContainer.classList.add 'idris-mode'
     @holesContainer.classList.add 'block'

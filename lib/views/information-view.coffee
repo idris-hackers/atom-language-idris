@@ -2,6 +2,7 @@ highlighter = require '../utils/highlighter'
 
 class InformationView extends HTMLElement
   initialize: (params) ->
+    @classList.add 'idris-panel'
     @obligation = params.obligation
     @highlightingInfo = params.highlightingInfo
     if @highlightingInfo?
@@ -13,8 +14,6 @@ class InformationView extends HTMLElement
     else
       @text @obligation
 
-  @content: ->
-    @pre class: 'idris-mode block'
-
 module.exports = InformationView =
-  document.registerElement('idris-informations-view', {prototype: InformationView.prototype})
+  document.registerElement 'idris-informations-view',
+    prototype: InformationView.prototype
