@@ -7,6 +7,18 @@ module.exports =
       type: 'string'
       default: 'idris'
       description: 'Path to the idris executable'
+    panelFontFamily:
+      type: 'string'
+      default: ''
+      description: 'The font family to use in the various idris panels'
+    panelFontSize:
+      type: 'number'
+      default: 13
+      description: 'The font size to use in the various idris panels'
+    panelFontLigatures:
+      type: 'boolean'
+      default: false
+      description: 'Enable ligatures in the various idris panels'
 
   activate: ->
     @controller = new IdrisController
