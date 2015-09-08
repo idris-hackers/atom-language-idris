@@ -11,6 +11,9 @@ createCodeElement = ->
     pre.style.fontFamily = fontFamily
   fontSize = atom.config.get 'language-idris.panelFontSize'
   pre.style.fontSize = "#{fontSize}px"
+  enableLigatures = atom.config.get 'language-idris.panelFontLigatures'
+  if enableLigatures
+    pre.style.webkitFontFeatureSettings = '"liga"'
   pre
 
 module.exports =

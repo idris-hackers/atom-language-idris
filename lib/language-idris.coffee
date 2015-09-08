@@ -15,6 +15,10 @@ module.exports =
       type: 'number'
       default: 13
       description: 'The font size to use in the various idris panels'
+    panelFontLigatures:
+      type: 'boolean'
+      default: false
+      description: 'Enable ligatures in the various idris panels'
 
   activate: ->
     @controller = new IdrisController
