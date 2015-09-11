@@ -5,6 +5,7 @@
 ### Added
 
 - Add a means of setting the Idris -p option [#29](https://github.com/idris-hackers/atom-language-idris/issues/29)
+- added the ability to style all the idris-panels
 
 ### Fixed
 
