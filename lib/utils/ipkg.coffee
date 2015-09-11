@@ -31,9 +31,13 @@ parseIpkgFile = (fileInfo) ->
     compilerOptions = {}
     if optionsMatches
       compilerOptions.options = optionsMatches[1]
-    if sourcedirMatches
-      compilerOptions.sourcedir = sourcedirMatches[1]
-      compilerOptions.src = path.join fileInfo.directory, sourcedirMatches[1]
+
+    compilerOptions.src =
+      if sourcedirMatches
+        compilerOptions.sourcedir = sourcedirMatches[1]
+        path.join fileInfo.directory, sourcedirMatches[1]
+      else
+        fileInfo.directory
 
     compilerOptions
 
