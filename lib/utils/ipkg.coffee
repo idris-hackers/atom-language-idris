@@ -34,7 +34,6 @@ parseIpkgFile = (fileInfo) ->
 
     compilerOptions.src =
       if sourcedirMatches
-        compilerOptions.sourcedir = sourcedirMatches[1]
         path.join fileInfo.directory, sourcedirMatches[1]
       else
         fileInfo.directory
