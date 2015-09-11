@@ -24,6 +24,11 @@ If it doesn't work it's probably a bug.
 
 There is a tutorial on how to use the editor under [`documentation/tutorial.md`](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/tutorial.md).
 
+### Working with ipkg files
+
+Place your ipkg file in the top level directory of your project.
+There is more information available in a in a [separate documentation](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/ipkg.md).
+
 ## Todo
 
  - Add better support for drawing attention to error-messages
