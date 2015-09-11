@@ -56,7 +56,7 @@ class IdrisController
           console.log "Compiler Options:", options
           @initialize options
           command args
-        ), (() ->
+        ), (() =>
           @initialize {}
           command args
         )
