@@ -3,7 +3,7 @@ fs = require 'fs'
 Rx = require 'rx-lite'
 
 optionsRegexp = /opts\s*=\s*\"([^\"]*)\"/
-sourcedirRegexp = /sourcedir\s*=\s*([a-zA-Z/0-9]+)/
+sourcedirRegexp = /sourcedir\s*=\s*([a-zA-Z/0-9.]+)/
 
 # Find all ipkg-files in a directory and returns
 # an observable of an array of files
