@@ -81,7 +81,7 @@ class IdrisController
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()
-      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      @messages.setTitle 'Idris: Docs for <tt>' + word + '</tt>', true
       informationView = new InformationView
       informationView.initialize
         obligation: type
