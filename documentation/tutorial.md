@@ -32,7 +32,7 @@ mul (S k) y = add y (mul k y)
 
 ### Typecheck
 
-Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`.
+Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`. (or use `ctrl-alt-r`)
 
 ### Type info
 
@@ -59,7 +59,7 @@ module Main
 plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 ```
 
-Load the file into idris by typecheckiing it by pressing  `ctrl-shift-p` and typing "Language Idris: Typecheck" into the command palette then press `ctrl-shift-p` again and type "Language Idris: Holes".
+Load the file into idris by typecheckiing it by pressing `ctrl-shift-r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
 
 At the bottom of your window should open a small panel with all holes you'll have to prove.
 Here it should just show:
@@ -74,7 +74,7 @@ Main.plusAssoc : plus l (plus c r) = plus (plus l c) r
 where `l : Nat, c : Nat, r : Nat` are variables you can use to prove
 `Main.plusAssoc : plus l (plus c r) = plus (plus l c) r`.
 
-If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" a line wil be inserted by atom at the bottom of your file.
+If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" (`ctrl-alt-a`) a line wil be inserted by atom at the bottom of your file.
 
 Your file should now look like this:
 ```idris
@@ -125,7 +125,7 @@ plusAssoc Z c r = Refl
 plusAssoc (S l) c r = ?plusAssoc_rhs_2
 ```
 
-Only ne hole is left now:
+Only one hole is left now:
 
 ```
 Main.plusAssoc_rhs_2
@@ -145,7 +145,7 @@ plusAssoc (S l) c r = ?plusAssoc_rhs_2
 with
 
 ```idris
-plusAssoc (S l) c r = ?plusAssoc_rhs_2
+plusAssoc (S l) c r = rewrite plusAssoc l r c in ?plusAssoc_rhs_2
 ```
 
 and after type checking the holes view now shows us:
