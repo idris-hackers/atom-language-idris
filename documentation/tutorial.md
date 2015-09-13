@@ -59,7 +59,7 @@ module Main
 plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 ```
 
-Load the file into idris by typecheckiing it by pressing `ctrl-shift-r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
+Load the file into Idris by typechecking it by pressing `ctrl-alt-r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
 
 At the bottom of your window should open a small panel with all holes you'll have to prove.
 Here it should just show:
