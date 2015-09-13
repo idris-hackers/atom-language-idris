@@ -4,8 +4,7 @@
 
 ## Learning Idris
 
-This is an overview over the atom package for Idris.
-If you are interested in learning Idris you can find the official documentation here http://docs.idris-lang.org/en/latest/ and the official Idris tutorial here http://eb.host.cs.st-andrews.ac.uk/writings/idris-tutorial.pdf.
+This is an overview of the atom package for Idris. If you are interested in learning Idris you can find the [official documentation](http://docs.idris-lang.org/en/latest/), and the [official Idris tutorial](http://docs.idris-lang.org/en/latest/tutorial/).
 
 ### Installation
 
@@ -36,8 +35,7 @@ Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idri
 
 ### Type info
 
-Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of".
-A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
+Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of". A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
 Now try the same thing with the `mul` function.
 
 ### Show documentation
@@ -160,7 +158,7 @@ Main.plusAssoc_rhs_2
 Main.plusAssoc_rhs_2 : S (plus (plus l c) r) = S (plus (plus l c) r)
 ```
 
-Now you need to prove that `S (plus (plus l c) r) = S (plus (plus l c) r)` and Idrs can again do this for us.
+Now you need to prove that `S (plus (plus l c) r) = S (plus (plus l c) r)` and Idris can again do this for us.
 
 And you end with the file
 
@@ -174,5 +172,5 @@ plusAssoc (S l) c r = rewrite plusAssoc l c r in Refl
 
 and a proof that the addition of natural numbers is associative.
 
-This tutorial is a written version of [David Christiansens](https://twitter.com/d_christiansen) emacs video for Atom.
+This tutorial is a written version of [David Christiansen's](https://twitter.com/d_christiansen) emacs video for Atom.
 https://www.youtube.com/watch?v=0eOY1NxbZHo&list=PLiHLLF-foEexGJu1a0WH_llkQ2gOKqipg
