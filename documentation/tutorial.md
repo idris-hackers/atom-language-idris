@@ -145,7 +145,7 @@ plusAssoc (S l) c r = ?plusAssoc_rhs_2
 with
 
 ```idris
-plusAssoc (S l) c r = rewrite plusAssoc l r c in ?plusAssoc_rhs_2
+plusAssoc (S l) c r = rewrite plusAssoc l c r in ?plusAssoc_rhs_2
 ```
 
 and after type checking the holes view now shows us:
