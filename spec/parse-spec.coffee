@@ -89,6 +89,13 @@ list6 =
     6
   ]
 
+test7 = "(:interpret \":cd C:/Path/to/dir\")"
+list7 =
+  [
+    ":interpret"
+    ":cd C:/Path/to/dir"
+  ]
+
 describe "The sub-parser(s)", ->
   it "for :True and :False should work.", ->
     expect(runP(parse.trueP, ':True')).toEqual(true)
@@ -124,6 +131,7 @@ describe "A parser", ->
     expect(sexpFormatter.formatSexp(list2)).toEqual(test2)
     expect(sexpFormatter.formatSexp(list3)).toEqual(test3)
     expect(sexpFormatter.formatSexp(list4)).toEqual(test4)
+    expect(sexpFormatter.formatSexp(list7)).toEqual(test7)
 
   it "should serialize common commands.", ->
     loadFile = [[':load-file', "idris.idr"], 1]
