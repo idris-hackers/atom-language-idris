@@ -2,6 +2,7 @@ IdrisIdeMode = require './idris-ide-mode'
 Logger = require './Logger'
 Rx = require 'rx-lite'
 JS = require './utils/js'
+path = require 'path'
 
 class IdrisModel
   requestId: 0
@@ -72,8 +73,26 @@ class IdrisModel
     @ideMode(@compilerOptions).send [cmd, id]
     subject
 
+  changeDirectory: (dir) ->
+    @interpret ":cd #{dir}"
+
   load: (uri) ->
-    @prepareCommand [':load-file', uri]
+    dir =
+      if @compilerOptions.src
+        @compilerOptions.src
+      else
+        path.dirname uri
+
+    cd =
+      if dir != @compilerOptions.src
+        @compilerOptions.src = dir
+        @changeDirectory dir
+          .map (_) -> dir
+      else
+        Rx.Observable.of dir
+
+    cd.flatMap (_) =>
+      @prepareCommand [':load-file', uri]
 
   docsFor: (word) ->
     @prepareCommand [':docs-for', word]
@@ -89,6 +108,9 @@ class IdrisModel
 
   makeLemma: (line, word) ->
     @prepareCommand [':make-lemma', line, word]
+
+  interpret: (code) ->
+    @prepareCommand [':interpret', code]
 
   makeCase: (line, word) ->
     @prepareCommand [':make-case', line, word]
