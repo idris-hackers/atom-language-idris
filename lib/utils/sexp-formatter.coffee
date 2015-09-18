@@ -2,7 +2,7 @@ isString = (s) ->
   typeof(s) == 'string' || s instanceof String
 
 isSymbol = (s) ->
-  isString(s) and s.length > 0 and s[0] == ':'
+  isString(s) and s.length > 0 and s[0] == ':' and s.indexOf(' ') == -1
 
 isBoolean = (s) ->
   typeof(s) == 'boolean' || s instanceof Boolean

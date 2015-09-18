@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add a means of setting the Idris -p option [#29](https://github.com/idris-hackers/atom-language-idris/issues/29)
+
 ### Fixed
 
 ## v0.2.5

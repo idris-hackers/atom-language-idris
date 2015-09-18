@@ -5,6 +5,7 @@ HolesView = require './views/holes-view'
 StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
 IdrisModel = require './idris-model'
+Ipkg = require './utils/ipkg'
 
 class IdrisController
 
@@ -38,7 +39,7 @@ class IdrisController
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
     editor.getTextInBufferRange cursorPosition
 
-  initialize: ->
+  initialize: (compilerOptions) ->
     if !@model
       @model = new IdrisModel
       @messages = new MessagePanelView
@@ -46,6 +47,7 @@ class IdrisController
         closeMethod: 'hide'
       @messages.attach()
       @messages.hide()
+    @model.setCompilerOptions compilerOptions
 
   stopCompiler: =>
     @model?.stop()
@@ -53,8 +55,15 @@ class IdrisController
   runCommand:
     (command) =>
       (args) =>
-        @initialize()
-        command args
+        compilerOptions = Ipkg.compilerOptions atom.project
+        compilerOptions.subscribe ((options) =>
+          console.log "Compiler Options:", options
+          @initialize options
+          command args
+        ), (() =>
+          @initialize {}
+          command args
+        )
 
   saveFile: (editor) ->
     if editor.getURI()
