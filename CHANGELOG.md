@@ -4,6 +4,12 @@
 
 ### Added
 
+### Fixed
+
+## v0.2.5
+
+### Added
+
 - Restart the idris compiler after every commmand if it was killed [#54](https://github.com/idris-hackers/atom-language-idris/pull/54)
 - added the ability to style all the idris-panels
 
