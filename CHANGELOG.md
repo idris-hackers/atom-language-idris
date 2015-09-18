@@ -5,8 +5,11 @@
 ### Added
 
 - Restart the idris compiler after every commmand if it was killed [#54](https://github.com/idris-hackers/atom-language-idris/pull/54)
+- added the ability to style all the idris-panels
 
 ### Fixed
+
+- Status message should appear only in idris projects [#52](https://github.com/idris-hackers/atom-language-idris/issues/52) many thanks to @jeremy-w
 
 ## v0.2.4
 

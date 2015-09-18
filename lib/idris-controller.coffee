@@ -85,7 +85,7 @@ class IdrisController
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()
-      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      @messages.setTitle 'Idris: Docs for <tt>' + word + '</tt>', true
       informationView = new InformationView
       informationView.initialize
         obligation: type
@@ -340,10 +340,15 @@ class IdrisController
         message: warning[3]
 
   attachStatusIndicator: (statusBar) ->
-    @statusIndicator = new StatusIndicator
-    @statusIndicator.initialize()
-    statusBar.addLeftTile
-      item: @statusIndicator
+    if not @statusIndicator
+      @statusIndicator = new StatusIndicator
+      @statusIndicator.initialize()
+      statusBar.addLeftTile
+        item: @statusIndicator
+
+  detachStatusIndicator: ->
+    @statusIndicator?.remove()
+    @statusIndicator = null
 
 
 module.exports = IdrisController
