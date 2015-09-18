@@ -12,6 +12,7 @@ class IdrisModel
     if !@ideModeRef
       @ideModeRef = new IdrisIdeMode
       @ideModeRef.on 'message', @handleCommand
+    @ideModeRef.start()
     @ideModeRef
 
   stop: ->
