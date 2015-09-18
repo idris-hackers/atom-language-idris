@@ -4,6 +4,8 @@
 
 ### Added
 
+- Restart the idris compiler after every commmand if it was killed [#54](https://github.com/idris-hackers/atom-language-idris/pull/54)
+
 ### Fixed
 
 ## v0.2.4
