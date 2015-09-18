@@ -21,6 +21,7 @@ class IdrisController
     'language-idris:proof-search': @runCommand @doProofSearch
     'language-idris:typecheck': @runCommand @typecheckFile
     'language-idris:print-definition': @runCommand @printDefinition
+    'language-idris:stop-compiler': @stopCompiler
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -47,6 +48,9 @@ class IdrisController
       @messages.attach()
       @messages.hide()
     @model.setCompilerOptions compilerOptions
+
+  stopCompiler: =>
+    @model?.stop()
 
   runCommand:
     (command) =>
@@ -90,7 +94,7 @@ class IdrisController
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()
-      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      @messages.setTitle 'Idris: Docs for <tt>' + word + '</tt>', true
       informationView = new InformationView
       informationView.initialize
         obligation: type

@@ -4,8 +4,7 @@
 
 ## Learning Idris
 
-This is an overview over the atom package for Idris.
-If you are interested in learning Idris you can find the official documentation here http://docs.idris-lang.org/en/latest/ and the official Idris tutorial here http://eb.host.cs.st-andrews.ac.uk/writings/idris-tutorial.pdf.
+This is an overview of the atom package for Idris. If you are interested in learning Idris you can find the [official documentation](http://docs.idris-lang.org/en/latest/), and the [official Idris tutorial](http://docs.idris-lang.org/en/latest/tutorial/).
 
 ### Installation
 
@@ -32,12 +31,11 @@ mul (S k) y = add y (mul k y)
 
 ### Typecheck
 
-Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`.
+Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`. (or use `ctrl-alt-r`)
 
 ### Type info
 
-Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of".
-A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
+Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of". A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
 Now try the same thing with the `mul` function.
 
 ### Show documentation
@@ -59,7 +57,7 @@ module Main
 plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 ```
 
-Load the file into idris by typecheckiing it by pressing  `ctrl-shift-p` and typing "Language Idris: Typecheck" into the command palette then press `ctrl-shift-p` again and type "Language Idris: Holes".
+Load the file into Idris by typechecking it by pressing `ctrl-alt-r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
 
 At the bottom of your window should open a small panel with all holes you'll have to prove.
 Here it should just show:
@@ -74,7 +72,7 @@ Main.plusAssoc : plus l (plus c r) = plus (plus l c) r
 where `l : Nat, c : Nat, r : Nat` are variables you can use to prove
 `Main.plusAssoc : plus l (plus c r) = plus (plus l c) r`.
 
-If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" a line wil be inserted by atom at the bottom of your file.
+If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" (`ctrl-alt-a`) a line wil be inserted by atom at the bottom of your file.
 
 Your file should now look like this:
 ```idris
@@ -125,7 +123,7 @@ plusAssoc Z c r = Refl
 plusAssoc (S l) c r = ?plusAssoc_rhs_2
 ```
 
-Only ne hole is left now:
+Only one hole is left now:
 
 ```
 Main.plusAssoc_rhs_2
@@ -145,7 +143,7 @@ plusAssoc (S l) c r = ?plusAssoc_rhs_2
 with
 
 ```idris
-plusAssoc (S l) c r = ?plusAssoc_rhs_2
+plusAssoc (S l) c r = rewrite plusAssoc l c r in ?plusAssoc_rhs_2
 ```
 
 and after type checking the holes view now shows us:
@@ -160,7 +158,7 @@ Main.plusAssoc_rhs_2
 Main.plusAssoc_rhs_2 : S (plus (plus l c) r) = S (plus (plus l c) r)
 ```
 
-Now you need to prove that `S (plus (plus l c) r) = S (plus (plus l c) r)` and Idrs can again do this for us.
+Now you need to prove that `S (plus (plus l c) r) = S (plus (plus l c) r)` and Idris can again do this for us.
 
 And you end with the file
 
@@ -174,5 +172,5 @@ plusAssoc (S l) c r = rewrite plusAssoc l c r in Refl
 
 and a proof that the addition of natural numbers is associative.
 
-This tutorial is a written version of [David Christiansens](https://twitter.com/d_christiansen) emacs video for Atom.
+This tutorial is a written version of [David Christiansen's](https://twitter.com/d_christiansen) emacs video for Atom.
 https://www.youtube.com/watch?v=0eOY1NxbZHo&list=PLiHLLF-foEexGJu1a0WH_llkQ2gOKqipg

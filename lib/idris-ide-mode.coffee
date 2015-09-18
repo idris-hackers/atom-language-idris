@@ -11,25 +11,26 @@ class IdrisIdeMode extends EventEmitter
   compilerOptions: {}
 
   start: (compilerOptions) ->
-    pathToIdris = atom.config.get("language-idris.pathToIdris")
-    parameters =
-      if compilerOptions.options
-        ['--ide-mode'].concat compilerOptions.options.split(' ')
-      else
-        ['--ide-mode']
-    options =
-      if compilerOptions.src
-        cwd: compilerOptions.src
-      else
-        {}
-    @process =
-      spawn pathToIdris, parameters, options
-    @process.on 'error', @error
-    @process.on 'exit', @exited
-    @process.on 'close', @exited
-    @process.on 'disconnect', @exited
+    if (not @process?) || @process.killed
+      pathToIdris = atom.config.get("language-idris.pathToIdris")
+      parameters =
+        if compilerOptions.options
+          ['--ide-mode'].concat compilerOptions.options.split(' ')
+        else
+          ['--ide-mode']
+      options =
+        if compilerOptions.src
+          cwd: compilerOptions.src
+        else
+          {}
+      @process =
+        spawn pathToIdris, parameters, options
+      @process.on 'error', @error
+      @process.on 'exit', @exited
+      @process.on 'close', @exited
+      @process.on 'disconnect', @exited
 
-    @process.stdout.setEncoding('utf8').on 'data', @stdout
+      @process.stdout.setEncoding('utf8').on 'data', @stdout
 
   setCompilerOptions: (options) ->
     @compilerOptions options
@@ -53,13 +54,18 @@ class IdrisIdeMode extends EventEmitter
     atom.notifications.addError e.short, detail: e.long
 
   exited: (code, signal) ->
-    short = "The idris compiler was closed or crashed"
-    long =
-      if signal
-        "It was closed with the signal: #{signal}"
-      else
-        "It (probably) crashed with the error code: #{code}"
-    atom.notifications.addError short, detail: long
+    if signal == "SIGTERM"
+      short = "The idris compiler was closed"
+      long = "You stopped the compiler"
+      atom.notifications.addInfo short, detail: long
+    else
+      short = "The idris compiler was closed or crashed"
+      long =
+        if signal
+          "It was closed with the signal: #{signal}"
+        else
+          "It (probably) crashed with the error code: #{code}"
+      atom.notifications.addError short, detail: long
 
   running: ->
     !!@process
