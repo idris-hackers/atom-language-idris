@@ -1,4 +1,4 @@
-# A Idris Mode for Atom
+# An Idris Mode for Atom
 
 A work-in-progress Idris Mode for Atom.
 
