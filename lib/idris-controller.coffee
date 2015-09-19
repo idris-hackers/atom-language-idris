@@ -6,6 +6,7 @@ StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
+Symbol = require './utils/symbol'
 
 class IdrisController
 
@@ -32,10 +33,11 @@ class IdrisController
       @model.stop()
     @statusbar.destroy()
 
+  # get the word or operator under the cursor
   getWordUnderCursor: (editorView) ->
     editor = editorView.model
     options =
-      wordRegex: /^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+/g
+      wordRegex: /(^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+)|(\?[-!#\$%&\*\+\.\/<=>@\\\^\|~:]+|[-!#\$%&\*\+\.\/<=>@\\\^\|~:][-!#\$%&\*\+\.\/<=>@\\\^\|~:\?]*)+/g
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
     editor.getTextInBufferRange cursorPosition
 
@@ -88,7 +90,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getDocsForWord: ({target}) =>
-    word = @getWordUnderCursor target
+    word = Symbol.serializeWord @getWordUnderCursor(target)
 
     successHandler = ({responseType, msg}) =>
       [type, highlightingInfo] = msg
@@ -109,7 +111,7 @@ class IdrisController
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
-    word = @getWordUnderCursor target
+    word = Symbol.serializeWord @getWordUnderCursor(target)
 
     successHandler = ({responseType, msg}) =>
       [type, highlightingInfo] = msg
@@ -237,7 +239,6 @@ class IdrisController
           editor.insertText param2[1]
           editor.insertNewlineBelow()
 
-
     @model
       .load uri
       .filter ({responseType}) -> responseType == 'return'
@@ -316,7 +317,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   printDefinition: ({target}) =>
-    word = @getWordUnderCursor target
+    word = Symbol.serializeWord @getWordUnderCursor(target)
 
     successHandler = ({responseType, msg}) =>
       [type, highlightingInfo] = msg

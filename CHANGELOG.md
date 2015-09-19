@@ -6,6 +6,8 @@
 
 ### Fixed
 
+- get documentation or types for operators [#66](https://github.com/idris-hackers/atom-language-idris/issues/66)
+
 ## v0.3.0
 
 ### Added
