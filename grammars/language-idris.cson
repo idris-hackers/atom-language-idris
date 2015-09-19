@@ -20,6 +20,10 @@ patterns:
       match:  '\\b(public|private|abstract|implicit)\\b'
     }
     {
+      name: 'storage.type.function.idris'
+      match: '\\?[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]+|[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:\\?][-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]*'
+    }
+    {
       name: 'storage.type.builtin.idris'
       match: '\\b(Type|Int|Nat|Integer|Float|Char|String|Ptr|Bits8|Bits16|Bits32|Bits64|Bool)\\b'
     }
