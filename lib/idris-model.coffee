@@ -7,10 +7,10 @@ path = require 'path'
 class IdrisModel
   requestId: 0
   ideModeRef: null
-  subjects: {}
-  warnings: {}
-  compilerOptions: {}
-  oldCompilerOptions: {}
+  subjects: { }
+  warnings: { }
+  compilerOptions: { }
+  oldCompilerOptions: { }
 
   ideMode: (compilerOptions) ->
     if !@ideModeRef || !JS.objectEqual(@oldCompilerOptions, compilerOptions)

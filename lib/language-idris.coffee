@@ -1,5 +1,5 @@
 IdrisController = require './idris-controller'
-{CompositeDisposable} = require 'atom'
+{ CompositeDisposable } = require 'atom'
 
 module.exports =
   config:

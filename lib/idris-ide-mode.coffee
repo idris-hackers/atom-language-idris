@@ -1,14 +1,14 @@
 Logger = require './Logger'
 sexpFormatter = require './utils/sexp-formatter'
 parse = require './parse'
-{EventEmitter} = require 'events'
-{spawn} = require 'child_process'
+{ EventEmitter } = require 'events'
+{ spawn } = require 'child_process'
 
 class IdrisIdeMode extends EventEmitter
   process: null
   buffer: ''
   idrisBuffers: 0
-  compilerOptions: {}
+  compilerOptions: { }
 
   start: (compilerOptions) ->
     if (not @process?) || @process.killed
@@ -22,7 +22,7 @@ class IdrisIdeMode extends EventEmitter
         if compilerOptions.src
           cwd: compilerOptions.src
         else
-          {}
+          { }
       @process =
         spawn pathToIdris, parameters, options
       @process.on 'error', @error

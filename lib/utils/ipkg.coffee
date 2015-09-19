@@ -28,7 +28,7 @@ parseIpkgFile = (fileInfo) ->
     optionsMatches = fileContents.match optionsRegexp
     sourcedirMatches = fileContents.match sourcedirRegexp
 
-    compilerOptions = {}
+    compilerOptions = { }
     if optionsMatches
       compilerOptions.options = optionsMatches[1]
 
@@ -55,7 +55,7 @@ compilerOptions = (project) ->
       readIpkgFile(ipkgFile)
         .map parseIpkgFile(ipkgFile)
     else
-      Rx.Observable.return {}
+      Rx.Observable.return { }
 
 module.exports =
   findIpkgFile: findIpkgFile

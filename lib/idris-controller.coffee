@@ -1,4 +1,4 @@
-{MessagePanelView, PlainMessageView, LineMessageView} =
+{ MessagePanelView, PlainMessageView, LineMessageView } =
   require 'atom-message-panel'
 InformationView = require './views/information-view'
 HolesView = require './views/holes-view'
@@ -63,7 +63,7 @@ class IdrisController
           @initialize options
           command args
         ), (() =>
-          @initialize {}
+          @initialize { }
           command args
         )
 
@@ -73,12 +73,12 @@ class IdrisController
     else
       atom.workspace.saveActivePaneItemAs()
 
-  typecheckFile: ({target}) =>
+  typecheckFile: ({ target }) =>
     # the file needs to be saved for typechecking
     @saveFile target.model
     uri = target.model.getURI()
 
-    successHandler = ({responseType, msg}) =>
+    successHandler = ({ responseType, msg }) =>
       @statusIndicator.setStatusLoaded()
       @messages.clear()
       @messages.show()
@@ -86,13 +86,13 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .subscribe successHandler, @displayErrors
 
-  getDocsForWord: ({target}) =>
+  getDocsForWord: ({ target }) =>
     word = Symbol.serializeWord @getWordUnderCursor(target)
 
-    successHandler = ({responseType, msg}) =>
+    successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()
@@ -107,13 +107,13 @@ class IdrisController
       .docsFor word
       .subscribe successHandler, @displayErrors
 
-  getTypeForWord: ({target}) =>
+  getTypeForWord: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord @getWordUnderCursor(target)
 
-    successHandler = ({responseType, msg}) =>
+    successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()
@@ -126,11 +126,11 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.getType word
       .subscribe successHandler, @displayErrors
 
-  doCaseSplit: ({target}) =>
+  doCaseSplit: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
@@ -138,25 +138,25 @@ class IdrisController
     line = cursor.getBufferRow()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [split] = msg
       lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
       editor.setTextInBufferRange lineRange, split
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.caseSplit line + 1, word
       .subscribe successHandler, @displayErrors
 
-  doAddClause: ({target}) =>
+  doAddClause: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [clause] = msg
       editor.transact ->
         # Insert a newline and the new clause
@@ -168,11 +168,11 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.addClause line + 1, word
       .subscribe successHandler, @displayErrors
 
-  doMakeWith: ({target}) =>
+  doMakeWith: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
@@ -180,7 +180,7 @@ class IdrisController
     editor.moveToBeginningOfLine()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [clause] = msg
       editor.transact ->
         # Delete old line, insert the new with block
@@ -193,18 +193,18 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.makeWith line + 1, word
       .subscribe successHandler, @displayErrors
 
-  doMakeLemma: ({target}) =>
+  doMakeLemma: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [lemty, param1, param2] = msg
       editor.transact ->
         if lemty == ':metavariable-lemma'
@@ -241,18 +241,18 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.makeLemma line + 1, word
       .subscribe successHandler, @displayErrors
 
-  doMakeCase: ({target}) =>
+  doMakeCase: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [clause] = msg
       editor.transact ->
         # Delete old line, insert the new case block
@@ -265,16 +265,16 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.makeCase line + 1, word
       .subscribe successHandler, @displayErrors
 
-  showHoles: ({target}) =>
+  showHoles: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
 
-    successHandler = ({responseType, msg}) =>
+    successHandler = ({ responseType, msg }) =>
       [holes] = msg
       @messages.show()
       @messages.clear()
@@ -285,18 +285,18 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.holes 80
       .subscribe successHandler, @displayErrors
 
-  doProofSearch: ({target}) =>
+  doProofSearch: ({ target }) =>
     editor = target.model
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor target
 
-    successHandler = ({responseType, msg}) ->
+    successHandler = ({ responseType, msg }) ->
       [res] = msg
       editor.transact ->
         # Move the cursor to the beginning of the word
@@ -312,14 +312,14 @@ class IdrisController
 
     @model
       .load uri
-      .filter ({responseType}) -> responseType == 'return'
+      .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.proofSearch line + 1, word
       .subscribe successHandler, @displayErrors
 
-  printDefinition: ({target}) =>
+  printDefinition: ({ target }) =>
     word = Symbol.serializeWord @getWordUnderCursor(target)
 
-    successHandler = ({responseType, msg}) =>
+    successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
       @messages.show()
       @messages.clear()

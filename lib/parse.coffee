@@ -1,5 +1,5 @@
-{parse, text, lang} = require 'bennu'
-{stream} = require 'nu-stream'
+{ parse, text, lang } = require 'bennu'
+{ stream } = require 'nu-stream'
 
 streamToString = (s) -> stream.toArray(s).join ''
 

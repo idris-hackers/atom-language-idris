@@ -55,4 +55,5 @@ class HolesView extends HTMLElement
     ]
 
 module.exports = HolesView =
-  document.registerElement('idris-holes-view', {prototype: HolesView.prototype})
+  document.registerElement 'idris-holes-view',
+    prototype: HolesView.prototype

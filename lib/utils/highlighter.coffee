@@ -2,7 +2,7 @@
 # http://docs.idris-lang.org/en/latest/reference/ide-protocol.html#output-highlighting
 
 highlightInfoListToOb = (list) ->
-  obj = {}
+  obj = { }
   for x in list
     key = x[0].slice(1)
     value = x[1]
@@ -56,7 +56,7 @@ highlight = (code, highlightingInfo) ->
 # Applies the highlighting and returns the result as an html-string.
 highlightToString = (highlights) ->
   highlights
-    .map ({classes, word}) ->
+    .map ({ classes, word }) ->
       if classes.length == 0
         word
       else
@@ -66,7 +66,7 @@ highlightToString = (highlights) ->
 # Applies the highlighting and returns the result as a DOM-objects.
 highlightToHtml = (highlights) ->
   spans = highlights
-    .map ({classes, word}) ->
+    .map ({ classes, word }) ->
       if classes.length == 0
         document.createTextNode word
       else

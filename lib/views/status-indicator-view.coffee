@@ -17,4 +17,6 @@ class StatusIndicator extends HTMLElement
   setText: (text) ->
     @iconSpan.textContent = text
 
-module.exports = StatusIndicator = document.registerElement('idris-status-indicator', {prototype: StatusIndicator.prototype})
+module.exports = StatusIndicator =
+  document.registerElement 'idris-status-indicator',
+    prototype: StatusIndicator.prototype
