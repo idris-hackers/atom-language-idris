@@ -2,7 +2,6 @@
   require 'atom-message-panel'
 InformationView = require './views/information-view'
 HolesView = require './views/holes-view'
-StatusIndicator = require './views/status-indicator-view'
 Logger = require './Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
@@ -79,7 +78,6 @@ class IdrisController
     uri = target.model.getURI()
 
     successHandler = ({ responseType, msg }) =>
-      @statusIndicator.setStatusLoaded()
       @messages.clear()
       @messages.show()
       @messages.setTitle 'Idris: File loaded successfully'
@@ -348,17 +346,5 @@ class IdrisController
         line: warning[1][0]
         character: warning[1][1]
         message: warning[3]
-
-  attachStatusIndicator: (statusBar) ->
-    if not @statusIndicator
-      @statusIndicator = new StatusIndicator
-      @statusIndicator.initialize()
-      statusBar.addLeftTile
-        item: @statusIndicator
-
-  detachStatusIndicator: ->
-    @statusIndicator?.remove()
-    @statusIndicator = null
-
 
 module.exports = IdrisController
