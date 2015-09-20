@@ -6,7 +6,14 @@
 
 ### Fixed
 
+## v0.3.1
+
+### Added
+
+### Fixed
+
 - get documentation or types for operators [#66](https://github.com/idris-hackers/atom-language-idris/issues/66)
+- removed the statusbar [#67](https://github.com/idris-hackers/atom-language-idris/issues/67)
 
 ## v0.3.0
 
