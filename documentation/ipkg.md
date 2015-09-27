@@ -30,8 +30,22 @@ modules = Main
 executable = yourExecutable
 main = Main
 
-opts = "-p lightyear"
+opts = "-p lightyear effects"
 ```
 
 the package will search in the `src`-directory for your files and will
 load the dependencies specified in `opts`.
+
+Newer versions of Idris also accept packages specified in a comma-separated list
+under the `pkgs` key:
+
+```
+package yourProject
+
+sourcedir = src
+modules = Main
+executable = yourExecutable
+main = Main
+
+pkgs = lightyear, effects
+```
