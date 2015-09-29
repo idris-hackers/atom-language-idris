@@ -13,11 +13,22 @@ class IdrisIdeMode extends EventEmitter
   start: (compilerOptions) ->
     if (not @process?) || @process.killed
       pathToIdris = atom.config.get("language-idris.pathToIdris")
-      parameters =
-        if compilerOptions.options
-          ['--ide-mode'].concat compilerOptions.options.split(' ')
+
+      pkgs =
+        if compilerOptions.pkgs.length
+          ["-p"].concat compilerOptions.pkgs
         else
-          ['--ide-mode']
+          []
+
+      options =
+        if compilerOptions.options
+          compilerOptions.options.split(' ')
+        else
+          []
+
+      parameters =
+        ['--ide-mode'].concat pkgs, options
+
       options =
         if compilerOptions.src
           cwd: compilerOptions.src

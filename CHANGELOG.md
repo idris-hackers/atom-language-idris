@@ -4,6 +4,8 @@
 
 ### Added
 
+- parse the new `pkgs`option in the ipkg file [idris-lang/Idris-dev/pull/2668](https://github.com/idris-lang/Idris-dev/pull/2668)
+
 ### Fixed
 
 ## v0.3.1
