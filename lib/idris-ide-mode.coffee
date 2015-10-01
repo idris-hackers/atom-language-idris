@@ -15,7 +15,7 @@ class IdrisIdeMode extends EventEmitter
       pathToIdris = atom.config.get("language-idris.pathToIdris")
 
       pkgs =
-        if compilerOptions.pkgs.length
+        if compilerOptions.pkgs && compilerOptions.pkgs.length
           ["-p"].concat compilerOptions.pkgs
         else
           []
