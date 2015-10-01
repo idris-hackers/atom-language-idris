@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v0.3.3
+
+### Added
+
+### Fixed
+
+- Most commands throw exceptions on Windows 8.1 (@aochagavia)
+
 ## v0.3.2
 
 ### Added
