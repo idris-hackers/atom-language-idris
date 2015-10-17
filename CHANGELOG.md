@@ -7,6 +7,7 @@
 ### Fixed
 
 - Added a better description for the path to the idris executable in the settings
+- Fixed the highlighting of comments
 
 ## v0.3.3
 
