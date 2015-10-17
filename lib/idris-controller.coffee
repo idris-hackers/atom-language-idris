@@ -6,6 +6,7 @@ Logger = require './Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'
+editorHelper = require './utils/editor'
 
 class IdrisController
 
@@ -157,11 +158,15 @@ class IdrisController
     successHandler = ({ responseType, msg }) ->
       [clause] = msg
       editor.transact ->
-        # Insert a newline and the new clause
-        editor.insertNewlineBelow()
+        editorHelper.moveToNextEmptyLine editor
+
+        # Insert the new clause
         editor.insertText clause
+
         # And move the cursor to the beginning of
-        # the new line
+        # the new line and add an empty line below it
+        editor.insertNewlineBelow()
+        editor.moveUp()
         editor.moveToBeginningOfLine()
 
     @model
