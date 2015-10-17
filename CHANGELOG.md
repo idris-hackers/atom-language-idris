@@ -6,6 +6,8 @@
 
 ### Fixed
 
+- Fixed the highlighting of comments
+
 ## v0.3.3
 
 ### Added

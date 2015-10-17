@@ -20,6 +20,11 @@ patterns:
       match:  '\\b(public|private|abstract|implicit)\\b'
     }
     {
+      name: 'comment.line.idris'
+      match: '(--).*$\n?'
+      comment: 'Line comment'
+    }
+    {
       name: 'storage.type.function.idris'
       match: '\\?[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]+|[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:\\?][-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]*'
     }
@@ -44,11 +49,6 @@ patterns:
     {
       match: '\\(\\)'
       name: 'constant.unit.idris'
-    }
-    {
-      name: 'comment.line.idris'
-      match: '(--).*$\n?'
-      comment: 'Line comment'
     }
     {
       name: 'comment.documentation.line.idris'
