@@ -9,7 +9,7 @@ isCurrentLineEmpty = (editor) ->
 
   # reset the selection to what it was before calling
   # this function
-  editor.getSelectedBufferRange bufferRange
+  editor.setSelectedBufferRange bufferRange
 
   selectedText.trim() == ''
 
