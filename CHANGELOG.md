@@ -6,6 +6,8 @@
 
 ### Fixed
 
+- Added a better description for the path to the idris executable in the settings
+
 ## v0.3.3
 
 ### Added
