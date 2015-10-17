@@ -4,9 +4,10 @@ IdrisController = require './idris-controller'
 module.exports =
   config:
     pathToIdris:
+      title: 'Idris Location'
       type: 'string'
       default: 'idris'
-      description: 'Path to the idris executable'
+      description: 'Location of the Idris executable'
     panelFontFamily:
       type: 'string'
       default: ''
