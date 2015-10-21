@@ -127,4 +127,7 @@ class IdrisModel
   printDefinition: (name) ->
     @prepareCommand [':print-definition', name]
 
+  apropos: (name) ->
+    @prepareCommand [':apropos', name]
+
 module.exports = IdrisModel

@@ -27,6 +27,7 @@ class IdrisController
     'language-idris:print-definition': @runCommand @printDefinition
     'language-idris:stop-compiler': @stopCompiler
     'language-idris:open-repl': @runCommand @openREPL
+    'language-idris:apropos': @runCommand @apropos
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -356,6 +357,22 @@ class IdrisController
       .load uri
       .filter ({ responseType }) -> responseType == 'return'
       .subscribe successHandler, @displayErrors
+
+  apropos: ({ target }) =>
+      editor = target.model
+      uri = editor.getURI()
+
+      successHandler = ({ responseType, msg }) =>
+        options =
+          split: 'right'
+          searchAllPanes: true
+
+        atom.workspace.open "idris://apropos", options
+
+      @model
+        .load uri
+        .filter ({ responseType }) -> responseType == 'return'
+        .subscribe successHandler, @displayErrors
 
   displayErrors: (err) =>
     @messages.show()
