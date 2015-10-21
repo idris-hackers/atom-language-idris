@@ -1,6 +1,8 @@
 # Applies the highlighting we get from the idris compiler to our source code.
 # http://docs.idris-lang.org/en/latest/reference/ide-protocol.html#output-highlighting
 
+CycleDOM = require '@cycle/dom'
+
 highlightInfoListToOb = (list) ->
   obj = { }
   for x in list
@@ -80,8 +82,15 @@ highlightToHtml = (highlights) ->
     container.appendChild span
   container
 
+highlightToCycle = (highlights) ->
+  highlights.map ({classes, word}) ->
+    if classes.length == 0
+      word
+    else
+      CycleDOM.h 'span', { className: classes.join(' ') }, word
 
 module.exports =
   highlight: highlight
   highlightToString: highlightToString
   highlightToHtml: highlightToHtml
+  highlightToCycle: highlightToCycle

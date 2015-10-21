@@ -1,5 +1,7 @@
 IdrisController = require './idris-controller'
 { CompositeDisposable } = require 'atom'
+url = require 'url'
+{ IdrisPanel } = require './views/panel-view'
 
 module.exports =
   config:
@@ -27,6 +29,16 @@ module.exports =
     subscription = atom.commands.add 'atom-text-editor[data-grammar~="idris"]', @controller.getCommands()
     @subscriptions = new CompositeDisposable
     @subscriptions.add subscription
+
+    atom.workspace.addOpener (uriToOpen, options) =>
+      try
+        { protocol, host, pathname } = url.parse uriToOpen
+      catch error
+        return
+
+      return unless protocol is 'idris:'
+
+      new IdrisPanel @controller, host
 
   deactivate: ->
     @subscriptions.dispose()
