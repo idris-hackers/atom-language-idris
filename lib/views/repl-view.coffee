@@ -1,6 +1,7 @@
 Cycle = require '@cycle/core'
 CycleDOM = require '@cycle/dom'
 highlighter = require '../utils/highlighter'
+Rx = require 'rx-lite'
 
 fontOptions = () ->
   fontSize = atom.config.get 'language-idris.panelFontSize'
@@ -22,21 +23,41 @@ fontOptions = () ->
   '-webkit-font-feature-settings': webkitFontFeatureSettings
   'font-family': fontFamily
 
-REPLCycle =
-  # highlight : forall a.
-  #   { code : String, highlightInformation : HighlightInformation } ->
-  #   CycleDOM
-  highlight: ({ code, highlightInformation }) ->
-    highlights = highlighter.highlight code, highlightInformation
-    highlighter.highlightToCycle highlights
+styles = fontOptions()
 
+# highlight : forall a.
+#   { code : String, highlightInformation : HighlightInformation } ->
+#   CycleDOM
+highlight = ({ code, highlightInformation }) ->
+  highlights = highlighter.highlight code, highlightInformation
+  highlighter.highlightToCycle highlights
+
+displaySuccess = (line) ->
+  highlightedCode = highlight line
+
+  CycleDOM.h 'pre',
+    {
+      className: 'idris-repl-output'
+      style: styles
+    },
+    [
+      highlightedCode
+    ]
+
+displayError = (line) ->
+  CycleDOM.h 'pre', { }, line.message
+
+REPLCycle =
   # view : Observable State -> Observable CycleDOM
   view: (state$) ->
-    styles = fontOptions()
-
     state$.map (lines) ->
       lines = lines.map (line) ->
-        highlightedCode = REPLCycle.highlight line
+        answer =
+          if line.type == 'success'
+            displaySuccess line
+          else
+            displayError line
+
         CycleDOM.h 'div',
           {
             className: 'idris-repl-line'
@@ -48,14 +69,7 @@ REPLCycle =
                 CycleDOM.h 'span', { className: 'idris-repl-input-prompt' }, '> '
                 line.input
               ]
-            CycleDOM.h 'pre',
-              {
-                className: 'idris-repl-output'
-                style: styles
-              },
-              [
-                highlightedCode
-              ]
+            answer
           ]
 
       CycleDOM.h 'div',
@@ -89,9 +103,17 @@ REPLCycle =
             escapedLine = line.replace(/"/g, '\\"')
             options.model.interpret escapedLine
               .map (e) ->
+                type: 'success'
                 input: line
                 code: e.msg[0]
                 highlightInformation: e.msg[1]
+              .catch (e) ->
+                error =
+                  input: line
+                  type: 'error'
+                  message: e.message
+                  warnings: e.warnings
+                Rx.Observable.just error
           .scan ((acc, x) -> [x].concat acc), []
           .startWith []
 
