@@ -6,8 +6,15 @@
 
 ### Fixed
 
+## v0.3.4
+
+### Added
+
+### Fixed
+
 - Added a better description for the path to the idris executable in the settings
 - Fixed the highlighting of comments
+- Fix the highlighting of documentation comments [#82](https://github.com/idris-hackers/atom-language-idris/pull/82) (@geo2a)
 - Initial clause is inserted in wrong place for functions with multiline type annotation. [#72](https://github.com/idris-hackers/atom-language-idris/issues/72)
 
 ## v0.3.3
