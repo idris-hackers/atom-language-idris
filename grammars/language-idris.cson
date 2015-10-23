@@ -25,6 +25,11 @@ patterns:
       comment: 'Line comment'
     }
     {
+      name: 'comment.documentation.line.idris'
+      match: '(\\|\\|\\|).*$\n?'
+      comment: 'Line comment'
+    }
+    {
       name: 'storage.type.function.idris'
       match: '\\?[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]+|[-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:\\?][-!#\\$%&\\*\\+\\.\\/<=>@\\\\\^\|~:]*'
     }
@@ -49,11 +54,6 @@ patterns:
     {
       match: '\\(\\)'
       name: 'constant.unit.idris'
-    }
-    {
-      name: 'comment.documentation.line.idris'
-      match: '(\\|\\|\\|).*$\n?'
-      comment: 'Line comment'
     }
     {
       name: 'comment.block.idris'
