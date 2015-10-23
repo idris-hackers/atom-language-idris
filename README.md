@@ -44,4 +44,4 @@ and rename the folder to `language-idris` or the package settings won't get pick
 Then you need an `apm install` from the `language-idris` folder to install the dependencies.
 
 Or you can execute `apm dev language-idris`. This will install the package in a separate directory and you need to start
-Atom in dev-mode to load the development packages.
+Atom in dev-mode to load the development packages (`atom -d your/folder`).
