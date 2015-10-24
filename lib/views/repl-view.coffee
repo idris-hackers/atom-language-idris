@@ -106,7 +106,9 @@ REPLCycle =
           .filter (line) -> line != ''
           .flatMap (line) ->
             escapedLine = line.replace(/"/g, '\\"')
-            options.model.interpret escapedLine
+            # append a space to trick the formatter, so that it wont turn
+            # the input into a symbol
+            options.model.interpret "#{escapedLine} "
               .map (e) ->
                 type: 'success'
                 input: line

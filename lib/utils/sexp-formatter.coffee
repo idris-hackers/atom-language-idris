@@ -27,7 +27,7 @@ formatSexp = (sexp) ->
   else if isSymbol sexp
     sexp
   else if isString sexp
-    '"' + sexp + '"'
+    '"' + sexp.trim() + '"'
   else if isBoolean sexp
     if sexp
       ':True'
