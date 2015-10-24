@@ -1,6 +1,8 @@
 # Applies the highlighting we get from the idris compiler to our source code.
 # http://docs.idris-lang.org/en/latest/reference/ide-protocol.html#output-highlighting
 
+CycleDOM = require '@cycle/dom'
+
 highlightInfoListToOb = (list) ->
   obj = { }
   for x in list
@@ -21,8 +23,18 @@ decorToClasses = (decor) ->
     else []
 
 highlightWord = (word, info) ->
+  type = info.info.type || ""
+  doc = info.info['doc-overview'] || ""
+
+  description =
+    if info.info.type?
+      "#{type}\n\n#{doc}".trim()
+    else
+      ""
+
   classes: decorToClasses(info.info.decor).concat 'idris'
   word: word
+  description: description
 
 # Build highlighting information that we can then pass to one
 # of our serializers.
@@ -80,8 +92,15 @@ highlightToHtml = (highlights) ->
     container.appendChild span
   container
 
+highlightToCycle = (highlights) ->
+  highlights.map ({ classes, word, description }) ->
+    if classes.length == 0
+      word
+    else
+      CycleDOM.h 'span', { className: classes.join(' '), title: description }, word
 
 module.exports =
   highlight: highlight
   highlightToString: highlightToString
   highlightToHtml: highlightToHtml
+  highlightToCycle: highlightToCycle

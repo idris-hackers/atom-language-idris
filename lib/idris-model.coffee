@@ -48,6 +48,7 @@ class IdrisModel
               subject.onError
                 message: ret[1]
                 warnings: @warnings[id]
+                highlightInformation: ret[2]
             subject.onCompleted()
             delete @subjects[id]
           when ':write-string'
@@ -126,5 +127,8 @@ class IdrisModel
 
   printDefinition: (name) ->
     @prepareCommand [':print-definition', name]
+
+  apropos: (name) ->
+    @prepareCommand [':apropos', name]
 
 module.exports = IdrisModel
