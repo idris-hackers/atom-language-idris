@@ -23,8 +23,18 @@ decorToClasses = (decor) ->
     else []
 
 highlightWord = (word, info) ->
+  type = info.info.type || ""
+  doc = info.info['doc-overview'] || ""
+
+  description =
+    if info.info.type?
+      "#{type}\n\n#{doc}".trim()
+    else
+      ""
+
   classes: decorToClasses(info.info.decor).concat 'idris'
   word: word
+  description: description
 
 # Build highlighting information that we can then pass to one
 # of our serializers.
@@ -83,11 +93,11 @@ highlightToHtml = (highlights) ->
   container
 
 highlightToCycle = (highlights) ->
-  highlights.map ({classes, word}) ->
+  highlights.map ({ classes, word, description }) ->
     if classes.length == 0
       word
     else
-      CycleDOM.h 'span', { className: classes.join(' ') }, word
+      CycleDOM.h 'span', { className: classes.join(' '), title: description }, word
 
 module.exports =
   highlight: highlight
