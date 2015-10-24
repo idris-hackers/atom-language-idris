@@ -93,13 +93,12 @@ REPLCycle =
                 code: e.msg[0]
                 highlightInformation: e.msg[1]
               .catch (e) ->
-                error =
-                  input: line
+                Rx.Observable.just
                   type: 'error'
+                  input: line
                   code: e.message
-                  warnings: e.warnings
                   highlightInformation: e.highlightInformation
-                Rx.Observable.just error
+                  warnings: e.warnings
           .scan ((acc, x) -> [x].concat acc), []
           .startWith []
 

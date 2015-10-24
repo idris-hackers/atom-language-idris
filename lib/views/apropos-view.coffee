@@ -16,8 +16,6 @@ AproposCycle =
 
   # view : Observable State -> Observable CycleDOM
   view: (state$) ->
-    styles = fontOptions()
-
     state$.map (apropos) ->
       aproposAnswer =
         if apropos.code

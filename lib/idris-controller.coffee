@@ -6,9 +6,6 @@ Logger = require './Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'
-Cycle = require '@cycle/core'
-PanelView = require './views/panel-view'
-REPLView = require './views/repl-view'
 editorHelper = require './utils/editor'
 
 class IdrisController
