@@ -83,7 +83,7 @@ REPLCycle =
         },
         [
           CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, 'toggle'
-          CycleDOM.h 'div', lines
+          CycleDOM.h 'div', { className: 'idris-repl-lines' }, lines
         ]
 
   main: (responses) ->
