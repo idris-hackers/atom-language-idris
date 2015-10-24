@@ -29,8 +29,11 @@ styles = fontOptions()
 #   { code : String, highlightInformation : HighlightInformation } ->
 #   CycleDOM
 highlight = ({ code, highlightInformation }) ->
-  highlights = highlighter.highlight code, highlightInformation
-  highlighter.highlightToCycle highlights
+  if highlightInformation
+    highlights = highlighter.highlight code, highlightInformation
+    highlighter.highlightToCycle highlights
+  else
+    code
 
 displaySuccess = (line) ->
   highlightedCode = highlight line
@@ -45,7 +48,9 @@ displaySuccess = (line) ->
     ]
 
 displayError = (line) ->
-  CycleDOM.h 'pre', { }, line.message
+  highlightedCode = highlight line
+
+  CycleDOM.h 'pre', { }, highlightedCode
 
 REPLCycle =
   # view : Observable State -> Observable CycleDOM
@@ -111,8 +116,9 @@ REPLCycle =
                 error =
                   input: line
                   type: 'error'
-                  message: e.message
+                  code: e.message
                   warnings: e.warnings
+                  highlightInformation: e.highlightInformation
                 Rx.Observable.just error
           .scan ((acc, x) -> [x].concat acc), []
           .startWith []
