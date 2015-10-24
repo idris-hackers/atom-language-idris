@@ -1,26 +1,10 @@
 Cycle = require '@cycle/core'
 CycleDOM = require '@cycle/dom'
 highlighter = require '../utils/highlighter'
+Rx = require 'rx-lite'
+{ fontOptions } = require '../utils/dom'
 
-fontOptions = () ->
-  fontSize = atom.config.get 'language-idris.panelFontSize'
-  fontSizeAttr = "#{fontSize}px"
-  enableLigatures = atom.config.get 'language-idris.panelFontLigatures'
-  webkitFontFeatureSettings =
-    if enableLigatures
-      '"liga"'
-    else
-      '"inherit"'
-
-  fontFamily = atom.config.get 'language-idris.panelFontFamily'
-  if fontFamily != ''
-    fontFamily
-  else
-    '"inherit"'
-
-  'font-size': fontSizeAttr
-  '-webkit-font-feature-settings': webkitFontFeatureSettings
-  'font-family': fontFamily
+styles = fontOptions()
 
 AproposCycle =
   # highlight : forall a.
@@ -47,7 +31,7 @@ AproposCycle =
           className: 'idris-panel-view'
         },
         [
-          CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, 'toggle'
+          CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, ''
           CycleDOM.h 'div', aproposAnswer
         ]
 
@@ -72,10 +56,14 @@ AproposCycle =
           .flatMap (line) ->
             escapedLine = line.replace(/"/g, '\\"')
             options.model.apropos escapedLine
-          .map (e) ->
-            code: e.msg[0]
-            highlightInformation: e.msg[1]
-          .startWith {}
+            .map (e) ->
+              code: e.msg[0]
+              highlightInformation: e.msg[1]
+            .catch (e) ->
+              Rx.Observable.just
+                code: e.message
+                highlightInformation: e.highlightInformation
+          .startWith { }
 
 class AproposView
   constructor: (params) ->

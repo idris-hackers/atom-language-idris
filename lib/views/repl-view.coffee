@@ -2,26 +2,7 @@ Cycle = require '@cycle/core'
 CycleDOM = require '@cycle/dom'
 highlighter = require '../utils/highlighter'
 Rx = require 'rx-lite'
-
-fontOptions = () ->
-  fontSize = atom.config.get 'language-idris.panelFontSize'
-  fontSizeAttr = "#{fontSize}px"
-  enableLigatures = atom.config.get 'language-idris.panelFontLigatures'
-  webkitFontFeatureSettings =
-    if enableLigatures
-      '"liga"'
-    else
-      '"inherit"'
-
-  fontFamily = atom.config.get 'language-idris.panelFontFamily'
-  if fontFamily != ''
-    fontFamily
-  else
-    '"inherit"'
-
-  'font-size': fontSizeAttr
-  '-webkit-font-feature-settings': webkitFontFeatureSettings
-  'font-family': fontFamily
+{ fontOptions } = require '../utils/dom'
 
 styles = fontOptions()
 
@@ -82,7 +63,7 @@ REPLCycle =
           className: 'idris-panel-view'
         },
         [
-          CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, 'toggle'
+          CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, ''
           CycleDOM.h 'div', { className: 'idris-repl-lines' }, lines
         ]
 
@@ -95,9 +76,6 @@ REPLCycle =
     DOM: REPLCycle.view responses.CONTENT
     CONTENT: input
 
-  # driver : forall a.
-  #   IdrisModel -> Observable String ->
-  #   Observable (List { a | code : String, highlightInformation : highlightInformation })
   driver:
     (options) ->
       DOM: CycleDOM.makeDOMDriver options.hostElement

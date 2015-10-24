@@ -16,6 +16,28 @@ createCodeElement = ->
     pre.style.webkitFontFeatureSettings = '"liga"'
   pre
 
+fontOptions = ->
+  fontSize = atom.config.get 'language-idris.panelFontSize'
+  fontSizeAttr = "#{fontSize}px"
+  enableLigatures = atom.config.get 'language-idris.panelFontLigatures'
+  webkitFontFeatureSettings =
+    if enableLigatures
+      '"liga"'
+    else
+      '"inherit"'
+
+  fontFamily = atom.config.get 'language-idris.panelFontFamily'
+  if fontFamily != ''
+    fontFamily
+  else
+    '"inherit"'
+
+  'font-size': fontSizeAttr
+  '-webkit-font-feature-settings': webkitFontFeatureSettings
+  'font-family': fontFamily
+
+
 module.exports =
   joinHtmlElements: joinHtmlElements
   createCodeElement: createCodeElement
+  fontOptions: fontOptions

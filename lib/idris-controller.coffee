@@ -346,7 +346,7 @@ class IdrisController
     editor = target.model
     uri = editor.getURI()
 
-    successHandler = ({ responseType, msg }) =>
+    successHandler = ({ responseType, msg }) ->
       options =
         split: 'right'
         searchAllPanes: true
@@ -359,20 +359,20 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   apropos: ({ target }) =>
-      editor = target.model
-      uri = editor.getURI()
+    editor = target.model
+    uri = editor.getURI()
 
-      successHandler = ({ responseType, msg }) =>
-        options =
-          split: 'right'
-          searchAllPanes: true
+    successHandler = ({ responseType, msg }) ->
+      options =
+        split: 'right'
+        searchAllPanes: true
 
-        atom.workspace.open "idris://apropos", options
+      atom.workspace.open "idris://apropos", options
 
-      @model
-        .load uri
-        .filter ({ responseType }) -> responseType == 'return'
-        .subscribe successHandler, @displayErrors
+    @model
+      .load uri
+      .filter ({ responseType }) -> responseType == 'return'
+      .subscribe successHandler, @displayErrors
 
   displayErrors: (err) =>
     @messages.show()
