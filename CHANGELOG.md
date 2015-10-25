@@ -4,6 +4,12 @@
 
 ### Added
 
+### Fixed
+
+## v0.4.0
+
+### Added
+
 - Added a REPL [#80](https://github.com/idris-hackers/atom-language-idris/pull/80)
 - Added a panel for the `apropos` command
 
