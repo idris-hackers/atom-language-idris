@@ -15,6 +15,7 @@ It supports:
  - make-lemma (ctrl-alt-l)
  - Showing holes
  - ipkg highlighting
+ - REPL (ctrl-alt-enter)
 
 ## Usage
 
@@ -34,7 +35,6 @@ There is more information available in a in a [separate documentation](https://g
  - Add better support for drawing attention to error-messages
  - Improve the syntax-highlighting (the current is based on the Sublime plugin)
  - Add autocompletion
- - Add a REPL
  - ...
 
 ## Development
