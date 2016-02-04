@@ -13,7 +13,7 @@ patterns:
     }
     {
       name: 'keyword.control.idris'
-      match: '\\b(where|with|syntax|proof|postulate|using|namespace|class|instance)\\b'
+      match: '\\b(where|with|syntax|proof|postulate|using|namespace|class|instance|interface|implementation)\\b'
     }
     {
       name: 'keyword.control.idris'
