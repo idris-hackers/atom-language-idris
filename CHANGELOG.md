@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v0.4.1
+
+### Added
+
+- class and instance to interface and implementation (@justjoheinz)
+
+### Fixed
+
 ## v0.4.0
 
 ### Added
