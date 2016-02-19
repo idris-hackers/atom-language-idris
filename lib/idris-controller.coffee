@@ -10,22 +10,6 @@ editorHelper = require './utils/editor'
 
 class IdrisController
 
-  getCommands: ->
-    'language-idris:type-of': @runCommand @getTypeForWord
-    'language-idris:docs-for': @runCommand @getDocsForWord
-    'language-idris:case-split': @runCommand @doCaseSplit
-    'language-idris:add-clause': @runCommand @doAddClause
-    'language-idris:make-with': @runCommand @doMakeWith
-    'language-idris:make-lemma': @runCommand @doMakeLemma
-    'language-idris:make-case': @runCommand @doMakeCase
-    'language-idris:holes': @runCommand @showHoles
-    'language-idris:proof-search': @runCommand @doProofSearch
-    'language-idris:typecheck': @runCommand @typecheckFile
-    'language-idris:print-definition': @runCommand @printDefinition
-    'language-idris:stop-compiler': @stopCompiler
-    'language-idris:open-repl': @runCommand @openREPL
-    'language-idris:apropos': @runCommand @apropos
-
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
 
