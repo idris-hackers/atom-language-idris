@@ -239,7 +239,7 @@ repository:
         }
         {
           name: 'meta.parameter.named.idris'
-          comment: '(x : Nat)'
+          comment: '(a, b, c : Nat)'
           begin: "\\("
           end: "\\)"
           patterns:
@@ -249,7 +249,7 @@ repository:
               }
               {
                 name: 'entity.name.tag.idris'
-                match: "([\\w']+)"
+                match: "([\\w']+)\\s*((?=(,|:)))"
               }
             ]
         }
