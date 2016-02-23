@@ -169,6 +169,9 @@ patterns:
       name: 'keyword.operator.idris'
       match: "[|&!%$?~+:\\-.=</>\\\\*]+"
     }
+    {
+      include: '#data_ctor'
+    }
   ]
 repository:
   context_signature:
@@ -322,6 +325,14 @@ repository:
         {
           name: 'constant.character.escape.control.idris'
           match: '\\^[A-Z@\\[\\]\\\\\\^_]'
+        }
+      ]
+  data_ctor:
+    patterns:
+      [
+        {
+          'name': 'entity.name.tag.idris'
+          'match': '\\b[\\p{Lu}\\p{Lt}][\\p{Ll}_\\p{Lu}\\p{Lt}\\p{Nd}\']*(?:\\.[\\p{Lu}\\p{Lt}][\\p{Ll}_\\p{Lu}\\p{Lt}\\p{Nd}\']*)*\\b'
         }
       ]
 uuid: '4dd16092-ffa5-4ba4-8075-e5da9f368a72'
