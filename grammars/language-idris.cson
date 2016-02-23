@@ -238,6 +238,22 @@ repository:
             ]
         }
         {
+          name: 'meta.parameter.named.idris'
+          comment: '(x : Nat)'
+          begin: "\\("
+          end: "\\)"
+          patterns:
+            [
+              {
+                include: '#type_signature'
+              }
+              {
+                name: 'entity.name.tag.idris'
+                match: "([\\w']+)"
+              }
+            ]
+        }
+        {
           name: 'meta.parameter.implicit.idris'
           comment: '{auto p : a = b}'
           begin: "\\{((auto|default .+)\\s+)?([\\w']+)\\s*:(?!:)"
@@ -270,6 +286,9 @@ repository:
         }
         {
           include: '#language_const'
+        }
+        {
+          include: '#prelude_type'
         }
       ]
   function_signature:
@@ -322,6 +341,14 @@ repository:
         {
           name: 'constant.character.escape.control.idris'
           match: '\\^[A-Z@\\[\\]\\\\\\^_]'
+        }
+      ]
+  prelude_type:
+    patterns:
+      [
+        {
+          name: 'constant.language.idris'
+          match: '\\b(Type|Exists|World|IO|IntTy|FTy|Foreign|File|Mode|Dec|Bool|so|Ordering|Either|Fin|IsJust|List|Maybe|Nat|LTE|GTE|GT|LT|Stream|StrM|Vect|Not|Lazy|Inf|FalseElim)\\b'
         }
       ]
 uuid: '4dd16092-ffa5-4ba4-8075-e5da9f368a72'
