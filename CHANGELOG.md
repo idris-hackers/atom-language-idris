@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v0.4.2
+
+### Added
+
+- syntax highlighting for constructors [#95](https://github.com/idris-hackers/atom-language-idris/pull/95)
+
+### Fixed
+
 ## v0.4.1
 
 ### Added
