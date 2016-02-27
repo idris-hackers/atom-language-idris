@@ -48,7 +48,6 @@ class IdrisController
       @model = new IdrisModel
       @messages = new MessagePanelView
         title: 'Idris Messages'
-        closeMethod: 'hide'
       @messages.attach()
       @messages.hide()
     @model.setCompilerOptions compilerOptions
@@ -81,8 +80,9 @@ class IdrisController
     uri = target.model.getURI()
 
     successHandler = ({ responseType, msg }) =>
-      @messages.clear()
+      @messages.attach()
       @messages.show()
+      @messages.clear()
       @messages.setTitle 'Idris: File loaded successfully'
 
     @model
@@ -95,6 +95,7 @@ class IdrisController
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
+      @messages.attach()
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Docs for <tt>' + word + '</tt>', true
@@ -116,6 +117,7 @@ class IdrisController
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
+      @messages.attach()
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
@@ -281,6 +283,7 @@ class IdrisController
 
     successHandler = ({ responseType, msg }) =>
       [holes] = msg
+      @messages.attach()
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Holes'
@@ -326,6 +329,7 @@ class IdrisController
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
+      @messages.attach()
       @messages.show()
       @messages.clear()
       @messages.setTitle 'Idris: Definition of <tt>' + word + '</tt>', true
@@ -372,6 +376,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   displayErrors: (err) =>
+    @messages.attach()
     @messages.show()
     @messages.clear()
     @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
