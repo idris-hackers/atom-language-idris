@@ -33,7 +33,7 @@
   ],
   "consumedServices": {},
   "dependencies": {
-    "atom-message-panel": ">=0.1.0",
+    "atom-message-panel": "^1.2.4",
     "bennu": "17.3.0",
     "nu-stream": "3.3.1",
     "rx-lite": "4.0.0",
