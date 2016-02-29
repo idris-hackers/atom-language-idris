@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v0.4.3
+
+### Added
+
+### Fixed
+
+- After closing panel once with "X" icon, it no longer appears for type checking/inspection [#90](https://github.com/idris-hackers/atom-language-idris/issues/90) (@justjoheinz)
+
 ## v0.4.2
 
 ### Added
