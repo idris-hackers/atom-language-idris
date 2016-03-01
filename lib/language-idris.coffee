@@ -43,3 +43,7 @@ module.exports =
   deactivate: ->
     @subscriptions.dispose()
     this.controller.destroy()
+
+  provide: ->
+    console.log "Provider"
+    @controller.provideReplCompletions()
