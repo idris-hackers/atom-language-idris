@@ -59,14 +59,36 @@ class IdrisController
     (command) =>
       (args) =>
         compilerOptions = Ipkg.compilerOptions atom.project
-        compilerOptions.subscribe ((options) =>
+        compilerOptions.subscribe (options) =>
           console.log "Compiler Options:", options
           @initialize options
           command args
-        ), (() =>
-          @initialize { }
-          command args
-        )
+
+  # see https://github.com/atom/autocomplete-plus/wiki/Provider-API
+  provideReplCompletions: =>
+    selector: '.source.idris'
+
+    inclusionPriority: 1
+    excludeLowerPriority: false
+
+    # Get suggestions from the Idris REPL. You can always ask for suggestions <Ctrl+Space>
+    # or type at least 3 characters to get suggestions based on your autocomplete-plus
+    # settings.
+    getSuggestions: ({ editor, bufferPosition, scopeDescriptor, prefix, activatedManually }) =>
+      trimmedPrefix = prefix.trim()
+      if trimmedPrefix.length > 2 or activatedManually
+        Ipkg.compilerOptions atom.project
+          .flatMap (options) =>
+            @initialize options
+            @model
+              .replCompletions trimmedPrefix
+          .toPromise()
+          .then ({ responseType, msg }) ->
+            for sug in msg[0][0]
+              type: "function"
+              text: sug
+      else
+        null
 
   saveFile: (editor) ->
     if editor.getURI()
