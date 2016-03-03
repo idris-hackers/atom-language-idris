@@ -59,14 +59,10 @@ class IdrisController
     (command) =>
       (args) =>
         compilerOptions = Ipkg.compilerOptions atom.project
-        compilerOptions.subscribe ((options) =>
+        compilerOptions.subscribe (options) =>
           console.log "Compiler Options:", options
           @initialize options
           command args
-        ), (() =>
-          @initialize { }
-          command args
-        )
 
   # see https://github.com/atom/autocomplete-plus/wiki/Provider-API
   provideReplCompletions: =>
