@@ -17,7 +17,7 @@ patterns:
     }
     {
       name: 'keyword.control.idris'
-      match:  '\\b(public|private|abstract|implicit)\\b'
+      match:  '\\b(public|private|export|implicit)\\b'
     }
     {
       name: 'comment.line.idris'
