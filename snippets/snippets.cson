@@ -1,0 +1,75 @@
+'.source.idris':
+  'Show implementation':
+    'prefix': 'Show'
+    'body': """
+      Show ${1:Type} where
+        show s = ?holeShow
+      """
+  'Eq implementation':
+    'prefix': 'Eq'
+    'body': """
+      Eq ${1:Type} where
+        (==) a b = ?holeEq
+      """
+  'Ord implementation':
+    'prefix': 'Ord'
+    'body': """
+      Ord ${1:Type} where
+        compare a b = ?holeOrd
+      """
+  'Semigroup implementation':
+    'prefix': 'Semigroup'
+    'body': """
+      Semigroup ${1:Type} where
+        (<+>) a b = ?holeSemigroup
+      """
+  'Monoid implementation':
+    'prefix': 'Monoid'
+    'body': """
+      Monoid ${1:Type} where
+        neutral = ?holeMonoid
+      """
+  'Functor implementation':
+    'prefix': 'Functor'
+    'body': """
+      Functor ${1:Type} where
+        map f fa = ?holeFunctor
+      """
+  'Applicative implementation':
+    'prefix': 'Applicative'
+    'body': """
+      Applicative ${1:Type} where
+        pure a = ?holePureApplicative
+
+        (<*>) f fa = ?holeApplyApplicative
+      """
+  'Monad implementation':
+    'prefix': 'Monad'
+    'body': """
+      Monad ${1:Type} where
+        (>>=) fa f = ?holeMonadBind
+      """
+  'Traversable implementation':
+    'prefix': 'Traversable'
+    'body': """
+      Traversable ${1:Type} where
+        traverse = ?holeTraverse
+      """
+  'Foldable implementation':
+    'prefix': 'Foldable'
+    'body': """
+      Foldable ${1:Type} where
+        foldr = ?holeFoldableFoldr
+      """
+  'DecEq implementation':
+    'prefix': 'DecEq'
+    'body': """
+      DecEq ${1:Type} where
+        decEq t1 t2 = ?holeDecEq
+    """
+  'Uninhabited implementation':
+    'prefix': 'Uninhabited'
+    'body': """
+      Uninhabited (${1:TypeWhichIsUninhabited}) where
+        uninhabited ${2:Proof} impossible
+    """
