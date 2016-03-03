@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add snippets for the most common interface implementations [#99](https://github.com/idris-hackers/atom-language-idris/pull/99) (@justjoheinz)
+
 ### Fixed
 
 ## v0.4.3
