@@ -68,6 +68,23 @@ class IdrisController
           command args
         )
 
+  # see https://github.com/atom/autocomplete-plus/wiki/Provider-API
+  provideReplCompletions: =>
+    selector: '.source.idris'
+
+    inclusionPriority: 1
+    excludeLowerPriority: false
+
+    # Required: Return a promise, an array of suggestions, or null.
+    getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix, activatedManually}) =>
+      @model
+        .replCompletions prefix
+        .toPromise()
+        .then ({ responseType, msg }) ->
+          for sug in msg[0][0]
+            type: "function"
+            text: sug
+
   saveFile: (editor) ->
     if editor.getURI()
       editor.save()

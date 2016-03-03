@@ -9,7 +9,7 @@ module.exports =
       title: 'Idris Location'
       type: 'string'
       default: 'idris'
-      description: 'Location of the Idris executable'
+      description: 'Location of the Idris executable (e.g. /usr/local/bin/idris)'
     panelFontFamily:
       type: 'string'
       default: ''
@@ -43,3 +43,7 @@ module.exports =
   deactivate: ->
     @subscriptions.dispose()
     this.controller.destroy()
+
+  provide: ->
+    console.log "Provider"
+    @controller.provideReplCompletions()
