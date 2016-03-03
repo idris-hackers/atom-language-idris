@@ -72,9 +72,12 @@ class IdrisController
     excludeLowerPriority: false
 
     # Required: Return a promise, an array of suggestions, or null.
-    getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix, activatedManually}) =>
-      @model
-        .replCompletions prefix
+    getSuggestions: ({ editor, bufferPosition, scopeDescriptor, prefix, activatedManually }) =>
+      Ipkg.compilerOptions atom.project
+        .flatMap (options) =>
+          @initialize options
+          @model
+            .replCompletions prefix
         .toPromise()
         .then ({ responseType, msg }) ->
           for sug in msg[0][0]
