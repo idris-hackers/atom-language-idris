@@ -30,7 +30,7 @@ AproposCycle =
         },
         [
           CycleDOM.h 'input', { type: 'text', className: 'native-key-bindings idris-repl-input-field' }, ''
-          CycleDOM.h 'div', aproposAnswer
+          CycleDOM.h 'div', {className: 'idris-repl-lines' }, aproposAnswer
         ]
 
   main: (responses) ->
