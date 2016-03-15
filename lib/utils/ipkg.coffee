@@ -57,12 +57,15 @@ readIpkgFile = (ipkgFile) ->
 # the compiler options in it.
 compilerOptions = (project) ->
   ipkgFilesObserver = findIpkgFile project
-  ipkgFilesObserver.flatMap (ipkgFiles) ->
-    if ipkgFiles.length
-      ipkgFile = ipkgFiles[0]
-      readIpkgFile(ipkgFile)
-        .map parseIpkgFile(ipkgFile)
-    else
+  ipkgFilesObserver
+    .flatMap (ipkgFiles) ->
+      if ipkgFiles.length
+        ipkgFile = ipkgFiles[0]
+        readIpkgFile(ipkgFile)
+          .map parseIpkgFile(ipkgFile)
+      else
+        Rx.Observable.return { }
+    .catch ->
       Rx.Observable.return { }
 
 module.exports =

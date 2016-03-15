@@ -98,6 +98,9 @@ class IdrisModel
   docsFor: (word) ->
     @prepareCommand [':docs-for', word]
 
+  replCompletions: (word) ->
+      @prepareCommand [':repl-completions', word]
+
   getType: (word) ->
     @prepareCommand [':type-of', word]
 
