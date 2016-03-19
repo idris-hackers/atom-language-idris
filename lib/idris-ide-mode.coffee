@@ -13,10 +13,10 @@ class IdrisIdeMode extends EventEmitter
   start: (compilerOptions) ->
     if (not @process?) || @process.killed
       pathToIdris = atom.config.get("language-idris.pathToIdris")
-
       pkgs =
         if compilerOptions.pkgs && compilerOptions.pkgs.length
-          ["-p"].concat compilerOptions.pkgs
+          p = compilerOptions.pkgs.map (p) -> ["-p", p]
+          [].concat.apply([], p)
         else
           []
 
