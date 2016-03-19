@@ -4,6 +4,10 @@
 
 ### Added
 
+- Fix passing packages in ipkg files [#111](https://github.com/idris-hackers/atom-language-idris/pull/111)
+- Make apropos view results scrollable [#109](https://github.com/idris-hackers/atom-language-idris/pull/109) (@justjoheinz)
+- Codecompletion via autocomplete-plus [#98](https://github.com/idris-hackers/atom-language-idris/pull/98) (@justjoheinz)
+- Replace deprecated abstract keyword with export [#101](https://github.com/idris-hackers/atom-language-idris/pull/101) (@justjoheinz)
 - Add snippets for the most common interface implementations [#99](https://github.com/idris-hackers/atom-language-idris/pull/99) (@justjoheinz)
 
 ### Fixed
