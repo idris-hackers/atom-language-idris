@@ -206,7 +206,6 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    editor.moveToBeginningOfLine()
     word = @getWordUnderCursor target
 
     successHandler = ({ responseType, msg }) ->
@@ -219,6 +218,7 @@ class IdrisController
         # the new line
         editor.moveToBeginningOfLine()
         editor.moveUp()
+
 
     @model
       .load uri
