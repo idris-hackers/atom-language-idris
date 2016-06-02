@@ -132,6 +132,7 @@ class IdrisController
       .load uri
       .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.docsFor word
+      .catch (e) => @model.docsFor word
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({ target }) =>
@@ -369,6 +370,7 @@ class IdrisController
       .load uri
       .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.printDefinition word
+      .catch (e) => @model.printDefinition word
       .subscribe successHandler, @displayErrors
 
   openREPL: ({ target }) =>
