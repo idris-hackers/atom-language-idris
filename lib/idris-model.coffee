@@ -13,7 +13,10 @@ class IdrisModel
   oldCompilerOptions: { }
 
   ideMode: (compilerOptions) ->
-    if !@ideModeRef || !JS.objectEqual(@oldCompilerOptions, compilerOptions)
+    if @ideModeRef && !JS.objectEqual(@oldCompilerOptions, compilerOptions)
+      @ideModeRef.stop()
+      @ideModeRef = null
+    if !@ideModeRef
       @ideModeRef = new IdrisIdeMode
       @ideModeRef.on 'message', @handleCommand
       @ideModeRef.start compilerOptions
