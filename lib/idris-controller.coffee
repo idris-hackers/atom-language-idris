@@ -114,6 +114,7 @@ class IdrisController
 
   getDocsForWord: ({ target }) =>
     word = Symbol.serializeWord @getWordUnderCursor(target)
+    uri = target.model.getURI()
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
@@ -128,7 +129,9 @@ class IdrisController
       @messages.add informationView
 
     @model
-      .docsFor word
+      .load uri
+      .filter ({ responseType }) -> responseType == 'return'
+      .flatMap => @model.docsFor word
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({ target }) =>
@@ -348,6 +351,7 @@ class IdrisController
 
   printDefinition: ({ target }) =>
     word = Symbol.serializeWord @getWordUnderCursor(target)
+    uri = target.model.getURI()
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
@@ -362,7 +366,9 @@ class IdrisController
       @messages.add informationView
 
     @model
-      .printDefinition word
+      .load uri
+      .filter ({ responseType }) -> responseType == 'return'
+      .flatMap => @model.printDefinition word
       .subscribe successHandler, @displayErrors
 
   openREPL: ({ target }) =>
