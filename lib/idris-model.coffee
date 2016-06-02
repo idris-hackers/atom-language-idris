@@ -14,6 +14,7 @@ class IdrisModel
 
   ideMode: (compilerOptions) ->
     if @ideModeRef && !JS.objectEqual(@oldCompilerOptions, compilerOptions)
+      @ideModeRef.process.removeAllListeners()
       @ideModeRef.stop()
       @ideModeRef = null
     if !@ideModeRef
