@@ -6,6 +6,14 @@
 
 ### Fixed
 
+## v0.4.5
+
+### Added
+
+### Fixed
+
+- Many different processes are spawned [#114](https://github.com/idris-hackers/atom-language-idris/issues/114) (@pyrtsa)
+
 ## v0.4.4
 
 ### Added
