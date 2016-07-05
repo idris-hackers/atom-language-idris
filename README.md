@@ -1,3 +1,11 @@
+---------
+
+I'm Searching for a maintainer since I don't really use Atom anymore
+
+---------
+
+
+
 # An Idris Mode for Atom
 
 A work-in-progress Idris Mode for Atom.
