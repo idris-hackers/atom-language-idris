@@ -1,6 +1,5 @@
 {
-  ".platform-win32, atom-text-editor[data-grammar~=\"idris\"],
-   .platform-linux, atom-text-editor[data-grammar~=\"idris\"]": {
+  "atom-text-editor[data-grammar~=\"idris\"]": {
     "ctrl-alt-c": "language-idris:case-split",
     "ctrl-alt-t": "language-idris:type-of",
     "ctrl-alt-a": "language-idris:add-clause",
