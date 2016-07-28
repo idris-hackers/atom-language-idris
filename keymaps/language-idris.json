@@ -10,5 +10,18 @@
     "ctrl-alt-l": "language-idris:make-lemma",
     "ctrl-alt-r": "language-idris:typecheck",
     "ctrl-alt-m": "language-idris:make-case"
+  },
+
+  ".platform-darwin, atom-text-editor[data-grammar~=\"idris\"]": {
+    "ctrl-cmd-c": "language-idris:case-split",
+    "ctrl-cmd-t": "language-idris:type-of",
+    "ctrl-cmd-a": "language-idris:add-clause",
+    "ctrl-cmd-s": "language-idris:proof-search",
+    "ctrl-cmd-d": "language-idris:docs-for",
+    "ctrl-cmd-enter": "language-idris:open-repl",
+    "ctrl-cmd-w": "language-idris:make-with",
+    "ctrl-cmd-l": "language-idris:make-lemma",
+    "ctrl-cmd-r": "language-idris:typecheck",
+    "ctrl-cmd-m": "language-idris:make-case"
   }
 }
