@@ -412,7 +412,7 @@ class IdrisController
     @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
 
     @messages.add new PlainMessageView
-      message: err.message
+      message: "Errors (#{err.warnings.length})" 
       className: 'idris-error'
 
     for warning in err.warnings
@@ -420,5 +420,6 @@ class IdrisController
         line: warning[1][0]
         character: warning[1][1]
         message: warning[3]
+        file: warning[0].replace("./", err.cwd + "/")
 
 module.exports = IdrisController
