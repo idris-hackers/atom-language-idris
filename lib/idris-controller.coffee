@@ -9,6 +9,7 @@ Symbol = require './utils/symbol'
 editorHelper = require './utils/editor'
 
 class IdrisController
+  errorMarkers: []
 
   getCommands: ->
     'language-idris:type-of': @runCommand @getTypeForWord
@@ -28,6 +29,17 @@ class IdrisController
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
+  
+  createMarker: (editor, range, type) ->
+    marker = editor.markBufferRange(range, invalidate: 'never')
+    editor.decorateMarker marker,
+      type: type
+      class: 'highlight-idris-error'
+    marker
+  
+  destroyMarkers: () ->
+    for marker in @errorMarkers
+      marker.destroy()
 
   destroy: ->
     if @model
@@ -44,6 +56,7 @@ class IdrisController
     editor.getTextInBufferRange cursorPosition
 
   initialize: (compilerOptions) ->
+    @destroyMarkers()
     if !@model
       @model = new IdrisModel
       @messages = new MessagePanelView
@@ -416,10 +429,25 @@ class IdrisController
       className: 'idris-error'
 
     for warning in err.warnings
+      line = warning[1][0]
+      character = warning[1][1]
+      uri = warning[0].replace("./", err.cwd + "/")
+
       @messages.add new LineMessageView
-        line: warning[1][0]
-        character: warning[1][1]
+        line: line
+        character: character 
         message: warning[3]
-        file: warning[0].replace("./", err.cwd + "/")
+        file: uri 
+      
+      editor = atom.workspace.getActiveTextEditor()
+      if line > 0 && uri == editor.getURI()
+        startPoint = warning[1]
+        startPoint[0] = startPoint[0] - 1
+        endPoint = warning[2]
+        endPoint[0] = endPoint[0] - 1
+        gutterMarker = @createMarker editor, [startPoint, endPoint], 'line-number'
+        lineMarker = @createMarker editor, [[line - 1, character - 1], [line, 0]], 'line' 
+        @errorMarkers.push gutterMarker
+        @errorMarkers.push lineMarker
 
 module.exports = IdrisController

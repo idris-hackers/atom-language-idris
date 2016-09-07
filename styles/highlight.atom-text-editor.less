@@ -1,0 +1,21 @@
+@import "syntax-variables";
+
+@red-color: @syntax-color-removed;
+
+atom-text-editor::shadow
+{
+  .gutter .line-number
+  {
+    &.highlight-idris-error
+    {
+      background-color: @red-color;
+    }
+  }
+  .line
+  {
+    &.highlight-idris-error
+    {
+      background-color: lighten(@red-color, 20%);
+    }
+  }
+}
