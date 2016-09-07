@@ -5,7 +5,7 @@ patterns:
   [
     {
       name: 'keyword.control.ipkg'
-      match: '\\b(package|opts|modules|sourcedir|makefile|objs|executable|main|libs|pkgs)\\b'
+      match: '\\b(package|opts|modules|sourcedir|makefile|objs|executable|main|libs|pkgs|tests)\\b'
     }
     {
       name: 'string.quoted.double.ipkg'
