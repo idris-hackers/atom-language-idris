@@ -53,6 +53,7 @@ class IdrisModel
                 message: ret[1]
                 warnings: @warnings[id]
                 highlightInformation: ret[2]
+                cwd: @compilerOptions.src
             subject.onCompleted()
             delete @subjects[id]
           when ':write-string'
