@@ -4,6 +4,17 @@ fileTypes: ['ipkg']
 patterns:
   [
     {
+      name: 'comment.line.ipkg'
+      match: '(--).*$\n?'
+      comment: 'Line comment'
+    }
+    {
+      name: 'comment.block.ipkg'
+      begin: '\\{-'
+      end: '-\\}'
+      comment: 'Block comment'
+    }
+    {
       name: 'keyword.control.ipkg'
       match: '\\b(package|opts|modules|sourcedir|makefile|objs|executable|main|libs|pkgs|tests)\\b'
     }
