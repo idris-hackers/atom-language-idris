@@ -29,14 +29,14 @@ class IdrisController
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
-  
+
   createMarker: (editor, range, type) ->
     marker = editor.markBufferRange(range, invalidate: 'never')
     editor.decorateMarker marker,
       type: type
       class: 'highlight-idris-error'
     marker
-  
+
   destroyMarkers: () ->
     for marker in @errorMarkers
       marker.destroy()
@@ -113,6 +113,8 @@ class IdrisController
     # the file needs to be saved for typechecking
     @saveFile target.model
     uri = target.model.getURI()
+    @messages.setTitle 'Idris: Typechecking...'
+    @messages.clear()
 
     successHandler = ({ responseType, msg }) =>
       @messages.attach()
@@ -425,7 +427,7 @@ class IdrisController
     @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
 
     @messages.add new PlainMessageView
-      message: "Errors (#{err.warnings.length})" 
+      message: "Errors (#{err.warnings.length})"
       className: 'idris-error'
 
     for warning in err.warnings
@@ -435,10 +437,10 @@ class IdrisController
 
       @messages.add new LineMessageView
         line: line
-        character: character 
+        character: character
         message: warning[3]
-        file: uri 
-      
+        file: uri
+
       editor = atom.workspace.getActiveTextEditor()
       if line > 0 && uri == editor.getURI()
         startPoint = warning[1]
@@ -446,7 +448,7 @@ class IdrisController
         endPoint = warning[2]
         endPoint[0] = endPoint[0] - 1
         gutterMarker = @createMarker editor, [startPoint, endPoint], 'line-number'
-        lineMarker = @createMarker editor, [[line - 1, character - 1], [line, 0]], 'line' 
+        lineMarker = @createMarker editor, [[line - 1, character - 1], [line, 0]], 'line'
         @errorMarkers.push gutterMarker
         @errorMarkers.push lineMarker
 
