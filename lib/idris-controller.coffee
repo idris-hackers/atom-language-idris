@@ -438,7 +438,7 @@ class IdrisController
       @messages.add new LineMessageView
         line: line
         character: character
-        message: warning[3]
+        preview: warning[3]
         file: uri
 
       editor = atom.workspace.getActiveTextEditor()
