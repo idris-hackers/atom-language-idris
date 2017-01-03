@@ -4,6 +4,12 @@
 
 ### Added
 
+### Fixed
+
+## v0.4.6
+
+### Added
+
 - Report type checking status
 - Snippets
 - Use 'cmd' on Mac
