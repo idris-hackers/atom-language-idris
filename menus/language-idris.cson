@@ -11,6 +11,22 @@
                 'label': 'Typecheck'
                 'command': 'language-idris:typecheck'
               }
+              {
+                'label': 'Open REPL'
+                'command': 'language-idris:open-repl'
+              }
+              {
+                'label': 'Apropos'
+                'command': 'language-idris:apropos'
+              }
+              {
+                'label': 'Holes'
+                'command': 'language-idris:holes'
+              }
+              {
+                'label': 'Stop Compiler'
+                'command': 'language-idris:stop-compiler'
+              }
             ]
         ]
     }
