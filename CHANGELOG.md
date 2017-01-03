@@ -12,7 +12,6 @@
 
 - Report type checking status
 - Snippets
-- Use 'cmd' on Mac
 - Navigate to error
 - Highlight error
 
@@ -28,6 +27,7 @@
 ### Fixed
 
 - Many different processes are spawned [#114](https://github.com/idris-hackers/atom-language-idris/issues/114) (@pyrtsa)
+- use 'cmd' instead of 'alt' on osx (@karljs)
 
 ## v0.4.4
 
