@@ -4,7 +4,16 @@
 
 ### Added
 
+- Report type checking status
+- Snippets
+- Use 'cmd' on Mac
+- Navigate to error
+- Highlight error
+
 ### Fixed
+
+- Styling of error messages
+- ipkg grammar
 
 ## v0.4.5
 
