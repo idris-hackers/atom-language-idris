@@ -127,7 +127,7 @@ patterns:
         ]
     }
     {
-      begin: '\\b(import)\\b'
+      begin: '\\b(import\\s+public|import)\\b'
       beginCaptures:
         1:
           name: 'keyword.other.idris'
