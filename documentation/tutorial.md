@@ -42,9 +42,18 @@ Now try the same thing with the `mul` function.
 
 Another useful command is triggered by selecting a word and pressing `ctrl-alt-d` (or "Language Idris: Docs for" from the command palette). You can try it on `add`, `mul` or `Nat` for instance.
 
-## REPL
+### REPL
 
-## Proving
+You can create a REPL window by pressing `ctrl-alt-enter`. Enter REPL commands at the top, just as if you were using the REPL command line interface. 
+
+### Idris command line options and library package dependencies 
+
+Sometimes you may have dependendencies on Idris packages, for instance Lightyear for parsing or Pruvioj for advanced theorem proving. 
+In Atom you can specify these dependencies using the project model, which simply means using Open Folder rather than Open File 
+from the File menu. Atom will look for a .ipkg file in the folder and load any dependencies listed. More details are described in 
+[Working with ipkg files](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/ipkg.md). 
+
+## Interactive proofs using Idris and Atom
 
 We'll try to prove that the addition of natural numbers is associative for the
 purpose of this tutorial.
