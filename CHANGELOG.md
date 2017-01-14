@@ -6,6 +6,11 @@
 
 ### Fixed
 
+## v0.4.8
+
+### Fixed
+- Fix proof search
+
 ## v0.4.7
 
 ### Added
