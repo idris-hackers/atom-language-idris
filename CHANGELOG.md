@@ -10,6 +10,7 @@
 
 ### Fixed
 - Fix proof search
+- Remove deprecated selector
 
 ## v0.4.7
 
