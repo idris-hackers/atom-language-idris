@@ -341,7 +341,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doProofSearch: ({ target }) =>
-    editor = getEditor()
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
