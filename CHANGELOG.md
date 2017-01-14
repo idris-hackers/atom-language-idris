@@ -11,12 +11,12 @@
 ### Added
 
 - REPL and package documentation [#146](https://github.com/idris-hackers/atom-language-idris/pull/146) (@allancto)
+- Additional commands in menu [#142](https://github.com/idris-hackers/atom-language-idris/pull/142) (@joheinz)
 
 ### Fixed
 
 - Crashes with Atom 1.13.0 [#149](https://github.com/idris-hackers/atom-language-idris/pull/149) (@melted)
 - 'import public' syntax [#145](https://github.com/idris-hackers/atom-language-idris/pull/145) (@joheinz)
-- Addition commands in menu [#142](https://github.com/idris-hackers/atom-language-idris/pull/142) (@joheinz)
 
 ## v0.4.6
 
