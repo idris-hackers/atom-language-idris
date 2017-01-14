@@ -48,8 +48,7 @@ class IdrisController
     @statusbar.destroy()
 
   # get the word or operator under the cursor
-  getWordUnderCursor: (editorView) ->
-    editor = editorView.model
+  getWordUnderCursor: (editor) ->
     options =
       wordRegex: /(^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+)|(\?[-!#\$%&\*\+\.\/<=>@\\\^\|~:]+|[-!#\$%&\*\+\.\/<=>@\\\^\|~:][-!#\$%&\*\+\.\/<=>@\\\^\|~:\?]*)+/g
     cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
@@ -64,6 +63,9 @@ class IdrisController
       @messages.attach()
       @messages.hide()
     @model.setCompilerOptions compilerOptions
+
+  getEditor: () ->
+    atom.workspace.getActiveTextEditor()
 
   stopCompiler: =>
     @model?.stop()
@@ -109,10 +111,10 @@ class IdrisController
     else
       atom.workspace.saveActivePaneItemAs()
 
-  typecheckFile: ({ target }) =>
-    # the file needs to be saved for typechecking
-    @saveFile target.model
-    uri = target.model.getURI()
+  typecheckFile: (event) =>
+    editor = @getEditor()
+    @saveFile editor
+    uri = editor.getURI()
     @messages.setTitle 'Idris: Typechecking...'
     @messages.clear()
 
@@ -128,8 +130,9 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getDocsForWord: ({ target }) =>
-    word = Symbol.serializeWord @getWordUnderCursor(target)
-    uri = target.model.getURI()
+    editor = @getEditor()
+    uri = editor.getURI()
+    word = Symbol.serializeWord @getWordUnderCursor(editor)
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
@@ -151,10 +154,9 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({ target }) =>
-    editor = target.model
-    @saveFile editor
+    editor = @getEditor()
     uri = editor.getURI()
-    word = Symbol.serializeWord @getWordUnderCursor(target)
+    word = Symbol.serializeWord @getWordUnderCursor(editor)
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
@@ -175,12 +177,12 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doCaseSplit: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [split] = msg
@@ -194,11 +196,11 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doAddClause: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [clause] = msg
@@ -221,11 +223,11 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doMakeWith: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [clause] = msg
@@ -246,11 +248,11 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doMakeLemma: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [lemty, param1, param2] = msg
@@ -294,11 +296,11 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doMakeCase: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [clause] = msg
@@ -318,7 +320,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   showHoles: ({ target }) =>
-    editor = target.model
+    editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
 
@@ -339,11 +341,11 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   doProofSearch: ({ target }) =>
-    editor = target.model
+    editor = getEditor()
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor target
+    word = @getWordUnderCursor editor
 
     successHandler = ({ responseType, msg }) ->
       [res] = msg
@@ -366,8 +368,9 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   printDefinition: ({ target }) =>
-    word = Symbol.serializeWord @getWordUnderCursor(target)
-    uri = target.model.getURI()
+    editor = @getEditor()
+    uri = editor.getURI()
+    word = Symbol.serializeWord @getWordUnderCursor(editor)
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
@@ -389,8 +392,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   openREPL: ({ target }) =>
-    editor = target.model
-    uri = editor.getURI()
+    uri = @getEditor().getURI()
 
     successHandler = ({ responseType, msg }) ->
       options =
@@ -405,8 +407,7 @@ class IdrisController
       .subscribe successHandler, @displayErrors
 
   apropos: ({ target }) =>
-    editor = target.model
-    uri = editor.getURI()
+    uri = @getEditor().getURI()
 
     successHandler = ({ responseType, msg }) ->
       options =
