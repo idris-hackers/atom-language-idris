@@ -151,7 +151,7 @@ patterns:
           name: 'entity.name.type.idris'
         3:
           name: 'keyword.operator.colon.idris'
-      end: '\\b(where)\\b|(=)'
+      end: '\\b(where)\\b|(=)|$'
       endCaptures:
         1:
           name: 'keyword.other.idris'
