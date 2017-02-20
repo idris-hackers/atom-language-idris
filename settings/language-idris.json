@@ -1,7 +1,8 @@
 {
   ".source.idris": {
     "editor": {
-      "commentStart": "-- "
+      "commentStart": "-- ",
+      "increaseIndentPattern": "(((=|\\bdo|\\bwhere|\\bthen|\\belse|\\bof)\\s*)|(\\bif(?!.*\\bthen\\b.*\\belse\\b.*).*))$"
     }
   }
 }
