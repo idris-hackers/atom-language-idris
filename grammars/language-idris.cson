@@ -13,7 +13,7 @@ patterns:
     }
     {
       name: 'keyword.control.idris'
-      match: '\\b(where|with|syntax|proof|postulate|using|namespace|class|instance|interface|implementation)\\b'
+      match: '\\b(where|with|syntax|proof|postulate|using|namespace|class|instance|interface|implementation|record|rewrite)\\b'
     }
     {
       name: 'keyword.control.idris'
@@ -77,6 +77,10 @@ patterns:
             include: '#escape_characters'
           }
         ]
+    }
+    {
+      name: 'variable.other.idris'
+      match : "(?<!\\w)\\'\\w++(?!')"
     }
     {
       name: 'string.quoted.single.idris'
