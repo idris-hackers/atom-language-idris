@@ -81,3 +81,9 @@
       Uninhabited (${1:TypeWhichIsUninhabited}) where
         uninhabited ${2:Proof} impossible
     """
+  'Cast implementation':
+    'prefix': 'Cast'
+    'body': """
+      Cast ${1:FromType} ${2:ToType} where
+        case from = ?holeTo
+    """
