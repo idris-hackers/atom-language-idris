@@ -1,6 +1,6 @@
 name: 'Idris'
 scopeName: 'source.idris'
-fileTypes: ['idr']
+fileTypes: ['idr', 'lidr']
 patterns:
   [
     {
