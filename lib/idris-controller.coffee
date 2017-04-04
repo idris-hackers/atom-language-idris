@@ -155,6 +155,7 @@ class IdrisController
 
   getTypeForWord: ({ target }) =>
     editor = @getEditor()
+    @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord @getWordUnderCursor(editor)
 
