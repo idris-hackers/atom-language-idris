@@ -6,6 +6,21 @@
 
 ### Fixed
 
+
+## v0.4.9
+
+### Added
+
+- Allow incomplete data definition
+- Add record and rewrite keywords
+- Support literate files
+- Add cast snippet
+
+### Fixed
+
+- Indent after do/where/if/then/else/of
+- Save file state when executing commands
+
 ## v0.4.8
 
 ### Fixed
