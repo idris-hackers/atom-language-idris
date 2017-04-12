@@ -9,7 +9,7 @@
     'prefix': 'Eq'
     'body': """
       Eq ${1:Type} where
-        (==) a b = ?holeEq
+        a == b = ?holeEq
       """
   'Ord implementation':
     'prefix': 'Ord'
@@ -21,7 +21,7 @@
     'prefix': 'Semigroup'
     'body': """
       Semigroup ${1:Type} where
-        (<+>) a b = ?holeSemigroup
+        a <+> b = ?holeSemigroup
       """
   'Monoid implementation':
     'prefix': 'Monoid'
@@ -49,13 +49,13 @@
       Applicative ${1:Type} where
         pure a = ?holePureApplicative
 
-        (<*>) f fa = ?holeApplyApplicative
+        f <*> fa = ?holeApplyApplicative
       """
   'Monad implementation':
     'prefix': 'Monad'
     'body': """
       Monad ${1:Type} where
-        (>>=) fa f = ?holeMonadBind
+        fa >>= f = ?holeMonadBind
       """
   'Traversable implementation':
     'prefix': 'Traversable'
@@ -87,3 +87,11 @@
       Cast ${1:FromType} ${2:ToType} where
         case from = ?holeTo
     """
+  'Alternative implementation':
+    'prefix': 'Alternative'
+    'body': """
+      Alternative ${1:Type} where
+        empty = ?holeAlternativeEmpty 
+
+        fa <|> fb = ?holeAlternative
+      """
