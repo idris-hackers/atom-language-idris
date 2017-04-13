@@ -127,6 +127,9 @@ class IdrisModel
   addClause: (line, word) ->
     @prepareCommand [':add-clause', line, word]
 
+  addProofClause: (line, word) ->
+    @prepareCommand [':add-proof-clause', line, word]
+
   holes: (width) ->
     @prepareCommand [':metavariables', width]
 

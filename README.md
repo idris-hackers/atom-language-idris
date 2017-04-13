@@ -7,17 +7,27 @@ A work-in-progress Idris Mode for Atom.
 It supports:
 
  - Typechecking (ctrl-alt-r)
+   - compiles the file and reports errors
  - Case-splitting (ctrl-alt-c)
+   - split a variable which can be pattern matched
  - Clause-adding (ctrl-alt-a)
+   - add a clause to a function
  - Proof-search (ctrl-alt-s)
+   - search for a proof of a hole
  - Showing the types of a variable (ctrl-alt-t)
- - Show the doc for a variable (ctrl-alt-d)
+   - show the type of a hole
+ - Show the doc for a function (ctrl-alt-d)
  - make-with (ctrl-alt-w)
+   - add further variables on the left hand side of a function
  - make-case (ctrl-alt-m)
  - make-lemma (ctrl-alt-l)
+   - lift a hole into a function context
+  - Add proof case
+   - alternate version of clause adding when trying to proof a type. http://docs.idris-lang.org/en/latest/reference/misc.html#match-application
  - Showing holes
  - ipkg highlighting
  - REPL (ctrl-alt-enter)
+ - Apropos view
 
 ## Usage
 

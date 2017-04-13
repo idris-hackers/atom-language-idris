@@ -26,6 +26,7 @@ class IdrisController
     'language-idris:stop-compiler': @stopCompiler
     'language-idris:open-repl': @runCommand @openREPL
     'language-idris:apropos': @runCommand @apropos
+    'language-idris:add-proof-clause': @runCommand @doAddProofClause
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -222,6 +223,33 @@ class IdrisController
       .load uri
       .filter ({ responseType }) -> responseType == 'return'
       .flatMap => @model.addClause line + 1, word
+      .subscribe successHandler, @displayErrors
+
+  doAddProofClause: ({ target }) =>
+    editor = @getEditor()
+    @saveFile editor
+    uri = editor.getURI()
+    line = editor.getLastCursor().getBufferRow()
+    word = @getWordUnderCursor editor
+
+    successHandler = ({ responseType, msg }) ->
+      [clause] = msg
+      editor.transact ->
+        editorHelper.moveToNextEmptyLine editor
+
+        # Insert the new clause
+        editor.insertText clause
+
+        # And move the cursor to the beginning of
+        # the new line and add an empty line below it
+        editor.insertNewlineBelow()
+        editor.moveUp()
+        editor.moveToBeginningOfLine()
+
+    @model
+      .load uri
+      .filter ({ responseType }) -> responseType == 'return'
+      .flatMap => @model.addProofClause line + 1, word
       .subscribe successHandler, @displayErrors
 
   doMakeWith: ({ target }) =>
