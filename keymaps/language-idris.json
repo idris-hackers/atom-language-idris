@@ -9,7 +9,8 @@
     "ctrl-alt-w": "language-idris:make-with",
     "ctrl-alt-l": "language-idris:make-lemma",
     "ctrl-alt-r": "language-idris:typecheck",
-    "ctrl-alt-m": "language-idris:make-case"
+    "ctrl-alt-m": "language-idris:make-case",
+    "ctrl-alt-p": "language-idris:add-proof-clause"
   },
 
   ".platform-darwin, atom-text-editor[data-grammar~=\"idris\"]": {
@@ -22,6 +23,7 @@
     "ctrl-cmd-w": "language-idris:make-with",
     "ctrl-cmd-l": "language-idris:make-lemma",
     "ctrl-cmd-r": "language-idris:typecheck",
-    "ctrl-cmd-m": "language-idris:make-case"
+    "ctrl-cmd-m": "language-idris:make-case",
+    "ctrl-cmd-p": "language-idris:add-proof-clause"
   }
 }
