@@ -38,7 +38,8 @@ describe "The highlighter", ->
     should1 =
       [
         {
-          classes: ['storage', 'type', 'idris']
+          classes: ['syntax--storage', 'syntax--type', 'syntax--idris']
+          description: "Type\n\nUnary natural numbers"
           word: 'Prelude.Nat.Nat'
         }
         {
@@ -46,13 +47,15 @@ describe "The highlighter", ->
           word: ' : '
         }
         {
-          classes: ['storage', 'type', 'idris']
+          classes: ['syntax--storage', 'syntax--type', 'syntax--idris']
+          description: "Type\n\nThe type of types"
           word: 'Type'
         }
       ]
-    should1String = '<span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span>'
-    should1Html = '<span><span class="storage type idris">Prelude.Nat.Nat</span> : <span class="storage type idris">Type</span></span>'
+    should1String = '<span class="syntax--storage syntax--type syntax--idris">Prelude.Nat.Nat</span> : <span class="syntax--storage syntax--type syntax--idris">Type</span>'
+    should1Html = '<span><span class="syntax--storage syntax--type syntax--idris">Prelude.Nat.Nat</span> : <span class="syntax--storage syntax--type syntax--idris">Type</span></span>'
     highlight1 = highlighter.highlight(code1, info1)
+    console.log highlight1
     expect(highlight1).toEqual(should1)
     expect(highlighter.highlightToString(highlight1)).toEqual(should1String)
     html1 = highlighter.highlightToHtml(highlight1)

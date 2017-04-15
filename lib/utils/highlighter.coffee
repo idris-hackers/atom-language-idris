@@ -15,12 +15,16 @@ highlightInfoListToOb = (list) ->
 # syntax highlighting built into atom.
 decorToClasses = (decor) ->
   switch decor
-    when ':type' then ['storage', 'type']
-    when ':function' then ['entity', 'name', 'function']
-    when ':data' then ['constant']
-    when ':keyword' then ['keyword']
-    when ':bound' then ['support', 'function']
-    else []
+    when ':type' then ['syntax--storage', 'syntax--type']
+    when ':function' then ['syntax--entity', 'syntax--name', 'syntax--function']
+    when ':data' then ['syntax--constant']
+    when ':keyword' then ['syntax--keyword']
+    when ':bound' then ['syntax--support', 'syntax--function']
+    when ':metavar' then ['syntax--constant']
+    else
+      console.log("unknown decor: " + decor)
+      console.log("you may want to review the highlighter.coffee script")
+      []
 
 highlightWord = (word, info) ->
   type = info.info.type || ""
@@ -32,7 +36,7 @@ highlightWord = (word, info) ->
     else
       ""
 
-  classes: decorToClasses(info.info.decor).concat 'idris'
+  classes: decorToClasses(info.info.decor).concat 'syntax--idris'
   word: word
   description: description
 
