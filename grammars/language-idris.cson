@@ -167,6 +167,35 @@ patterns:
         ]
     }
     {
+      name: 'meta.declaration.data.idris'
+      begin: "\\b(parameters)\\s+(\\()"
+      end: "(\\))$"
+      beginCaptures:
+        1:
+          name: 'keyword.other.idris'
+        2:
+          name: 'punctuation.context.begin.idris'
+      endCaptures:
+        1:
+          name: 'punctuation.context.begin.idris'
+      patterns:
+        [
+            {
+              name: 'comment.line.idris'
+              match: '(--).*$\n?'
+            }
+            {
+              name: 'meta.parameter.block.named.idris'
+              match: "((\\w+)\\s*(:)\\s*(\\w+)\\s*)"
+              captures:
+                2:
+                  name: 'entity.name.tag.idris'
+                3:
+                  name: 'keyword.operator.colon.idris'
+            }
+        ]
+    }
+    {
       include: '#function_signature'
     }
     {
