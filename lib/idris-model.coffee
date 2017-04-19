@@ -13,7 +13,7 @@ class IdrisModel
   oldCompilerOptions: { }
 
   ideMode: (compilerOptions) ->
-    if @ideModeRef && !JS.objectEqual(@oldCompilerOptions, compilerOptions)
+    if @ideModeRef && (!JS.objectEqual(@oldCompilerOptions, compilerOptions) || not @ideModeRef.running())
       @ideModeRef.process.removeAllListeners()
       @ideModeRef.stop()
       @ideModeRef = null
