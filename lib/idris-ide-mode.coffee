@@ -79,7 +79,7 @@ class IdrisIdeMode extends EventEmitter
       atom.notifications.addError short, detail: long
 
   running: ->
-    !!@process
+    !!@process && !@process.killed
 
   stdout: (data) =>
     @buffer += data
