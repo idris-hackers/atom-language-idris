@@ -107,11 +107,10 @@ class IdrisController
         null
 
   saveFile: (editor) ->
-    waitsForPromise ->
-      if editor.getURI()
-        editor.save()
-      else
-        atom.workspace.saveActivePaneItemAs()
+    if editor.getURI()
+      editor.save()
+    else
+      atom.workspace.saveActivePaneItemAs()
 
   typecheckFile: (event) =>
     editor = @getEditor()
