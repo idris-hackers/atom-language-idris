@@ -7,6 +7,7 @@ IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'
 editorHelper = require './utils/editor'
+highlighter = require './utils/highlighter'
 
 class IdrisController
   errorMarkers: []
@@ -30,6 +31,25 @@ class IdrisController
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
+
+  # check if this is a literate idris file
+  isLiterateGrammar: () ->
+    @getEditor().getGrammar().scopeName == "source.idris.literate"
+
+  # prefix code lines with "> "  if we are in the literate grammar
+  prefixLiterateClause: (clause) =>
+    birdPattern = ///^ # beginning of line
+      >     # the bird
+      (\s)+ # some whitespace
+      ///
+
+    if (@isLiterateGrammar())
+      for line in clause
+        if line.match birdPattern
+           line
+         else "> " + line
+    else
+      clause
 
   createMarker: (editor, range, type) ->
     marker = editor.markBufferRange(range, invalidate: 'never')
@@ -65,6 +85,7 @@ class IdrisController
       @messages.hide()
     @model.setCompilerOptions compilerOptions
 
+  # get the currently active text editor
   getEditor: () ->
     atom.workspace.getActiveTextEditor()
 
@@ -198,6 +219,7 @@ class IdrisController
       .flatMap => @model.caseSplit line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # add a new clause to a function
   doAddClause: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -205,8 +227,8 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
-      [clause] = msg
+    successHandler = ({ responseType, msg }) =>
+      [clause] = @prefixLiterateClause msg
       editor.transact ->
         editorHelper.moveToNextEmptyLine editor
 
@@ -225,6 +247,7 @@ class IdrisController
       .flatMap => @model.addClause line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # use special syntax for proof obligation clauses
   doAddProofClause: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -232,8 +255,8 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
-      [clause] = msg
+    successHandler = ({ responseType, msg }) =>
+      [clause] = @prefixLiterateClause msg
       editor.transact ->
         editorHelper.moveToNextEmptyLine editor
 
@@ -252,6 +275,7 @@ class IdrisController
       .flatMap => @model.addProofClause line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # add a with view
   doMakeWith: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -259,8 +283,8 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
-      [clause] = msg
+    successHandler = ({ responseType, msg }) =>
+      [clause] = @prefixLiterateClause msg
       editor.transact ->
         # Delete old line, insert the new with block
         editor.deleteLine()
@@ -277,6 +301,7 @@ class IdrisController
       .flatMap => @model.makeWith line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # construct a lemma from a hole
   doMakeLemma: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -284,8 +309,12 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
+    successHandler = ({ responseType, msg }) =>
+      # param1 contains the code which replaces the hole
+      # param2 contains the code for the lemma function
       [lemty, param1, param2] = msg
+      param2 = @prefixLiterateClause param2
+
       editor.transact ->
         if lemty == ':metavariable-lemma'
           # Move the cursor to the beginning of the word
@@ -325,6 +354,7 @@ class IdrisController
       .flatMap => @model.makeLemma line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # create a case statement
   doMakeCase: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -332,8 +362,9 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
-      [clause] = msg
+    successHandler = ({ responseType, msg }) =>
+      [clause] = @prefixLiterateClause msg
+
       editor.transact ->
         # Delete old line, insert the new case block
         editor.deleteLine()
@@ -349,6 +380,7 @@ class IdrisController
       .flatMap => @model.makeCase line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # show all holes in the current file
   showHoles: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -370,6 +402,7 @@ class IdrisController
       .flatMap => @model.holes 80
       .subscribe successHandler, @displayErrors
 
+  # replace a hole with a proof
   doProofSearch: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -397,6 +430,7 @@ class IdrisController
       .flatMap => @model.proofSearch line + 1, word
       .subscribe successHandler, @displayErrors
 
+  # get the definition of a function or type
   printDefinition: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
@@ -422,6 +456,7 @@ class IdrisController
       .catch (e) => @model.printDefinition word
       .subscribe successHandler, @displayErrors
 
+  # open the repl window
   openREPL: ({ target }) =>
     uri = @getEditor().getURI()
 
@@ -437,6 +472,7 @@ class IdrisController
       .filter ({ responseType }) -> responseType == 'return'
       .subscribe successHandler, @displayErrors
 
+  # open the apropos window
   apropos: ({ target }) =>
     uri = @getEditor().getURI()
 
@@ -452,26 +488,42 @@ class IdrisController
       .filter ({ responseType }) -> responseType == 'return'
       .subscribe successHandler, @displayErrors
 
+  # generic function to display errors in the status bar
   displayErrors: (err) =>
     @messages.attach()
     @messages.show()
     @messages.clear()
     @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
 
-    @messages.add new PlainMessageView
-      message: "Errors (#{err.warnings.length})"
-      className: 'idris-error'
+    # display the general error message 
+    if err.message?
+      @messages.add new PlainMessageView
+        raw: true
+        message: "<pre>" + err.message + "</pre>"
+        className: "preview"
 
     for warning in err.warnings
+      type = warning[3]
+      highlightingInfo = warning[4]
+      highlighting = highlighter.highlight type, highlightingInfo
+      info = highlighter.highlightToString highlighting
+
       line = warning[1][0]
       character = warning[1][1]
       uri = warning[0].replace("./", err.cwd + "/")
 
+      # this provides information about the line and column of the error
       @messages.add new LineMessageView
         line: line
         character: character
-        preview: warning[3]
         file: uri
+
+      # this provides a highlighted version of the error message
+      # returned by idris
+      @messages.add new PlainMessageView
+        raw: true
+        message: "<pre>" + info + "</pre>"
+        className: "preview"
 
       editor = atom.workspace.getActiveTextEditor()
       if line > 0 && uri == editor.getURI()
