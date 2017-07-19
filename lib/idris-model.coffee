@@ -64,6 +64,16 @@ class IdrisModel
           when ':warning'
             warning = params[0]
             @warnings[id].push warning
+          when ':run-program'
+            options =
+              detail: "The path for the compiled program. It was copied to your clipboard. Paste it into a terminal to execute."
+              dismissible: true
+              icon: "comment"
+              buttons: [
+                {text: "Confirm"}
+              ]
+            atom.clipboard.write params[0]
+            atom.notifications.addSuccess params[0], options
           when ':set-prompt'
             # Ignore
           else
