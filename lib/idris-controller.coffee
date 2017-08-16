@@ -137,8 +137,10 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
-    @messages.setTitle 'Idris: Typechecking...'
+    @messages.attach()
+    @messages.show()
     @messages.clear()
+    @messages.setTitle 'Idris: Typechecking...'
 
     successHandler = ({ responseType, msg }) =>
       @messages.attach()
@@ -495,7 +497,7 @@ class IdrisController
     @messages.clear()
     @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
 
-    # display the general error message 
+    # display the general error message
     if err.message?
       @messages.add new PlainMessageView
         raw: true
