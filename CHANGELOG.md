@@ -6,6 +6,21 @@
 
 ### Fixed
 
+## v0.4.10
+
+### Added
+ - Display typechecking information 
+ - Copy executable path to clipboard
+ - Syntax highlitning in message panel
+ - Proof clause
+ - higlightning of parameters
+ - Better support for literate idris
+ - Added snippets
+
+### Fixed
+ - Display error message from idris
+ - Idris now restarts if stopped
+ - fix comments highlightning 
 
 ## v0.4.9
 
