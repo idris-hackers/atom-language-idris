@@ -68,6 +68,18 @@ class IdrisController
       @model.stop()
     @statusbar.destroy()
 
+  # clear the message panel and optionally display a new title
+  clearMessagePanel: (title) ->
+    @messages.attach()
+    @messages.show()
+    @messages.clear()
+    @messages.setTitle title, true if title?
+
+  # hide the message panel
+  hideAndClearMessagePanel: () ->
+    @clearMessagePanel()
+    @messages.hide()
+
   # get the word or operator under the cursor
   getWordUnderCursor: (editor) ->
     options =
@@ -137,16 +149,10 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
-    @messages.attach()
-    @messages.show()
-    @messages.clear()
-    @messages.setTitle 'Idris: Typechecking...'
+    @clearMessagePanel 'Idris: Typechecking ...'
 
     successHandler = ({ responseType, msg }) =>
-      @messages.attach()
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: File loaded successfully'
+      @clearMessagePanel 'Idris: File loaded successfully'
 
     @model
       .load uri
@@ -158,13 +164,12 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord @getWordUnderCursor(editor)
+    @clearMessagePanel 'Idris: Searching docs for <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
-      @messages.attach()
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: Docs for <tt>' + word + '</tt>', true
+      @clearMessagePanel 'Idris: Docs for <tt>' + word + '</tt>'
+
       informationView = new InformationView
       informationView.initialize
         obligation: type
@@ -183,13 +188,12 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord @getWordUnderCursor(editor)
+    @clearMessagePanel 'Idris: Searching type of <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
-      @messages.attach()
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: Type of <tt>' + word + '</tt>', true
+      @clearMessagePanel 'Idris: Type of <tt>' + word + '</tt>'
+
       informationView = new InformationView
       informationView.initialize
         obligation: type
@@ -210,8 +214,13 @@ class IdrisController
     line = cursor.getBufferRow()
     word = @getWordUnderCursor editor
 
-    successHandler = ({ responseType, msg }) ->
+    @clearMessagePanel 'Idris: Do case split ...'
+
+    successHandler = ({ responseType, msg }) =>
       [split] = msg
+
+      @hideAndClearMessagePanel()
+
       lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
       editor.setTextInBufferRange lineRange, split
 
@@ -229,8 +238,13 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
+    @clearMessagePanel 'Idris: Add clause ...'
+
     successHandler = ({ responseType, msg }) =>
       [clause] = @prefixLiterateClause msg
+
+      @hideAndClearMessagePanel()
+
       editor.transact ->
         editorHelper.moveToNextEmptyLine editor
 
@@ -256,9 +270,13 @@ class IdrisController
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
+    @clearMessagePanel 'Idris: Add proof clause ...'
 
     successHandler = ({ responseType, msg }) =>
       [clause] = @prefixLiterateClause msg
+
+      @hideAndClearMessagePanel()
+
       editor.transact ->
         editorHelper.moveToNextEmptyLine editor
 
@@ -285,8 +303,13 @@ class IdrisController
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
 
+    @clearMessagePanel 'Idris: Make with view ...'
+
     successHandler = ({ responseType, msg }) =>
       [clause] = @prefixLiterateClause msg
+
+      @hideAndClearMessagePanel()
+
       editor.transact ->
         # Delete old line, insert the new with block
         editor.deleteLine()
@@ -310,12 +333,15 @@ class IdrisController
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
+    @clearMessagePanel 'Idris: Make lemma ...'
 
     successHandler = ({ responseType, msg }) =>
       # param1 contains the code which replaces the hole
       # param2 contains the code for the lemma function
       [lemty, param1, param2] = msg
       param2 = @prefixLiterateClause param2
+
+      @hideAndClearMessagePanel()
 
       editor.transact ->
         if lemty == ':metavariable-lemma'
@@ -363,9 +389,12 @@ class IdrisController
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
+    @clearMessagePanel 'Idris: Make case ...'
 
     successHandler = ({ responseType, msg }) =>
       [clause] = @prefixLiterateClause msg
+
+      @hideAndClearMessagePanel()
 
       editor.transact ->
         # Delete old line, insert the new case block
@@ -387,13 +416,11 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
+    @clearMessagePanel 'Idris: Searching holes ...'
 
     successHandler = ({ responseType, msg }) =>
       [holes] = msg
-      @messages.attach()
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: Holes'
+      @clearMessagePanel 'Idris: Holes'
       holesView = new HolesView
       holesView.initialize holes
       @messages.add holesView
@@ -411,9 +438,13 @@ class IdrisController
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
     word = @getWordUnderCursor editor
+    @clearMessagePanel 'Idris: Searching proof ...'
 
-    successHandler = ({ responseType, msg }) ->
+    successHandler = ({ responseType, msg }) =>
       [res] = msg
+
+      @hideAndClearMessagePanel()
+
       editor.transact ->
         # Move the cursor to the beginning of the word
         editor.moveToBeginningOfWord()
@@ -438,13 +469,11 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord @getWordUnderCursor(editor)
+    @clearMessagePanel 'Idris: Searching definition of <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
       [type, highlightingInfo] = msg
-      @messages.attach()
-      @messages.show()
-      @messages.clear()
-      @messages.setTitle 'Idris: Definition of <tt>' + word + '</tt>', true
+      @clearMessagePanel 'Idris: Definition of <tt>' + word + '</tt>'
       informationView = new InformationView
       informationView.initialize
         obligation: type
@@ -461,8 +490,11 @@ class IdrisController
   # open the repl window
   openREPL: ({ target }) =>
     uri = @getEditor().getURI()
+    @clearMessagePanel 'Idris: opening REPL ...'
 
-    successHandler = ({ responseType, msg }) ->
+    successHandler = ({ responseType, msg }) =>
+      @hideAndClearMessagePanel()
+
       options =
         split: 'right'
         searchAllPanes: true
@@ -477,8 +509,11 @@ class IdrisController
   # open the apropos window
   apropos: ({ target }) =>
     uri = @getEditor().getURI()
+    @clearMessagePanel 'Idris: opening apropos view ...'
 
-    successHandler = ({ responseType, msg }) ->
+    successHandler = ({ responseType, msg }) =>
+      @hideAndClearMessagePanel()
+
       options =
         split: 'right'
         searchAllPanes: true
@@ -492,10 +527,7 @@ class IdrisController
 
   # generic function to display errors in the status bar
   displayErrors: (err) =>
-    @messages.attach()
-    @messages.show()
-    @messages.clear()
-    @messages.setTitle '<i class="icon-bug"></i> Idris Errors', true
+    @clearMessagePanel '<i class="icon-bug"></i> Idris Errors'
 
     # display the general error message
     if err.message?
