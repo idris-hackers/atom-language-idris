@@ -24,6 +24,8 @@ It supports:
    - lift a hole into a function context
   - Add proof case
    - alternate version of clause adding when trying to proof a type. http://docs.idris-lang.org/en/latest/reference/misc.html#match-application
+ - Browse namespace (ctrl-alt-b)
+   - select the name of a namespace beforehand
  - Showing holes
  - ipkg highlighting
  - REPL (ctrl-alt-enter)

@@ -152,4 +152,7 @@ class IdrisModel
   apropos: (name) ->
     @prepareCommand [':apropos', name]
 
+  browseNamespace: (name) ->
+    @prepareCommand [':browse-namespace', name]
+
 module.exports = IdrisModel
