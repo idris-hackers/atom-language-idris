@@ -88,13 +88,6 @@ class IdrisController
       message: '<pre>' + text + '</pre>'
       className: 'preview'
 
-  # get the word or operator under the cursor
-  getWordUnderCursor: (editor) ->
-    options =
-      wordRegex: /(^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+)|(\?[-!#\$%&\*\+\.\/<=>@\\\^\|~:]+|[-!#\$%&\*\+\.\/<=>@\\\^\|~:][-!#\$%&\*\+\.\/<=>@\\\^\|~:\?]*)+/g
-    cursorPosition = editor.getLastCursor().getCurrentWordBufferRange options
-    editor.getTextInBufferRange cursorPosition
-
   initialize: (compilerOptions) ->
     @destroyMarkers()
     if !@model
@@ -171,7 +164,7 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
-    word = Symbol.serializeWord @getWordUnderCursor(editor)
+    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
     @clearMessagePanel 'Idris: Searching docs for <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -195,7 +188,7 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
-    word = Symbol.serializeWord @getWordUnderCursor(editor)
+    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
     @clearMessagePanel 'Idris: Searching type of <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -220,7 +213,7 @@ class IdrisController
     uri = editor.getURI()
     cursor = editor.getLastCursor()
     line = cursor.getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
 
     @clearMessagePanel 'Idris: Do case split ...'
 
@@ -244,7 +237,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
 
     @clearMessagePanel 'Idris: Add clause ...'
 
@@ -277,7 +270,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
     @clearMessagePanel 'Idris: Add proof clause ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -309,7 +302,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
 
     @clearMessagePanel 'Idris: Make with view ...'
 
@@ -340,7 +333,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
     @clearMessagePanel 'Idris: Make lemma ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -396,7 +389,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
     @clearMessagePanel 'Idris: Make case ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -445,7 +438,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = @getWordUnderCursor editor
+    word = editorHelper.getWordUnderCursor editor
     @clearMessagePanel 'Idris: Searching proof ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -506,7 +499,7 @@ class IdrisController
     editor = @getEditor()
     @saveFile editor
     uri = editor.getURI()
-    word = Symbol.serializeWord @getWordUnderCursor(editor)
+    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
     @clearMessagePanel 'Idris: Searching definition of <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
