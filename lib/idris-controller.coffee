@@ -28,6 +28,7 @@ class IdrisController
     'language-idris:open-repl': @runCommand @openREPL
     'language-idris:apropos': @runCommand @apropos
     'language-idris:add-proof-clause': @runCommand @doAddProofClause
+    'language-idris:browse-namespace': @runCommand @doBrowseNamespace
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -79,6 +80,13 @@ class IdrisController
   hideAndClearMessagePanel: () ->
     @clearMessagePanel()
     @messages.hide()
+
+  # add raw information to the message panel
+  rawMessage: (text) ->
+    @messages.add new PlainMessageView
+      raw: true
+      message: '<pre>' + text + '</pre>'
+      className: 'preview'
 
   # get the word or operator under the cursor
   getWordUnderCursor: (editor) ->
@@ -463,6 +471,36 @@ class IdrisController
       .flatMap => @model.proofSearch line + 1, word
       .subscribe successHandler, @displayErrors
 
+  doBrowseNamespace: ({target}) =>
+    editor = @getEditor()
+    @saveFile editor
+    uri = editor.getURI()
+    nameSpace = editor.getSelectedText()
+    console.log nameSpace
+
+    @clearMessagePanel 'Idris: Browsing namespace <tt>' + nameSpace + '</tt>'
+
+    successHandler = ({ responseType, msg }) =>
+      # the information is in a two dimensional array
+      # one array contains the namespaces contained in the namespace
+      # and the seconds all the methods
+      namesSpaceInformation = msg[0][0]
+      for nameSpace in namesSpaceInformation
+          @rawMessage nameSpace
+
+      methodInformation = msg[0][1]
+      for [line, highlightInformation] in methodInformation
+          highlighted = highlighter.highlight line, highlightInformation
+          highlighting = highlighter.highlight line, highlightInformation
+          info = highlighter.highlightToString highlighting
+          @rawMessage info
+
+    @model
+      .load uri
+      .filter ({ responseType }) -> responseType == 'return'
+      .flatMap => @model.browseNamespace nameSpace
+      .subscribe successHandler, @displayErrors
+
   # get the definition of a function or type
   printDefinition: ({ target }) =>
     editor = @getEditor()
@@ -531,10 +569,7 @@ class IdrisController
 
     # display the general error message
     if err.message?
-      @messages.add new PlainMessageView
-        raw: true
-        message: "<pre>" + err.message + "</pre>"
-        className: "preview"
+      @rawMessage err.message
 
     for warning in err.warnings
       type = warning[3]
@@ -554,10 +589,7 @@ class IdrisController
 
       # this provides a highlighted version of the error message
       # returned by idris
-      @messages.add new PlainMessageView
-        raw: true
-        message: "<pre>" + info + "</pre>"
-        className: "preview"
+      @rawMessage info
 
       editor = atom.workspace.getActiveTextEditor()
       if line > 0 && uri == editor.getURI()
