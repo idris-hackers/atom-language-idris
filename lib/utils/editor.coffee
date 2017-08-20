@@ -27,6 +27,16 @@ moveToNextEmptyLine = (editor) ->
 
   editor.moveToBeginningOfLine()
 
+# the REGEXP to define what constitutes a word
+options =
+  wordRegex: /(^[	 ]*$|[^\s\/\\\(\)":,\.;<>~!@#\$%\^&\*\|\+=\[\]\{\}`\?\-…]+)|(\?[-!#\$%&\*\+\.\/<=>@\\\^\|~:]+|[-!#\$%&\*\+\.\/<=>@\\\^\|~:][-!#\$%&\*\+\.\/<=>@\\\^\|~:\?]*)+/g
+
+# get the word or operator under the cursor
+getWordUnderCursor = (editor) ->
+  range = editor.getLastCursor().getCurrentWordBufferRange options
+  editor.getTextInBufferRange range
+
 module.exports =
   isCurrentLineEmpty: isCurrentLineEmpty
   moveToNextEmptyLine: moveToNextEmptyLine
+  getWordUnderCursor: getWordUnderCursor
