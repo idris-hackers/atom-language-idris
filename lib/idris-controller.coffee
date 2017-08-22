@@ -2,7 +2,7 @@
   require 'atom-message-panel'
 InformationView = require './views/information-view'
 HolesView = require './views/holes-view'
-Logger = require './Logger'
+Logger = require './utils/Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'

@@ -1,6 +1,6 @@
-Logger = require './Logger'
+Logger = require './utils/Logger'
 sexpFormatter = require './utils/sexp-formatter'
-parse = require './parse'
+parse = require './utils/parse'
 { EventEmitter } = require 'events'
 { spawn } = require 'child_process'
 

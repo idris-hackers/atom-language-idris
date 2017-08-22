@@ -1,5 +1,5 @@
 sexpFormatter = require '../lib/utils/sexp-formatter'
-parse = require '../lib/parse'
+parse = require '../lib/utils/parse'
 runP = require('bennu').parse.run
 
 test1 = "(:protocol-version 1 0)"
