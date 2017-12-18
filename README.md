@@ -22,7 +22,7 @@ It supports:
  - make-case (ctrl-alt-m)
  - make-lemma (ctrl-alt-l)
    - lift a hole into a function context
-  - Add proof case
+ - Add proof case (ctrl-alt-p)
    - alternate version of clause adding when trying to proof a type. http://docs.idris-lang.org/en/latest/reference/misc.html#match-application
  - Browse namespace (ctrl-alt-b)
    - select the name of a namespace beforehand
