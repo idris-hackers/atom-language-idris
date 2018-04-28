@@ -16,7 +16,8 @@ It supports:
    - search for a proof of a hole
  - Showing the types of a variable (<kbd>ctrl-i</kbd> <kbd>t</kbd>)
    - show the type of a hole
- - Show the doc for a function (<kbd>ctrl-i</kbd> <kbd>d</kbd>)
+ - Show the doc for a function or interface (<kbd>ctrl-i</kbd> <kbd>d</kbd>)
+ - Print definition of data type, function, interface (<kbd>ctrl-i</kbd> <kbd>f</kbd>)
  - make-with (<kbd>ctrl-i</kbd> <kbd>w</kbd>)
    - add further variables on the left hand side of a function
  - make-case (<kbd>ctrl-i</kbd> <kbd>m</kbd>)
@@ -26,7 +27,7 @@ It supports:
    - alternate version of clause adding when trying to proof a type. http://docs.idris-lang.org/en/latest/reference/misc.html#match-application
  - Browse namespace (<kbd>ctrl-i</kbd> <kbd>b</kbd>)
    - select the name of a namespace beforehand
- - Showing holes
+ - Showing holes (<kbd>ctrl-i</kbd> <kbd>o</kbd>)
  - ipkg highlighting
  - REPL (<kbd>ctrl-i</kbd> <kbd>enter</kbd>)
  - Apropos view
