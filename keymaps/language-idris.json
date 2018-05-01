@@ -17,7 +17,7 @@
     "escape": "language-idris:close-information-view"
   },
 
-  ".platform-darwin, atom-text-editor[data-grammar~=\"idris\"]": {
+  ".platform-darwin atom-text-editor[data-grammar~=\"idris\"]": {
     "cmd-i a": "language-idris:add-clause",
     "cmd-i b": "language-idris:browse-namespace",
     "cmd-i c": "language-idris:case-split",
