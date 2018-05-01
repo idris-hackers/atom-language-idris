@@ -48,6 +48,10 @@
           'label': 'Docs for'
           'command': 'language-idris:docs-for'
         }
+        {
+          'label': 'Show definition'
+          'command': 'language-idris:print-definition'
+        }
       ]
     }
   ]
