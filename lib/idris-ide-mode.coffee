@@ -26,8 +26,12 @@ class IdrisIdeMode extends EventEmitter
         else
           []
 
+      tabLength = atom.config.get('editor.tabLength', scope: ['source.idris'])
+      configParams = ['--ide-mode', '--indent-with=' + tabLength,
+                      '--indent-clause=' + tabLength]
+
       parameters =
-        ['--ide-mode'].concat pkgs, options
+        configParams.concat pkgs, options
 
       options =
         if compilerOptions.src
