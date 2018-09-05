@@ -2,7 +2,7 @@
   require 'atom-message-panel'
 InformationView = require './views/information-view'
 HolesView = require './views/holes-view'
-Logger = require './Logger'
+Logger = require './utils/Logger'
 IdrisModel = require './idris-model'
 Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'
@@ -189,6 +189,7 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
+
     @clearMessagePanel 'Idris: Searching type of <tt>' + word + '</tt> ...'
 
     successHandler = ({ responseType, msg }) =>
@@ -320,12 +321,14 @@ class IdrisController
         editor.moveToBeginningOfLine()
         editor.moveUp()
 
-
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.makeWith line + 1, word
-      .subscribe successHandler, @displayErrors
+    if (word?.length)
+      @model
+        .load uri
+        .filter ({ responseType }) -> responseType == 'return'
+        .flatMap => @model.makeWith line + 1, word
+        .subscribe successHandler, @displayErrors
+    else 
+      @clearMessagePanel "Idris: Illegal position to make a with view"
 
   # construct a lemma from a hole
   doMakeLemma: ({ target }) =>

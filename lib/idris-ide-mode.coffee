@@ -1,6 +1,6 @@
-Logger = require './Logger'
+Logger = require './utils/Logger'
 sexpFormatter = require './utils/sexp-formatter'
-parse = require './parse'
+parse = require './utils/parse'
 { EventEmitter } = require 'events'
 { spawn } = require 'child_process'
 
@@ -26,8 +26,12 @@ class IdrisIdeMode extends EventEmitter
         else
           []
 
+      tabLength = atom.config.get('editor.tabLength', scope: ['source.idris'])
+      configParams = ['--ide-mode', '--indent-with=' + tabLength,
+                      '--indent-clause=' + tabLength]
+
       parameters =
-        ['--ide-mode'].concat pkgs, options
+        configParams.concat pkgs, options
 
       options =
         if compilerOptions.src

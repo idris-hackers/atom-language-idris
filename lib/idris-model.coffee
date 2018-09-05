@@ -1,5 +1,5 @@
 IdrisIdeMode = require './idris-ide-mode'
-Logger = require './Logger'
+Logger = require './utils/Logger'
 Rx = require 'rx-lite'
 JS = require './utils/js'
 path = require 'path'
