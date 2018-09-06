@@ -327,7 +327,7 @@ class IdrisController
         .filter ({ responseType }) -> responseType == 'return'
         .flatMap => @model.makeWith line + 1, word
         .subscribe successHandler, @displayErrors
-    else 
+    else
       @clearMessagePanel "Idris: Illegal position to make a with view"
 
   # construct a lemma from a hole
@@ -402,6 +402,7 @@ class IdrisController
 
       editor.transact ->
         # Delete old line, insert the new case block
+        editor.moveToBeginningOfLine()
         editor.deleteLine()
         editor.insertText clause
         # And move the cursor to the beginning of
