@@ -238,11 +238,13 @@ class IdrisController
     @saveFile editor
     uri = editor.getURI()
     line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
+    # by adding a clause we make sure that the word is
+    # not treated as a symbol
+    word = ' ' + editorHelper.getWordUnderCursor editor
 
     @clearMessagePanel 'Idris: Add clause ...'
 
-    successHandler = ({ responseType, msg }) =>
+    successHandler =  ({ responseType, msg }) =>
       [clause] = @prefixLiterateClause msg
 
       @hideAndClearMessagePanel()
