@@ -53,9 +53,4 @@ There is more information available in a in a [separate documentation](https://g
 
 ## Development
 
-To work on this plugin you need to clone it into your atom directory
-and rename the folder to `language-idris` or the package settings won't get picked up.
-Then you need an `apm install` from the `language-idris` folder to install the dependencies.
-
-Or you can execute `apm dev language-idris`. This will install the package in a separate directory and you need to start
-Atom in dev-mode to load the development packages (`atom -d your/folder`).
+see the [Development Guide](DEVELOPMENT.md)
