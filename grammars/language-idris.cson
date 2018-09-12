@@ -106,7 +106,7 @@ patterns:
     }
     {
       name: 'keyword.operator.function.infix.idris'
-      begin: '`'
+      begin: '`(?![\{|\(])'
       beginCaptures:
         0:
           name: 'punctuation.definition.entity.idris'
