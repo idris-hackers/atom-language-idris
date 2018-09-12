@@ -451,18 +451,22 @@ class IdrisController
       [res] = msg
 
       @hideAndClearMessagePanel()
-
-      editor.transact ->
-        # Move the cursor to the beginning of the word
-        editor.moveToBeginningOfWord()
-        # Because the ? in the Holes isn't part of
-        # the word, we move left once, and then select two
-        # words
-        editor.moveLeft()
-        editor.selectToEndOfWord()
-        editor.selectToEndOfWord()
-        # And then replace the replacement with the guess..
-        editor.insertText res
+      console.log res
+      if (res.startsWith("?"))
+        # proof search returned a new hole
+        @clearMessagePanel 'Idris: Searching proof was not successful.'
+      else
+        editor.transact ->
+          # Move the cursor to the beginning of the word
+          editor.moveToBeginningOfWord()
+          # Because the ? in the Holes isn't part of
+          # the word, we move left once, and then select two
+          # words
+          editor.moveLeft()
+          editor.selectToEndOfWord()
+          editor.selectToEndOfWord()
+          # And then replace the replacement with the guess..
+          editor.insertText res
 
     @model
       .load uri
