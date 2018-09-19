@@ -11,7 +11,8 @@
     "ctrl-alt-r": "language-idris:typecheck",
     "ctrl-alt-m": "language-idris:make-case",
     "ctrl-alt-p": "language-idris:add-proof-clause",
-    "ctrl-alt-b": "language-idris:browse-namespace"
+    "ctrl-alt-b": "language-idris:browse-namespace",
+    "escape": "language-idris:close-information-view"
   },
 
   ".platform-darwin, atom-text-editor[data-grammar~=\"idris\"]": {
@@ -26,6 +27,7 @@
     "ctrl-cmd-r": "language-idris:typecheck",
     "ctrl-cmd-m": "language-idris:make-case",
     "ctrl-cmd-p": "language-idris:add-proof-clause",
-    "ctrl-cmd-b": "language-idris:browse-namespace"
+    "ctrl-cmd-b": "language-idris:browse-namespace",
+    "escape": "language-idris:close-information-view"
   }
 }
