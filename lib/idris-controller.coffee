@@ -29,6 +29,7 @@ class IdrisController
     'language-idris:apropos': @runCommand @apropos
     'language-idris:add-proof-clause': @runCommand @doAddProofClause
     'language-idris:browse-namespace': @runCommand @doBrowseNamespace
+    'language-idris:close-information-view': @hideAndClearMessagePanel
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/
@@ -70,14 +71,14 @@ class IdrisController
     @statusbar.destroy()
 
   # clear the message panel and optionally display a new title
-  clearMessagePanel: (title) ->
+  clearMessagePanel: (title) =>
     @messages.attach()
     @messages.show()
     @messages.clear()
     @messages.setTitle title, true if title?
 
   # hide the message panel
-  hideAndClearMessagePanel: () ->
+  hideAndClearMessagePanel: () =>
     @clearMessagePanel()
     @messages.hide()
 
