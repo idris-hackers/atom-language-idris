@@ -221,11 +221,13 @@ class IdrisController
 
     successHandler = ({ responseType, msg }) =>
       [split] = msg
-
-      @hideAndClearMessagePanel()
-
-      lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
-      editor.setTextInBufferRange lineRange, split
+      if (split == "")
+        # split returned nothing - cannot split
+        @clearMessagePanel 'Idris: Cannot split ' + word
+      else
+        @hideAndClearMessagePanel()
+        lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
+        editor.setTextInBufferRange lineRange, split
 
     @model
       .load uri
