@@ -9,7 +9,16 @@ pkgsRegexp = /pkgs\s*=\s*(([a-zA-Z/0-9., ]+\s{0,1})*)/
 # Find all ipkg-files in a directory and returns
 # an observable of an array of files
 findIpkgFile = (project) ->
-  directory = project.getDirectories()[0].path
+
+  if (project.getDirectories()[0]?)
+    console.log "Project detected"
+    directory = project.getDirectories()[0].path
+  else
+    console.log "Single file detected"
+    editor = atom.workspace.getActivePaneItem()
+    file = editor?.buffer.file
+    directory = file.getParent().path
+
   readDir = Rx.Observable.fromNodeCallback fs.readdir
 
   r = readDir directory
