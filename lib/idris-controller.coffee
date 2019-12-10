@@ -72,15 +72,17 @@ class IdrisController
 
   # clear the message panel and optionally display a new title
   clearMessagePanel: (title) =>
-    @messages.attach()
-    @messages.show()
-    @messages.clear()
-    @messages.setTitle title, true if title?
+    if @messages
+      @messages.attach()
+      @messages.show()
+      @messages.clear()
+      @messages.setTitle title, true if title?
 
   # hide the message panel
   hideAndClearMessagePanel: () =>
-    @clearMessagePanel()
-    @messages.hide()
+    if @messages
+      @clearMessagePanel()
+      @messages.hide()
 
   # add raw information to the message panel
   rawMessage: (text) ->
