@@ -58,6 +58,7 @@ class IdrisModel
             delete @subjects[id]
           when ':write-string'
             msg = params[0]
+            atom.notifications.addInfo msg
             subject.onNext
               responseType: 'write-string'
               msg: msg
