@@ -152,386 +152,399 @@ class IdrisController
   typecheckFile: (event) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    @clearMessagePanel 'Idris: Typechecking ...'
+      .then =>
+        uri = editor.getURI()
+        @clearMessagePanel 'Idris: Typechecking...'
 
-    successHandler = ({ responseType, msg }) =>
-      @clearMessagePanel 'Idris: File loaded successfully'
+        successHandler = ({ responseType, msg }) =>
+          @clearMessagePanel 'Idris: File loaded successfully'
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .subscribe successHandler, @displayErrors
 
   getDocsForWord: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
-    @clearMessagePanel 'Idris: Searching docs for <tt>' + word + '</tt> ...'
+      .then =>
+        uri = editor.getURI()
+        word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
+        @clearMessagePanel 'Idris: Searching docs for <tt>' + word + '</tt> ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [type, highlightingInfo] = msg
-      @clearMessagePanel 'Idris: Docs for <tt>' + word + '</tt>'
+        successHandler = ({ responseType, msg }) =>
+          [type, highlightingInfo] = msg
+          @clearMessagePanel 'Idris: Docs for <tt>' + word + '</tt>'
 
-      informationView = new InformationView
-      informationView.initialize
-        obligation: type
-        highlightingInfo: highlightingInfo
-      @messages.add informationView
+          informationView = new InformationView
+          informationView.initialize
+            obligation: type
+            highlightingInfo: highlightingInfo
+          @messages.add informationView
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.docsFor word
-      .catch (e) => @model.docsFor word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.docsFor word
+          .catch (e) => @model.docsFor word
+          .subscribe successHandler, @displayErrors
 
   getTypeForWord: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
+      .then =>
+        uri = editor.getURI()
+        word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
 
-    @clearMessagePanel 'Idris: Searching type of <tt>' + word + '</tt> ...'
+        @clearMessagePanel 'Idris: Searching type of <tt>' + word + '</tt> ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [type, highlightingInfo] = msg
-      @clearMessagePanel 'Idris: Type of <tt>' + word + '</tt>'
+        successHandler = ({ responseType, msg }) =>
+          [type, highlightingInfo] = msg
+          @clearMessagePanel 'Idris: Type of <tt>' + word + '</tt>'
 
-      informationView = new InformationView
-      informationView.initialize
-        obligation: type
-        highlightingInfo: highlightingInfo
-      @messages.add informationView
+          informationView = new InformationView
+          informationView.initialize
+            obligation: type
+            highlightingInfo: highlightingInfo
+          @messages.add informationView
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.getType word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.getType word
+          .subscribe successHandler, @displayErrors
 
   doCaseSplit: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    cursor = editor.getLastCursor()
-    line = cursor.getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
+      .then =>
+        uri = editor.getURI()
+        cursor = editor.getLastCursor()
+        line = cursor.getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
 
-    @clearMessagePanel 'Idris: Do case split ...'
+        @clearMessagePanel 'Idris: Do case split ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [split] = msg
-      if (split == "")
-        # split returned nothing - cannot split
-        @clearMessagePanel 'Idris: Cannot split ' + word
-      else
-        @hideAndClearMessagePanel()
-        lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
-        editor.setTextInBufferRange lineRange, split
+        successHandler = ({ responseType, msg }) =>
+          [split] = msg
+          if (split == "")
+            # split returned nothing - cannot split
+            @clearMessagePanel 'Idris: Cannot split ' + word
+          else
+            @hideAndClearMessagePanel()
+            lineRange = cursor.getCurrentLineBufferRange(includeNewline: true)
+            editor.setTextInBufferRange lineRange, split
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.caseSplit line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.caseSplit line + 1, word
+          .subscribe successHandler, @displayErrors
 
   # add a new clause to a function
   doAddClause: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    # by adding a clause we make sure that the word is
-    # not treated as a symbol
-    word = ' ' + editorHelper.getWordUnderCursor editor
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        # by adding a clause we make sure that the word is
+        # not treated as a symbol
+        word = ' ' + editorHelper.getWordUnderCursor editor
 
-    @clearMessagePanel 'Idris: Add clause ...'
+        @clearMessagePanel 'Idris: Add clause ...'
 
-    successHandler =  ({ responseType, msg }) =>
-      [clause] = @prefixLiterateClause msg
+        successHandler =  ({ responseType, msg }) =>
+          [clause] = @prefixLiterateClause msg
 
-      @hideAndClearMessagePanel()
+          @hideAndClearMessagePanel()
 
-      editor.transact ->
-        editorHelper.moveToNextEmptyLine editor
+          editor.transact ->
+            editorHelper.moveToNextEmptyLine editor
 
-        # Insert the new clause
-        editor.insertText clause
+            # Insert the new clause
+            editor.insertText clause
 
-        # And move the cursor to the beginning of
-        # the new line and add an empty line below it
-        editor.insertNewlineBelow()
-        editor.moveUp()
-        editor.moveToBeginningOfLine()
+            # And move the cursor to the beginning of
+            # the new line and add an empty line below it
+            editor.insertNewlineBelow()
+            editor.moveUp()
+            editor.moveToBeginningOfLine()
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.addClause line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.addClause line + 1, word
+          .subscribe successHandler, @displayErrors
 
   # use special syntax for proof obligation clauses
   doAddProofClause: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
-    @clearMessagePanel 'Idris: Add proof clause ...'
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
+        @clearMessagePanel 'Idris: Add proof clause ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [clause] = @prefixLiterateClause msg
+        successHandler = ({ responseType, msg }) =>
+          [clause] = @prefixLiterateClause msg
 
-      @hideAndClearMessagePanel()
+          @hideAndClearMessagePanel()
 
-      editor.transact ->
-        editorHelper.moveToNextEmptyLine editor
+          editor.transact ->
+            editorHelper.moveToNextEmptyLine editor
 
-        # Insert the new clause
-        editor.insertText clause
+            # Insert the new clause
+            editor.insertText clause
 
-        # And move the cursor to the beginning of
-        # the new line and add an empty line below it
-        editor.insertNewlineBelow()
-        editor.moveUp()
-        editor.moveToBeginningOfLine()
+            # And move the cursor to the beginning of
+            # the new line and add an empty line below it
+            editor.insertNewlineBelow()
+            editor.moveUp()
+            editor.moveToBeginningOfLine()
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.addProofClause line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.addProofClause line + 1, word
+          .subscribe successHandler, @displayErrors
 
   # add a with view
   doMakeWith: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
 
-    @clearMessagePanel 'Idris: Make with view ...'
+        @clearMessagePanel 'Idris: Make with view ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [clause] = @prefixLiterateClause msg
+        successHandler = ({ responseType, msg }) =>
+          [clause] = @prefixLiterateClause msg
 
-      @hideAndClearMessagePanel()
+          @hideAndClearMessagePanel()
 
-      editor.transact ->
-        # Delete old line, insert the new with block
-        editor.deleteLine()
-        editor.insertText clause
-        # And move the cursor to the beginning of
-        # the new line
-        editor.moveToBeginningOfLine()
-        editor.moveUp()
+          editor.transact ->
+            # Delete old line, insert the new with block
+            editor.deleteLine()
+            editor.insertText clause
+            # And move the cursor to the beginning of
+            # the new line
+            editor.moveToBeginningOfLine()
+            editor.moveUp()
 
-    if (word?.length)
-      @model
-        .load uri
-        .filter ({ responseType }) -> responseType == 'return'
-        .flatMap => @model.makeWith line + 1, word
-        .subscribe successHandler, @displayErrors
-    else
-      @clearMessagePanel "Idris: Illegal position to make a with view"
+        if (word?.length)
+          @model
+            .load uri
+            .filter ({ responseType }) -> responseType == 'return'
+            .flatMap => @model.makeWith line + 1, word
+            .subscribe successHandler, @displayErrors
+        else
+          @clearMessagePanel "Idris: Illegal position to make a with view"
 
   # construct a lemma from a hole
   doMakeLemma: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
-    @clearMessagePanel 'Idris: Make lemma ...'
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
+        @clearMessagePanel 'Idris: Make lemma ...'
 
-    successHandler = ({ responseType, msg }) =>
-      # param1 contains the code which replaces the hole
-      # param2 contains the code for the lemma function
-      [lemty, param1, param2] = msg
-      param2 = @prefixLiterateClause param2
+        successHandler = ({ responseType, msg }) =>
+          # param1 contains the code which replaces the hole
+          # param2 contains the code for the lemma function
+          [lemty, param1, param2] = msg
+          param2 = @prefixLiterateClause param2
 
-      @hideAndClearMessagePanel()
+          @hideAndClearMessagePanel()
 
-      editor.transact ->
-        if lemty == ':metavariable-lemma'
-          # Move the cursor to the beginning of the word
-          editor.moveToBeginningOfWord()
-          # Because the ? in the Holes isn't part of
-          # the word, we move left once, and then select two
-          # words
-          editor.moveLeft()
-          editor.selectToEndOfWord()
-          editor.selectToEndOfWord()
-          # And then replace the replacement with the lemma call..
-          editor.insertText param1[1]
+          editor.transact ->
+            if lemty == ':metavariable-lemma'
+              # Move the cursor to the beginning of the word
+              editor.moveToBeginningOfWord()
+              # Because the ? in the Holes isn't part of
+              # the word, we move left once, and then select two
+              # words
+              editor.moveLeft()
+              editor.selectToEndOfWord()
+              editor.selectToEndOfWord()
+              # And then replace the replacement with the lemma call..
+              editor.insertText param1[1]
 
-          # Now move to the previous blank line and insert the type
-          # of the lemma
-          editor.moveToBeginningOfLine()
-          line = editor.getLastCursor().getBufferRow()
+              # Now move to the previous blank line and insert the type
+              # of the lemma
+              editor.moveToBeginningOfLine()
+              line = editor.getLastCursor().getBufferRow()
 
-          # I tried to make this a function but failed to find out how
-          # to call it and gave up...
-          while(line > 0)
-            editor.moveToBeginningOfLine()
-            editor.selectToEndOfLine()
-            contents = editor.getSelectedText()
-            if contents == ''
-              break
-            editor.moveUp()
-            line--
+              # I tried to make this a function but failed to find out how
+              # to call it and gave up...
+              while(line > 0)
+                editor.moveToBeginningOfLine()
+                editor.selectToEndOfLine()
+                contents = editor.getSelectedText()
+                if contents == ''
+                  break
+                editor.moveUp()
+                line--
 
-          editor.insertNewlineBelow()
-          editor.insertText param2[1]
-          editor.insertNewlineBelow()
+              editor.insertNewlineBelow()
+              editor.insertText param2[1]
+              editor.insertNewlineBelow()
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.makeLemma line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.makeLemma line + 1, word
+          .subscribe successHandler, @displayErrors
 
   # create a case statement
   doMakeCase: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
-    @clearMessagePanel 'Idris: Make case ...'
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
+        @clearMessagePanel 'Idris: Make case ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [clause] = @prefixLiterateClause msg
+        successHandler = ({ responseType, msg }) =>
+          [clause] = @prefixLiterateClause msg
 
-      @hideAndClearMessagePanel()
+          @hideAndClearMessagePanel()
 
-      editor.transact ->
-        # Delete old line, insert the new case block
-        editor.moveToBeginningOfLine()
-        editor.deleteLine()
-        editor.insertText clause
-        # And move the cursor to the beginning of
-        # the new line
-        editor.moveToBeginningOfLine()
-        editor.moveUp()
+          editor.transact ->
+            # Delete old line, insert the new case block
+            editor.moveToBeginningOfLine()
+            editor.deleteLine()
+            editor.insertText clause
+            # And move the cursor to the beginning of
+            # the new line
+            editor.moveToBeginningOfLine()
+            editor.moveUp()
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.makeCase line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.makeCase line + 1, word
+          .subscribe successHandler, @displayErrors
 
   # show all holes in the current file
   showHoles: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    @clearMessagePanel 'Idris: Searching holes ...'
+      .then =>
+        uri = editor.getURI()
+        @clearMessagePanel 'Idris: Searching holes ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [holes] = msg
-      @clearMessagePanel 'Idris: Holes'
-      holesView = new HolesView
-      holesView.initialize holes
-      @messages.add holesView
+        successHandler = ({ responseType, msg }) =>
+          [holes] = msg
+          @clearMessagePanel 'Idris: Holes'
+          holesView = new HolesView
+          holesView.initialize holes
+          @messages.add holesView
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.holes 80
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.holes 80
+          .subscribe successHandler, @displayErrors
 
   # replace a hole with a proof
   doProofSearch: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    line = editor.getLastCursor().getBufferRow()
-    word = editorHelper.getWordUnderCursor editor
-    @clearMessagePanel 'Idris: Searching proof ...'
+      .then =>
+        uri = editor.getURI()
+        line = editor.getLastCursor().getBufferRow()
+        word = editorHelper.getWordUnderCursor editor
+        @clearMessagePanel 'Idris: Searching proof ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [res] = msg
+        successHandler = ({ responseType, msg }) =>
+          [res] = msg
 
-      @hideAndClearMessagePanel()
-      console.log res
-      if (res.startsWith("?"))
-        # proof search returned a new hole
-        @clearMessagePanel 'Idris: Searching proof was not successful.'
-      else
-        editor.transact ->
-          # Move the cursor to the beginning of the word
-          editor.moveToBeginningOfWord()
-          # Because the ? in the Holes isn't part of
-          # the word, we move left once, and then select two
-          # words
-          editor.moveLeft()
-          editor.selectToEndOfWord()
-          editor.selectToEndOfWord()
-          # And then replace the replacement with the guess..
-          editor.insertText res
+          @hideAndClearMessagePanel()
+          console.log res
+          if (res.startsWith("?"))
+            # proof search returned a new hole
+            @clearMessagePanel 'Idris: Searching proof was not successful.'
+          else
+            editor.transact ->
+              # Move the cursor to the beginning of the word
+              editor.moveToBeginningOfWord()
+              # Because the ? in the Holes isn't part of
+              # the word, we move left once, and then select two
+              # words
+              editor.moveLeft()
+              editor.selectToEndOfWord()
+              editor.selectToEndOfWord()
+              # And then replace the replacement with the guess..
+              editor.insertText res
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.proofSearch line + 1, word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.proofSearch line + 1, word
+          .subscribe successHandler, @displayErrors
 
   doBrowseNamespace: ({target}) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    nameSpace = editor.getSelectedText()
-    console.log nameSpace
+      .then =>
+        uri = editor.getURI()
+        nameSpace = editor.getSelectedText()
+        console.log nameSpace
 
-    @clearMessagePanel 'Idris: Browsing namespace <tt>' + nameSpace + '</tt>'
+        @clearMessagePanel 'Idris: Browsing namespace <tt>' + nameSpace + '</tt>'
 
-    successHandler = ({ responseType, msg }) =>
-      # the information is in a two dimensional array
-      # one array contains the namespaces contained in the namespace
-      # and the seconds all the methods
-      namesSpaceInformation = msg[0][0]
-      for nameSpace in namesSpaceInformation
-          @rawMessage nameSpace
+        successHandler = ({ responseType, msg }) =>
+          # the information is in a two dimensional array
+          # one array contains the namespaces contained in the namespace
+          # and the seconds all the methods
+          namesSpaceInformation = msg[0][0]
+          for nameSpace in namesSpaceInformation
+              @rawMessage nameSpace
 
-      methodInformation = msg[0][1]
-      for [line, highlightInformation] in methodInformation
-          highlighted = highlighter.highlight line, highlightInformation
-          highlighting = highlighter.highlight line, highlightInformation
-          info = highlighter.highlightToString highlighting
-          @rawMessage info
+          methodInformation = msg[0][1]
+          for [line, highlightInformation] in methodInformation
+              highlighted = highlighter.highlight line, highlightInformation
+              highlighting = highlighter.highlight line, highlightInformation
+              info = highlighter.highlightToString highlighting
+              @rawMessage info
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.browseNamespace nameSpace
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.browseNamespace nameSpace
+          .subscribe successHandler, @displayErrors
 
   # get the definition of a function or type
   printDefinition: ({ target }) =>
     editor = @getEditor()
     @saveFile editor
-    uri = editor.getURI()
-    word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
-    @clearMessagePanel 'Idris: Searching definition of <tt>' + word + '</tt> ...'
+      .then =>
+        uri = editor.getURI()
+        word = Symbol.serializeWord editorHelper.getWordUnderCursor(editor)
+        @clearMessagePanel 'Idris: Searching definition of <tt>' + word + '</tt> ...'
 
-    successHandler = ({ responseType, msg }) =>
-      [type, highlightingInfo] = msg
-      @clearMessagePanel 'Idris: Definition of <tt>' + word + '</tt>'
-      informationView = new InformationView
-      informationView.initialize
-        obligation: type
-        highlightingInfo: highlightingInfo
-      @messages.add informationView
+        successHandler = ({ responseType, msg }) =>
+          [type, highlightingInfo] = msg
+          @clearMessagePanel 'Idris: Definition of <tt>' + word + '</tt>'
+          informationView = new InformationView
+          informationView.initialize
+            obligation: type
+            highlightingInfo: highlightingInfo
+          @messages.add informationView
 
-    @model
-      .load uri
-      .filter ({ responseType }) -> responseType == 'return'
-      .flatMap => @model.printDefinition word
-      .catch (e) => @model.printDefinition word
-      .subscribe successHandler, @displayErrors
+        @model
+          .load uri
+          .filter ({ responseType }) -> responseType == 'return'
+          .flatMap => @model.printDefinition word
+          .catch (e) => @model.printDefinition word
+          .subscribe successHandler, @displayErrors
 
   # open the repl window
   openREPL: ({ target }) =>
