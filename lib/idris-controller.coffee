@@ -8,6 +8,7 @@ Ipkg = require './utils/ipkg'
 Symbol = require './utils/symbol'
 editorHelper = require './utils/editor'
 highlighter = require './utils/highlighter'
+migrations = require './migrations'
 
 class IdrisController
   errorMarkers: []
@@ -30,6 +31,7 @@ class IdrisController
     'language-idris:add-proof-clause': @runCommand @doAddProofClause
     'language-idris:browse-namespace': @runCommand @doBrowseNamespace
     'language-idris:close-information-view': @hideAndClearMessagePanel
+    'language-idris:legacy-keymap-notice': migrations.showKeymapDeprecationNotice
 
   isIdrisFile: (uri) ->
     uri?.match? /\.idr$/

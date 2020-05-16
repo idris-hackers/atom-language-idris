@@ -31,27 +31,27 @@ mul (S k) y = add y (mul k y)
 
 ### Typecheck
 
-Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`. (or use `ctrl-alt-r`)
+Open the command palette (`ctrl-shift-p` on Win/Linux) and select `Language Idris: Typecheck`. (or use `ctrl-i r`)
 
 ### Type info
 
-Select an instance of the `add` function in your code and press `ctrl-alt-t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of". A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
+Select an instance of the `add` function in your code and press `ctrl-i t` or use the command palette (`ctrl-shift-p` on Win/Linux) and search for "Language Idris: Type Of". A panel should open at the bottom of your window showing you the type of the `add` function, `Ops.add : Nat -> Nat -> Nat`.
 Now try the same thing with the `mul` function.
 
 ### Show documentation
 
-Another useful command is triggered by selecting a word and pressing `ctrl-alt-d` (or "Language Idris: Docs for" from the command palette). You can try it on `add`, `mul` or `Nat` for instance.
+Another useful command is triggered by selecting a word and pressing `ctrl-i d` (or "Language Idris: Docs for" from the command palette). You can try it on `add`, `mul` or `Nat` for instance.
 
 ### REPL
 
-You can create a REPL window by pressing `ctrl-alt-enter`. Enter REPL commands at the top, just as if you were using the REPL command line interface. 
+You can create a REPL window by pressing `ctrl-i enter`. Enter REPL commands at the top, just as if you were using the REPL command line interface.
 
-### Idris command line options and library package dependencies 
+### Idris command line options and library package dependencies
 
-Sometimes you may have dependendencies on Idris packages, for instance Lightyear for parsing or Pruvioj for advanced theorem proving. 
-In Atom you can specify these dependencies using the project model, which simply means using Open Folder rather than Open File 
-from the File menu. Atom will look for a .ipkg file in the folder and load any dependencies listed. More details are described in 
-[Working with ipkg files](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/ipkg.md). 
+Sometimes you may have dependendencies on Idris packages, for instance Lightyear for parsing or Pruvioj for advanced theorem proving.
+In Atom you can specify these dependencies using the project model, which simply means using Open Folder rather than Open File
+from the File menu. Atom will look for a .ipkg file in the folder and load any dependencies listed. More details are described in
+[Working with ipkg files](https://github.com/idris-hackers/atom-language-idris/blob/master/documentation/ipkg.md).
 
 ## Interactive proofs using Idris and Atom
 
@@ -66,7 +66,7 @@ module Main
 plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 ```
 
-Load the file into Idris by typechecking it by pressing `ctrl-alt-r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
+Load the file into Idris by typechecking it by pressing `ctrl-i r`. Then press `ctrl-shift-p` and type "Language Idris: Holes".
 
 At the bottom of your window should open a small panel with all holes you'll have to prove.
 Here it should just show:
@@ -81,7 +81,7 @@ Main.plusAssoc : plus l (plus c r) = plus (plus l c) r
 where `l : Nat, c : Nat, r : Nat` are variables you can use to prove
 `Main.plusAssoc : plus l (plus c r) = plus (plus l c) r`.
 
-If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" (`ctrl-alt-a`) a line wil be inserted by atom at the bottom of your file.
+If you put your cursor over `plusAssoc` in the `proving.idr` file and execute the command "Language Idris: Add Clause" (`ctrl-i a`) a line wil be inserted by atom at the bottom of your file.
 
 Your file should now look like this:
 ```idris
@@ -91,7 +91,7 @@ plusAssoc : (l, c, r : Nat) -> l `plus` (c `plus` r) = (l `plus` c) `plus` r
 plusAssoc l c r = ?plusAssoc_rhs
 ```
 
-If you select the `l` in `plusAssoc l c r = ?plusAssoc_rhs` and press `ctrl-alt-c` ("Language Idris: Case Split") it splits the `Nat` at `l`
+If you select the `l` in `plusAssoc l c r = ?plusAssoc_rhs` and press `ctrl-i c` ("Language Idris: Case Split") it splits the `Nat` at `l`
 into it's two cases `Z` (zero) and `(S k)` (the successor of `k`).
 Rename `k` to `l` as we had it before, to show that it is the left value.
 
