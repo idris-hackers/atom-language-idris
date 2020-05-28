@@ -19,7 +19,7 @@ export function activate() {
     atom.workspace.addOpener((uriToOpen: string) => {
         try {
             const { protocol, host } = url.parse(uriToOpen)
-            if (protocol === 'idris:') {
+            if (protocol === 'idris:' && controller) {
                 return new IdrisPanel(controller, host || '')
             }
         } catch (error) {

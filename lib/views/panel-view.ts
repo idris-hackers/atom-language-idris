@@ -1,11 +1,12 @@
 import { REPLView } from './repl-view'
 import { AproposView } from './apropos-view'
+import { IdrisController } from '../idris-controller'
 
 export class IdrisPanel {
     panel: string = ''
-    controller: any
+    controller: IdrisController
 
-    constructor(controller: any, panel: string) {
+    constructor(controller: IdrisController, panel: string) {
         this.controller = controller
         this.panel = panel
     }
@@ -45,6 +46,8 @@ export class IdrisPanel {
             case 'apropos': {
                 return 'idris://apropos'
             }
+            default:
+                return undefined
         }
     }
 }
