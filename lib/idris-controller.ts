@@ -232,16 +232,21 @@ export class IdrisController {
         }
     }
 
-    saveFile(editor: TextEditor | undefined): Promise<void> {
+    saveFile(editor: TextEditor | undefined): Promise<string> {
         if (editor) {
             const path = editor.getPath()
             if (path) {
-                return editor.save()
+                return editor.save().then(() => path)
             } else {
                 const pane = this.getPane()
                 const savePromise = pane.saveActiveItemAs()
                 if (savePromise) {
-                    return savePromise
+                    const newPath = editor.getPath()
+                    if (newPath) {
+                        return savePromise.then(() => newPath)
+                    } else {
+                        return Promise.reject()
+                    }
                 } else {
                     return Promise.reject()
                 }
@@ -254,8 +259,7 @@ export class IdrisController {
     typecheckFile() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 this.clearMessagePanel('Idris: Typechecking...')
 
                 const successHandler = () => {
@@ -277,8 +281,7 @@ export class IdrisController {
     getDocsForWord() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const word = Symbol.serializeWord(getWordUnderCursor(editor))
                 this.clearMessagePanel(
                     'Idris: Searching docs for <tt>' + word + '</tt> ...',
@@ -313,8 +316,7 @@ export class IdrisController {
     getTypeForWord() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const word = Symbol.serializeWord(getWordUnderCursor(editor))
                 this.clearMessagePanel(
                     'Idris: Searching type of <tt>' + word + '</tt> ...',
@@ -345,8 +347,7 @@ export class IdrisController {
     doCaseSplit() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const cursor = editor.getLastCursor()
                 const line = cursor.getBufferRow()
                 const word = getWordUnderCursor(editor)
@@ -386,8 +387,7 @@ export class IdrisController {
     doAddClause() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
                 // by adding a clause we make sure that the word is
                 // not treated as a symbol
@@ -431,8 +431,7 @@ export class IdrisController {
     doAddProofClause() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Add proof clause ...')
@@ -471,8 +470,7 @@ export class IdrisController {
     doMakeWith() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
 
@@ -516,8 +514,7 @@ export class IdrisController {
     doMakeLemma() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 let line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Make lemma ...')
@@ -583,8 +580,7 @@ export class IdrisController {
     doMakeCase() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Make case ...')
@@ -621,8 +617,7 @@ export class IdrisController {
     showHoles() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 this.clearMessagePanel('Idris: Searching holes ...')
 
                 const successHandler = ({ msg }: any) => {
@@ -650,8 +645,7 @@ export class IdrisController {
     doProofSearch() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Searching proof ...')
@@ -695,8 +689,7 @@ export class IdrisController {
     doBrowseNamespace() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 let nameSpace = editor.getSelectedText()
 
                 this.clearMessagePanel(
@@ -749,8 +742,7 @@ export class IdrisController {
     printDefinition() {
         const editor = this.getEditor()
         if (editor) {
-            return this.saveFile(editor).then(() => {
-                const uri = editor.getPath() as any
+            return this.saveFile(editor).then((uri) => {
                 const word = Symbol.serializeWord(getWordUnderCursor(editor))
                 this.clearMessagePanel(
                     'Idris: Searching definition of <tt>' + word + '</tt> ...',
