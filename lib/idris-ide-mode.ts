@@ -1,9 +1,9 @@
 import Logger from './utils/Logger'
 import * as sexpFormatter from './protocol/sexp-formatter'
-import * as parse from './utils/parse'
 import { EventEmitter } from 'events'
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { SExp } from './protocol/ide-protocol'
+import { listP } from './protocol/parser'
 import { CompilerOptions } from './utils/ipkg'
 
 export class IdrisIdeMode extends EventEmitter {
@@ -120,8 +120,10 @@ export class IdrisIdeMode extends EventEmitter {
                 // Remove the length + command from the buffer
                 this.buffer = this.buffer.substr(6 + len)
                 // And then we can try to parse to command..
-                const obj = parse.parseCommand(cmd.trim())
-                result.push(this.emit('message', obj))
+                const typedCommand = listP.parse(cmd.trim())
+                if (typedCommand.isOk) {
+                    result.push(this.emit('message', typedCommand.value))
+                }
             } else {
                 // We didn't have the entire command, so let's break the
                 // while-loop and wait for the next data-event

@@ -7,7 +7,8 @@
     "repository": "https://github.com/idris-hackers/atom-language-idris",
     "license": "MIT",
     "scripts": {
-        "build": "tsc -p ./lib"
+        "build": "tsc -p ./lib",
+        "test": "jest"
     },
     "engines": {
         "atom": ">=1.31.0"
@@ -79,17 +80,19 @@
     "dependencies": {
         "@cycle/core": "3.1.0",
         "@cycle/dom": "5.3.0",
-        "atom-message-panel": "^1.3.0",
+        "atom-message-panel": "1.3.1",
         "atom-ts-transpiler": "^1.5.2",
-        "bennu": "17.3.0",
-        "nu-stream": "3.3.1",
+        "parjs": "0.12.7",
         "rx-lite": "4.0.8",
-        "tslib": "1.11.1",
-        "typescript": "3.9.2"
+        "tslib": "2.0.0",
+        "typescript": "3.9.3"
     },
     "devDependencies": {
         "@types/atom": "1.40.4",
+        "@types/jest": "25.2.3",
         "@types/rx-lite": "4.0.6",
-        "prettier": "2.0.5"
+        "jest": "26.0.1",
+        "prettier": "2.0.5",
+        "ts-jest": "26.1.0"
     }
 }

@@ -3,7 +3,7 @@ import * as Rx from 'rx-lite'
 import * as JS from './utils/js'
 import * as path from 'path'
 import { CompilerOptions } from './utils/ipkg'
-import { IDECommand, SExp } from './protocol/ide-protocol'
+import { IDECommand, SExp, SExpList } from './protocol/ide-protocol'
 import { ideCommandToSExp } from './protocol/to-sexp'
 import Logger from './utils/Logger'
 
@@ -46,70 +46,71 @@ export class IdrisModel {
         this.compilerOptions = options
     }
 
-    handleCommand(cmd: any) {
-        if (cmd.length > 0) {
-            const op = cmd[0],
-                adjustedLength = Math.max(cmd.length, 2),
-                params = cmd.slice(1, adjustedLength - 1),
-                id = cmd[adjustedLength - 1]
-            if (this.subjects[id] != null) {
-                const subject = this.subjects[id]
-                switch (op) {
-                    case ':return':
-                        var ret = params[0]
-                        if (ret[0] === ':ok') {
-                            const okparams = ret[1]
-                            if (okparams[0] === ':metavariable-lemma') {
-                                subject.onNext({
-                                    responseType: 'return',
-                                    msg: okparams,
-                                })
-                            } else {
-                                subject.onNext({
-                                    responseType: 'return',
-                                    msg: ret.slice(1),
-                                })
-                            }
-                        } else {
-                            subject.onError({
-                                message: ret[1],
-                                warnings: this.warnings[id],
-                                highlightInformation: ret[2],
-                                cwd: this.compilerOptions.src,
-                            })
-                        }
-                        subject.onCompleted()
-                        return delete this.subjects[id]
-                    case ':write-string':
-                        var msg = params[0]
-                        atom.notifications.addInfo(msg)
-                        return subject.onNext({
-                            responseType: 'write-string',
-                            msg,
-                        })
-                    case ':warning':
-                        var warning = params[0]
-                        return this.warnings[id].push(warning)
-                    case ':run-program':
-                        var options = {
-                            detail:
-                                'The path for the compiled program. It was copied to your clipboard. Paste it into a terminal to execute.',
-                            dismissible: true,
-                            icon: 'comment',
-                            buttons: [{ text: 'Confirm' }],
-                        }
-                        atom.clipboard.write(params[0])
-                        return atom.notifications.addSuccess(params[0], options)
-                    case ':set-prompt':
-                    // Ignore
-                    default: {
-                        Logger.logObject('Unhandled Operator', op)
-                        Logger.logObject('Params', params)
-                        return
-                    }
-                }
-            }
-        }
+    handleCommand(cmd: SExpList) {
+        debugger
+        // if (cmd.length > 0) {
+        //     const op = cmd[0],
+        //         adjustedLength = Math.max(cmd.length, 2),
+        //         params = cmd.slice(1, adjustedLength - 1),
+        //         id = cmd[adjustedLength - 1]
+        //     if (this.subjects[id] != null) {
+        //         const subject = this.subjects[id]
+        //         switch (op) {
+        //             case ':return':
+        //                 var ret = params[0]
+        //                 if (ret[0] === ':ok') {
+        //                     const okparams = ret[1]
+        //                     if (okparams[0] === ':metavariable-lemma') {
+        //                         subject.onNext({
+        //                             responseType: 'return',
+        //                             msg: okparams,
+        //                         })
+        //                     } else {
+        //                         subject.onNext({
+        //                             responseType: 'return',
+        //                             msg: ret.slice(1),
+        //                         })
+        //                     }
+        //                 } else {
+        //                     subject.onError({
+        //                         message: ret[1],
+        //                         warnings: this.warnings[id],
+        //                         highlightInformation: ret[2],
+        //                         cwd: this.compilerOptions.src,
+        //                     })
+        //                 }
+        //                 subject.onCompleted()
+        //                 return delete this.subjects[id]
+        //             case ':write-string':
+        //                 var msg = params[0]
+        //                 atom.notifications.addInfo(msg)
+        //                 return subject.onNext({
+        //                     responseType: 'write-string',
+        //                     msg,
+        //                 })
+        //             case ':warning':
+        //                 var warning = params[0]
+        //                 return this.warnings[id].push(warning)
+        //             case ':run-program':
+        //                 var options = {
+        //                     detail:
+        //                         'The path for the compiled program. It was copied to your clipboard. Paste it into a terminal to execute.',
+        //                     dismissible: true,
+        //                     icon: 'comment',
+        //                     buttons: [{ text: 'Confirm' }],
+        //                 }
+        //                 atom.clipboard.write(params[0])
+        //                 return atom.notifications.addSuccess(params[0], options)
+        //             case ':set-prompt':
+        //             // Ignore
+        //             default: {
+        //                 Logger.logObject('Unhandled Operator', op)
+        //                 Logger.logObject('Params', params)
+        //                 return
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     getUID(): number {
