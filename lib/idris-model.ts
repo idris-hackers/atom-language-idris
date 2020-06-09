@@ -6,6 +6,7 @@ import { CompilerOptions } from './utils/ipkg'
 import { IDECommand, SExp, SExpList } from './protocol/ide-protocol'
 import { ideCommandToSExp } from './protocol/to-sexp'
 import Logger from './utils/Logger'
+import { fromSExp } from './protocol/from-sexp'
 
 export class IdrisModel {
     requestId = 0
@@ -47,7 +48,8 @@ export class IdrisModel {
     }
 
     handleCommand(cmd: SExpList) {
-        debugger
+        const answer = fromSExp(cmd)
+        console.log(answer)
         // if (cmd.length > 0) {
         //     const op = cmd[0],
         //         adjustedLength = Math.max(cmd.length, 2),
