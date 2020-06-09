@@ -8,6 +8,10 @@ export type ProtocolVersion = {
 
 export type WithCommandId = { id: number }
 
+export type HighlightSource = {
+    type: 'highlight-source'
+}
+
 export type Premise = {
     name: string
     type: string
@@ -20,12 +24,14 @@ export type Conclusion = {
 }
 
 export type Hole = {
+    type: 'hole'
     name: string
     premises: Array<Premise>
     conclusions: Array<Conclusion>
 }
 
-export type Success = { type: 'success' }
+export type SuccessCommand = HighlightSource | Hole
+export type Success = { type: 'success'; command: SuccessCommand }
 export type Error = { type: 'error'; message: string }
 export type Result = Success | Error
 export type Output = { type: 'output'; result: Result } & WithCommandId

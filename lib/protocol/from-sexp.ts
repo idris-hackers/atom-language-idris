@@ -5,7 +5,7 @@ import {
     UnknownAnswer,
     Answer,
 } from './answers'
-import { SExpList, SExp, SExpType, ExtractSExpDataType } from './ide-protocol'
+import { SExpList, SExp } from './ide-protocol'
 import { sexpP } from './parser'
 
 type Succ<T> = { type: 'succ'; data: T }
@@ -35,7 +35,32 @@ const resultFromSExp = (
 ): ErrOrSucc<Result, { id: number; msg: string }> => {
     if (list.length === 2) {
         const head = list[0].type === 'symbol' ? list[0].data : undefined
-        const data = list[1].type === 'list' ? list[0].data : undefined
+        const data = list[1].type === 'list' ? list[1].data : undefined
+        if (head) {
+            console.log('head', head)
+            switch (head) {
+                case 'highlight-source': {
+                    return {
+                        type: 'succ',
+                        data: {
+                            type: 'success',
+                            command: { type: 'highlight-source' },
+                        },
+                    }
+                }
+                default: {
+                    return {
+                        type: 'err',
+                        data: { id, msg: `invalid command: "${head}"` },
+                    }
+                }
+            }
+        } else {
+            return {
+                type: 'err',
+                data: { id, msg: 'first element should be a symbol' },
+            }
+        }
     } else {
         return { type: 'err', data: { id, msg: 'invalid result type length' } }
     }

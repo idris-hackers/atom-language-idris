@@ -49,7 +49,7 @@ export class IdrisModel {
 
     handleCommand(cmd: SExpList) {
         const answer = fromSExp(cmd)
-        console.log(answer)
+        console.log('Answer', answer)
         // if (cmd.length > 0) {
         //     const op = cmd[0],
         //         adjustedLength = Math.max(cmd.length, 2),
