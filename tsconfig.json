@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
+        "jsx": "react",
+        "jsxFactory": "etch.dom",
+        "lib": ["es7", "dom", "ES2017.object"],
+        "module": "commonjs",
+        "noLib": false,
+        "outDir": "../dist",
+        "preserveConstEnums": true,
+        "skipLibCheck": false,
+        "sourceMap": true,
+        "strict": true,
+        "target": "es2017",
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "plugins": [{ "name": "typescript-tslint-plugin" }],
+        "newLine": "LF"
+    },
+    "compileOnSave": true
+}
