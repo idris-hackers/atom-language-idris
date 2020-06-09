@@ -38,7 +38,6 @@ Anytime you want to restart your project with the latest changes, you can just r
 ├── idris-model.coffee
 ├── language-idris.coffee
 ├── utils
-│   ├── Logger.coffee
 │   ├── dom.coffee
 │   ├── editor.coffee
 │   ├── highlighter.coffee

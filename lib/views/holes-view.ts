@@ -1,12 +1,20 @@
+import { FinalReply } from 'idris-ide-client'
 import * as highlighter from '../utils/highlighter'
 import { createCodeElement, joinHtmlElements } from '../utils/dom'
+import { MessageMetadata } from 'idris-ide-client/build/reply'
 
 const textNode = (text: string): Text => document.createTextNode(text)
+
+type Metavariable = {
+    name: string
+    type: string
+    metadata: Array<MessageMetadata>
+}
 
 export class HolesViewClass extends HTMLElement {
     holesContainer: HTMLPreElement | undefined
 
-    initialize(holes: any): void {
+    initialize(holes: FinalReply.Metavariables): void {
         this.classList.add('idris-panel')
         this.holesContainer = createCodeElement()
         this.holesContainer.classList.add('idris-mode')
@@ -17,56 +25,59 @@ export class HolesViewClass extends HTMLElement {
         this.showHoles(holes)
     }
 
-    showHoles(holes: any): void {
+    showHoles(holes: FinalReply.Metavariables): void {
         this.holesContainer?.appendChild(this.prettyprintHoles(holes))
     }
 
-    prettyprintHoles(holes: any) {
-        const html = holes.map(
-            ([name, premises, conclusion]: [string, any, any]) => {
-                return this.prettyprintHole(name, premises, conclusion)
-            },
-        )
+    prettyprintHoles(holes: FinalReply.Metavariables) {
+        const html = holes.ok.map((metavariable) => {
+            return this.prettyprintHole(
+                metavariable.metavariable,
+                metavariable.scope,
+            )
+        })
         return joinHtmlElements('div', html)
     }
 
-    prettyprintHole(name: string, premises: any, conclusion: any) {
+    prettyprintHole(metavariable: Metavariable, premises: Array<Metavariable>) {
         const prettyPremises = this.prettyprintPremises(premises)
-        const prettyConclusion: any = this.prettyprintConclusion(
-            name,
-            conclusion,
-        )
+        const prettyConclusion: any = this.prettyprintConclusion(metavariable)
 
-        const hole = joinHtmlElements(
-            'div',
-            [textNode(`${name}`)].concat(prettyPremises, prettyConclusion),
-        )
+        const children: Array<HTMLElement> = [
+            textNode(`${name}`),
+            prettyPremises,
+            ...prettyConclusion,
+        ]
+
+        const hole = joinHtmlElements('div', children)
         hole.classList.add('idris')
         hole.classList.add('idris-hole')
         return hole
     }
 
-    prettyprintPremises(premises: any) {
-        const html = premises.map(
-            ([name, type, highlightInformation]: [string, any, any]) => {
-                const highlight = highlighter.highlight(
-                    type,
-                    highlightInformation,
-                )
-                type = highlighter.highlightToHtml(highlight)
-                return joinHtmlElements(
-                    'div',
-                    [textNode(`    ${name} : `)].concat(type),
-                )
-            },
-        )
+    prettyprintPremises(premises: Array<Metavariable>) {
+        const html = premises.map((premise) => {
+            const highlight = highlighter.highlight(
+                premise.type,
+                premise.metadata,
+            )
+            const type = highlighter.highlightToHtml(highlight)
+            return joinHtmlElements('div', [
+                textNode(`    ${premise.name} : `),
+                type,
+            ])
+        })
         return joinHtmlElements('div', html)
     }
 
-    prettyprintConclusion(name: string, [type, highlightInformation]: any) {
-        const highlight = highlighter.highlight(type, highlightInformation)
+    prettyprintConclusion(metavariable: Metavariable) {
+        const highlight = highlighter.highlight(
+            metavariable.type,
+            metavariable.metadata,
+        )
         const highlightedConclusion = highlighter.highlightToHtml(highlight)
-        const dividerLength = `${name} : ${type}`.length
+        const dividerLength = `${metavariable.name} : ${metavariable.type}`
+            .length
         var divider = ''
         for (var i = 0; i < dividerLength; i++) {
             divider += '-'
@@ -75,7 +86,7 @@ export class HolesViewClass extends HTMLElement {
         return [
             textNode(divider),
             document.createElement('br'),
-            textNode(`${name} : `),
+            textNode(`${metavariable.name} : `),
             highlightedConclusion,
         ]
     }

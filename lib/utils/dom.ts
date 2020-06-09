@@ -1,4 +1,7 @@
-export const joinHtmlElements = function (containerElem: any, elems: any) {
+export const joinHtmlElements = function (
+    containerElem: string,
+    elems: Array<Node>,
+) {
     const div = document.createElement(containerElem)
     elems.forEach((elem: any) => div.appendChild(elem))
     return div

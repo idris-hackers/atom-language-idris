@@ -1,44 +1,25 @@
 import * as Preact from 'preact'
 import { useState, StateUpdater } from 'preact/hooks'
 import * as highlighter from '../utils/highlighter'
-import * as Rx from 'rx-lite'
 import { fontOptions } from '../utils/dom'
 import { IdrisController } from '../idris-controller'
-import { IdrisModel } from '../idris-model'
 import { HighlightInformation } from '../utils/highlighter'
+import { IdrisClient, FinalReply } from 'idris-ide-client'
 
 const styles = fontOptions()
 
 const ask = (
-    model: IdrisModel,
+    client: IdrisClient,
     question: string,
     setAnswer: StateUpdater<Array<HighlightInformation>>,
 ) => {
-    model
-        .apropos(question)
-        .map((e: any): {
-            code: string
-            highlightInfo: Array<[number, number, Array<any>]>
-        } => ({
-            code: e.msg[0],
-            highlightInfo: e.msg[1],
-        }))
-        .catch((e: any) =>
-            Rx.Observable.just({
-                code: e.message,
-                highlightInfo: e.highlightInformation,
-            }),
-        )
-        .subscribe(
-            ({ code, highlightInfo }) => {
-                const answer = highlighter.highlight(code, highlightInfo)
-                setAnswer(answer)
-            },
-            (err) =>
-                setAnswer([
-                    { word: err.message, classes: [], description: '' },
-                ]),
-        )
+    client.apropos(question).then((reply: FinalReply.Apropos) => {
+        if ('ok' in reply) {
+            setAnswer(highlighter.highlight(reply.ok.docs, reply.ok.metadata))
+        } else {
+            setAnswer(highlighter.highlight(reply.err, []))
+        }
+    })
 }
 
 type AnswerProps = { highlightInfo: Array<HighlightInformation> }
@@ -52,10 +33,10 @@ const Answer: Preact.FunctionComponent<AnswerProps> = (props) => {
     )
 }
 
-type AproposProps = { model: IdrisModel }
+type AproposProps = { client: IdrisClient }
 
 const Apropos: Preact.FunctionComponent<AproposProps> = (props) => {
-    const { model } = props
+    const { client } = props
     const [input, setInput] = useState<string>('')
     const [answer, setAnswer] = useState<Array<HighlightInformation>>([])
 
@@ -69,7 +50,7 @@ const Apropos: Preact.FunctionComponent<AproposProps> = (props) => {
                 }}
                 onKeyPress={(e) => {
                     if (e.keyCode === 13) {
-                        ask(model, input, setAnswer)
+                        ask(client, input, setAnswer)
                     }
                 }}
             >
@@ -88,8 +69,8 @@ export class AproposView {
     constructor(params: { controller: IdrisController }) {
         const hostElement = this[0]
 
-        const { model } = params.controller
+        const { client } = params.controller
 
-        Preact.render(<Apropos model={model} />, hostElement)
+        Preact.render(<Apropos client={client} />, hostElement)
     }
 }
