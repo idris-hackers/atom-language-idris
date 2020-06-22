@@ -3,7 +3,7 @@
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         "jsx": "react",
-        "jsxFactory": "etch.dom",
+        "jsxFactory": "Preact.h",
         "lib": ["es7", "dom", "ES2017.object"],
         "module": "commonjs",
         "noLib": false,

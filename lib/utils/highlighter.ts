@@ -1,7 +1,13 @@
-import * as CycleDOM from '@cycle/dom'
+import * as Preact from 'preact'
 import Logger from './Logger'
 
-const highlightInfoListToOb = (list: any) => {
+export type HighlightInformation = {
+    classes: Array<string>
+    word: string
+    description: string
+}
+
+const highlightInfoListToOb = (list: Array<any>) => {
     const obj: { [key: string]: any } = {}
     for (let x of list) {
         const key = x[0].slice(1)
@@ -13,7 +19,7 @@ const highlightInfoListToOb = (list: any) => {
 
 // Use the right CSS classes, so that we can use the
 // syntax highlighting built into atom.
-const decorToClasses = (decor: any) => {
+const decorToClasses = (decor: string) => {
     switch (decor) {
         case ':type':
             return ['syntax--storage', 'syntax--type']
@@ -36,7 +42,7 @@ const decorToClasses = (decor: any) => {
     }
 }
 
-const highlightWord = (word: string, info: any) => {
+const highlightWord = (word: string, info: any): HighlightInformation => {
     const type = info.info.type || ''
     const doc = info.info['doc-overview'] || ''
 
@@ -51,22 +57,26 @@ const highlightWord = (word: string, info: any) => {
 
 // Build highlighting information that we can then pass to one
 // of our serializers.
-export const highlight = (code: string, highlightingInfo: any) => {
+export const highlight = (
+    code: string,
+    highlightingInfo: Array<[number, number, Array<any>]>,
+): Array<HighlightInformation> => {
     const highlighted = highlightingInfo
-        .map(function ([start, length, info]: [any, any, any]) {
+        .map(function ([start, length, info]) {
             return {
                 start,
                 length,
                 info: highlightInfoListToOb(info),
             }
         })
-        .filter((i: any) => i.info.decor != null)
-        .reduce(
-            ([position, text]: any, info: any) => {
+        .filter((i) => i.info.decor != null)
+        .reduce<[number, Array<HighlightInformation>]>(
+            ([position, text], info) => {
                 const newPosition = info.start + info.length
-                const unhighlightedText = {
+                const unhighlightedText: HighlightInformation = {
                     classes: [],
                     word: code.slice(position, info.start),
+                    description: '',
                 }
                 const highlightedWord = highlightWord(
                     code.slice(info.start, newPosition),
@@ -79,10 +89,11 @@ export const highlight = (code: string, highlightingInfo: any) => {
             [0, []],
         )
 
-    const [position, text] = Array.from(highlighted)
+    const [position, text] = highlighted
     const rest = {
         classes: [],
         word: code.slice(position),
+        description: '',
     }
     const higlightedWords = text.concat(rest)
     return higlightedWords.filter(
@@ -91,9 +102,9 @@ export const highlight = (code: string, highlightingInfo: any) => {
 }
 
 // Applies the highlighting and returns the result as an html-string.
-export const highlightToString = (highlights: any) =>
+export const highlightToString = (highlights: Array<HighlightInformation>) =>
     highlights
-        .map(function ({ classes, word }: any) {
+        .map(function ({ classes, word }) {
             if (classes.length === 0) {
                 return word
             } else {
@@ -103,8 +114,8 @@ export const highlightToString = (highlights: any) =>
         .join('')
 
 // Applies the highlighting and returns the result as a DOM-objects.
-export const highlightToHtml = (highlights: any) => {
-    const spans = highlights.map(function ({ classes, word }: any) {
+export const highlightToHtml = (highlights: Array<HighlightInformation>) => {
+    const spans = highlights.map(function ({ classes, word }) {
         if (classes.length === 0) {
             return document.createTextNode(word)
         } else {
@@ -119,15 +130,19 @@ export const highlightToHtml = (highlights: any) => {
     return container
 }
 
-export const highlightToCycle = (highlights: any) =>
-    highlights.map(({ classes, word, description }: any) => {
+export const highlightToPreact = (
+    highlights: Array<HighlightInformation>,
+): Preact.VNode => {
+    const highlighted = highlights.map(({ classes, word, description }) => {
         if (classes.length === 0) {
-            return word
+            return word as string
         } else {
-            return CycleDOM.h(
+            return Preact.h(
                 'span',
                 { className: classes.join(' '), title: description },
                 word,
             )
         }
     })
+    return Preact.h('div', {}, highlighted)
+}
