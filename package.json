@@ -79,10 +79,10 @@
     "dependencies": {
         "atom-message-panel": "1.3.1",
         "atom-ts-transpiler": "1.5.2",
-        "preact": "10.4.4",
-        "idris-ide-client": "0.1.2",
+        "preact": "10.4.5",
+        "idris-ide-client": "0.1.3",
         "tslib": "2.0.0",
-        "typescript": "3.9.5"
+        "typescript": "3.9.6"
     },
     "devDependencies": {
         "@types/atom": "1.40.4",

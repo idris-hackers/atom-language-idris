@@ -277,7 +277,7 @@ export class IdrisController {
                             return this.client.replCompletions(trimmedPrefix)
                         })
                         .then((reply: FinalReply.ReplCompletions) => {
-                            return reply.ok.map((sug) => ({
+                            return reply.completions.map((sug) => ({
                                 type: 'function',
                                 text: sug,
                             }))
@@ -320,7 +320,7 @@ export class IdrisController {
                 this.clearMessagePanel('Idris: Typechecking...')
 
                 const successHandler = (loadFile: FinalReply.LoadFile) => {
-                    if ('ok' in loadFile) {
+                    if (loadFile.ok) {
                         this.clearMessagePanel(
                             'Idris: File loaded successfully',
                         )
@@ -345,14 +345,14 @@ export class IdrisController {
                 )
 
                 const successHandler = (docsFor: FinalReply.DocsFor) => {
-                    if ('ok' in docsFor) {
+                    if (docsFor.ok) {
                         this.clearMessagePanel(
                             'Idris: Docs for <tt>' + word + '</tt>',
                         )
                         const informationView = new InformationView()
                         informationView.initialize(
-                            docsFor.ok.docs,
-                            docsFor.ok.metadata,
+                            docsFor.docs,
+                            docsFor.metadata,
                         )
                         this.messages.add(informationView)
                     } else {
@@ -378,15 +378,12 @@ export class IdrisController {
                     'Idris: Searching type of <tt>' + word + '</tt> ...',
                 )
                 const successHandler = (typeOf: FinalReply.TypeOf) => {
-                    if ('ok' in typeOf) {
+                    if (typeOf.ok) {
                         this.clearMessagePanel(
                             'Idris: Type of <tt>' + word + '</tt>',
                         )
                         const informationView = new InformationView()
-                        informationView.initialize(
-                            typeOf.ok.type,
-                            typeOf.ok.metadata,
-                        )
+                        informationView.initialize(typeOf.type, typeOf.metadata)
                         this.messages.add(informationView)
                     } else {
                         this.rawMessage(typeOf.err)
@@ -412,14 +409,14 @@ export class IdrisController {
                 this.clearMessagePanel('Idris: Do case split ...')
 
                 const successHandler = (caseSplit: FinalReply.CaseSplit) => {
-                    if ('ok' in caseSplit) {
+                    if (caseSplit.ok) {
                         this.hideAndClearMessagePanel()
                         const lineRange = cursor.getCurrentLineBufferRange({
                             includeNewline: true,
                         })
                         return editor.setTextInBufferRange(
                             lineRange,
-                            caseSplit.ok,
+                            caseSplit.caseClause,
                         )
                     } else {
                         this.clearMessagePanel('Idris: Cannot split ' + word)
@@ -448,7 +445,9 @@ export class IdrisController {
                 this.clearMessagePanel('Idris: Add clause ...')
 
                 const successHandler = (addClause: FinalReply.AddClause) => {
-                    const clause = this.prefixLiterateClause(addClause.ok)
+                    const clause = this.prefixLiterateClause(
+                        addClause.initialClause,
+                    )
 
                     this.hideAndClearMessagePanel()
 
@@ -486,7 +485,9 @@ export class IdrisController {
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Add proof clause ...')
                 const successHandler = (reply: FinalReply.AddClause) => {
-                    const clause = this.prefixLiterateClause(reply.ok)
+                    const clause = this.prefixLiterateClause(
+                        reply.initialClause,
+                    )
                     this.hideAndClearMessagePanel()
                     editor.transact(() => {
                         moveToNextEmptyLine(editor)
@@ -519,7 +520,7 @@ export class IdrisController {
                 this.clearMessagePanel('Idris: Make with view ...')
 
                 const successHandler = (reply: FinalReply.MakeWith) => {
-                    const clause = this.prefixLiterateClause(reply.ok)
+                    const clause = this.prefixLiterateClause(reply.withClause)
 
                     this.hideAndClearMessagePanel()
 
@@ -566,7 +567,7 @@ export class IdrisController {
                     } else {
                         // metavariable contains the code which replaces the hole
                         // declaration contains the code for the lemma function
-                        const { declaration, metavariable } = reply.ok
+                        const { declaration, metavariable } = reply
 
                         this.hideAndClearMessagePanel()
 
@@ -624,7 +625,7 @@ export class IdrisController {
 
                 const successHandler = (reply: FinalReply.MakeCase) => {
                     const [clause] = Array.from(
-                        this.prefixLiterateClause(reply.ok),
+                        this.prefixLiterateClause(reply.caseClause),
                     )
 
                     this.hideAndClearMessagePanel()
@@ -688,7 +689,7 @@ export class IdrisController {
                 this.clearMessagePanel('Idris: Searching proof ...')
 
                 const successHandler = (reply: FinalReply.ProofSearch) => {
-                    const res = reply.ok
+                    const res = reply.solution
 
                     this.hideAndClearMessagePanel()
                     if (res.startsWith('?')) {
@@ -732,8 +733,8 @@ export class IdrisController {
                 )
 
                 const successHandler = (reply: FinalReply.BrowseNamespace) => {
-                    if ('ok' in reply) {
-                        const view = browseNamespaceView(reply.ok)
+                    if (reply.ok) {
+                        const view = browseNamespaceView(reply)
                         this.messages.add(view)
                     } else {
                         this.clearMessagePanel(
@@ -764,14 +765,14 @@ export class IdrisController {
                 )
 
                 const successHandler = (reply: FinalReply.PrintDefinition) => {
-                    if ('ok' in reply) {
+                    if (reply.ok) {
                         this.clearMessagePanel(
                             'Idris: Definition of <tt>' + word + '</tt>',
                         )
                         const informationView = new InformationView()
                         informationView.initialize(
-                            reply.ok.definition,
-                            reply.ok.metadata,
+                            reply.definition,
+                            reply.metadata,
                         )
                         this.messages.add(informationView)
                     } else {
