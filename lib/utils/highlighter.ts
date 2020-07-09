@@ -105,13 +105,13 @@ export const highlightToHtml = (highlights: Array<HighlightInformation>) => {
             return document.createTextNode(word)
         } else {
             const span = document.createElement('span')
-            classes.forEach((c: any) => span.classList.add(c))
+            classes.forEach((c) => span.classList.add(c))
             span.textContent = word
             return span
         }
     })
     const container = document.createElement('span')
-    spans.forEach((span: any) => container.appendChild(span))
+    spans.forEach((span) => container.appendChild(span))
     return container
 }
 

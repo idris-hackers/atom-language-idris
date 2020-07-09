@@ -41,9 +41,9 @@ export class HolesViewClass extends HTMLElement {
 
     prettyprintHole(metavariable: Metavariable, premises: Array<Metavariable>) {
         const prettyPremises = this.prettyprintPremises(premises)
-        const prettyConclusion: any = this.prettyprintConclusion(metavariable)
+        const prettyConclusion = this.prettyprintConclusion(metavariable)
 
-        const children: Array<HTMLElement> = [
+        const children: Array<HTMLElement | Text> = [
             textNode(`${name}`),
             prettyPremises,
             ...prettyConclusion,

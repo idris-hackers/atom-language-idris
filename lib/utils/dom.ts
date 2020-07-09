@@ -3,7 +3,7 @@ export const joinHtmlElements = function (
     elems: Array<Node>,
 ) {
     const div = document.createElement(containerElem)
-    elems.forEach((elem: any) => div.appendChild(elem))
+    elems.forEach((elem) => div.appendChild(elem))
     return div
 }
 
