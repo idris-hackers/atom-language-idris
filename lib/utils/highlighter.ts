@@ -1,5 +1,6 @@
 import * as Preact from 'preact'
-import Logger from './Logger'
+import { MessageMetadata } from 'idris-ide-client/build/reply'
+import { Decor } from 'idris-ide-client/build/s-exps'
 
 export type HighlightInformation = {
     classes: Array<string>
@@ -7,19 +8,9 @@ export type HighlightInformation = {
     description: string
 }
 
-const highlightInfoListToOb = (list: Array<any>) => {
-    const obj: { [key: string]: any } = {}
-    for (let x of list) {
-        const key = x[0].slice(1)
-        const value = x[1]
-        obj[key] = value
-    }
-    return obj
-}
-
 // Use the right CSS classes, so that we can use the
 // syntax highlighting built into atom.
-const decorToClasses = (decor: string) => {
+const decorToClasses = (decor: Decor | undefined): Array<string> => {
     switch (decor) {
         case ':type':
             return ['syntax--storage', 'syntax--type']
@@ -34,62 +25,56 @@ const decorToClasses = (decor: string) => {
         case ':metavar':
             return ['syntax--constant']
         default:
-            Logger.logText('unknown decor: ' + decor)
-            Logger.logText(
-                'you may want to review the highlighter.coffee script',
-            )
             return []
     }
 }
 
-const highlightWord = (word: string, info: any): HighlightInformation => {
-    const type = info.info.type || ''
-    const doc = info.info['doc-overview'] || ''
+const highlightWord = (
+    word: string,
+    info: MessageMetadata,
+): HighlightInformation => {
+    const type = info.metadata.type || ''
+    const doc = info.metadata.docOverview || ''
 
-    const description = info.info.type != null ? `${type}\n\n${doc}`.trim() : ''
+    const description = type != '' ? `${type}\n\n${doc}`.trim() : ''
 
     return {
-        classes: decorToClasses(info.info.decor).concat('syntax--idris'),
+        classes: decorToClasses(info.metadata.decor).concat('syntax--idris'),
         word,
         description,
     }
 }
 
+type Acc = {
+    position: number
+    text: Array<HighlightInformation>
+}
+const initialAcc: Acc = { position: 0, text: [] }
+
 // Build highlighting information that we can then pass to one
 // of our serializers.
 export const highlight = (
     code: string,
-    highlightingInfo: Array<[number, number, Array<any>]>,
+    highlightingInfo: Array<MessageMetadata>,
 ): Array<HighlightInformation> => {
     const highlighted = highlightingInfo
-        .map(function ([start, length, info]) {
-            return {
-                start,
-                length,
-                info: highlightInfoListToOb(info),
+        .filter((i) => i.metadata.decor != null)
+        .reduce<Acc>(({ position, text }, info) => {
+            const newPosition: number = info.start + info.length
+            const unhighlightedText = {
+                classes: [],
+                word: code.slice(position, info.start),
+                description: '',
             }
-        })
-        .filter((i) => i.info.decor != null)
-        .reduce<[number, Array<HighlightInformation>]>(
-            ([position, text], info) => {
-                const newPosition = info.start + info.length
-                const unhighlightedText: HighlightInformation = {
-                    classes: [],
-                    word: code.slice(position, info.start),
-                    description: '',
-                }
-                const highlightedWord = highlightWord(
-                    code.slice(info.start, newPosition),
-                    info,
-                )
-                const newText = text.concat(unhighlightedText, highlightedWord)
+            const highlightedWord = highlightWord(
+                code.slice(info.start, newPosition),
+                info,
+            )
+            const newText = text.concat(unhighlightedText, highlightedWord)
+            return { position: newPosition, text: newText }
+        }, initialAcc)
 
-                return [newPosition, newText]
-            },
-            [0, []],
-        )
-
-    const [position, text] = highlighted
+    const { position, text } = highlighted
     const rest = {
         classes: [],
         word: code.slice(position),
@@ -97,7 +82,7 @@ export const highlight = (
     }
     const higlightedWords = text.concat(rest)
     return higlightedWords.filter(
-        (higlightedWord: any) => higlightedWord.word !== '',
+        (higlightedWord) => higlightedWord.word !== '',
     )
 }
 
@@ -120,13 +105,13 @@ export const highlightToHtml = (highlights: Array<HighlightInformation>) => {
             return document.createTextNode(word)
         } else {
             const span = document.createElement('span')
-            classes.forEach((c: any) => span.classList.add(c))
+            classes.forEach((c) => span.classList.add(c))
             span.textContent = word
             return span
         }
     })
     const container = document.createElement('span')
-    spans.forEach((span: any) => container.appendChild(span))
+    spans.forEach((span) => container.appendChild(span))
     return container
 }
 

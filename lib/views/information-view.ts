@@ -1,26 +1,19 @@
 import * as highlighter from '../utils/highlighter'
 import * as dom from '../utils/dom'
+import { MessageMetadata } from 'idris-ide-client/build/reply'
 
 export class InformationViewClass extends HTMLElement {
-    obligation: any
-    highlightingInfo: any
-    text: any
-
-    initialize(params: any) {
+    initialize(content: string, metadata?: Array<MessageMetadata>) {
         this.classList.add('idris-panel')
-        this.obligation = params.obligation
-        this.highlightingInfo = params.highlightingInfo
-        if (this.highlightingInfo != null) {
-            const highlighting = highlighter.highlight(
-                this.obligation,
-                this.highlightingInfo,
-            )
+
+        if (metadata != null) {
+            const highlighting = highlighter.highlight(content, metadata)
             const info = highlighter.highlightToHtml(highlighting)
             const pre = dom.createCodeElement()
             pre.appendChild(info)
             return this.appendChild(pre)
         } else {
-            return this.text(this.obligation)
+            return this.append(content)
         }
     }
 }

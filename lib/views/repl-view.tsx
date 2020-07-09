@@ -1,10 +1,10 @@
 import * as Preact from 'preact'
 import { useState, StateUpdater } from 'preact/hooks'
-import { IdrisModel } from '../idris-model'
 import { HighlightInformation } from '../utils/highlighter'
 import * as highlighter from '../utils/highlighter'
-import * as Rx from 'rx-lite'
 import { fontOptions } from '../utils/dom'
+import { IdrisController } from '../idris-controller'
+import { IdrisClient, FinalReply } from 'idris-ide-client'
 
 const styles = fontOptions()
 
@@ -23,41 +23,37 @@ type ReplLineError = {
 type ReplLine = ReplLineSuccess | ReplLineError
 
 const ask = (
-    model: IdrisModel,
+    client: IdrisClient,
     question: string,
     lines: Array<ReplLine>,
     setLines: StateUpdater<Array<ReplLine>>,
 ) => {
     const escapedLine = question.replace(/"/g, '\\"')
-    // append a space to trick the formatter, so that it wont turn
-    // the input into a symbol
-    model
-        .interpret(`${escapedLine} `)
-        .map(
-            (e: any): ReplLine => ({
-                type: 'success',
-                question,
-                answer: highlighter.highlight(e.msg[0], e.msg[1]),
-            }),
-        )
-        .catch((e: any): any => {
-            const errorAnswer: ReplLineError = {
-                type: 'error',
-                question,
-                answer: highlighter.highlight(
-                    e.message,
-                    e.highlightInformation,
-                ),
-            }
-            const ob = Rx.Observable.just(errorAnswer)
-            return ob
-        })
-        .subscribe(
-            (answer: ReplLine) => {
-                setLines(lines.concat([answer]))
+    client
+        .interpret(escapedLine)
+        .then(
+            (reply: FinalReply.Interpret): ReplLine => {
+                if ('ok' in reply) {
+                    return {
+                        type: 'success',
+                        question,
+                        answer: highlighter.highlight(
+                            reply.ok.result,
+                            reply.ok.metadata,
+                        ),
+                    }
+                } else
+                    return {
+                        type: 'error',
+                        question,
+                        answer: highlighter.highlight(
+                            reply.err.message,
+                            reply.err.metadata,
+                        ),
+                    }
             },
-            (err) => console.log(err),
         )
+        .then((answer) => setLines(lines.concat([answer])))
 }
 
 const SuccessAnswer: Preact.FunctionComponent<{
@@ -104,10 +100,10 @@ const Line: Preact.FunctionComponent<ReplLine> = (props) => {
     )
 }
 
-type ReplProps = { model: IdrisModel }
+type ReplProps = { client: IdrisClient }
 
 const Repl: Preact.FunctionComponent<ReplProps> = (props) => {
-    const { model } = props
+    const { client } = props
 
     const [input, setInput] = useState<string>('')
     const [lines, setLines] = useState<Array<ReplLine>>([])
@@ -122,7 +118,7 @@ const Repl: Preact.FunctionComponent<ReplProps> = (props) => {
                 }}
                 onKeyPress={(e) => {
                     if (e.keyCode === 13) {
-                        ask(model, input, lines, setLines)
+                        ask(client, input, lines, setLines)
                     }
                 }}
             ></input>
@@ -143,11 +139,11 @@ const Repl: Preact.FunctionComponent<ReplProps> = (props) => {
 export class REPLView {
     0: HTMLDivElement = document.createElement('div')
 
-    constructor(params: any) {
+    constructor(params: { controller: IdrisController }) {
         const hostElement = this[0]
 
-        const { model } = params.controller
+        const { client } = params.controller
 
-        Preact.render(<Repl model={model} />, hostElement)
+        Preact.render(<Repl client={client} />, hostElement)
     }
 }

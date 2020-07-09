@@ -1,16 +1,15 @@
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import {
     MessagePanelView,
     PlainMessageView,
     LineMessageView,
 } from 'atom-message-panel'
+import { IdrisClient, InfoReply, FinalReply, Reply } from 'idris-ide-client'
 import { InformationView } from './views/information-view'
 import { HolesView } from './views/holes-view'
-import Logger from './utils/Logger'
-import { IdrisModel } from './idris-model'
-import * as Ipkg from './utils/ipkg'
+import { browseNamespaceView } from './views/browse-namespace'
 import * as Symbol from './utils/symbol'
 import { getWordUnderCursor, moveToNextEmptyLine } from './utils/editor'
-import * as highlighter from './utils/highlighter'
 import {
     TextEditor,
     RangeCompatible,
@@ -18,10 +17,30 @@ import {
     Pane,
     WorkspaceOpenOptions,
 } from 'atom'
+import {
+    findAndReadIpkgFile,
+    compilerOptionsToFlags,
+    CompilerOptions,
+    defaultCompilerOptions,
+    sameCompilerOptions,
+} from './utils/ipkg'
+import { highlight, highlightToString } from './utils/highlighter'
+
+const replyCallback = (handleWarning: (reply: InfoReply.Warning) => void) => (
+    reply: Reply,
+): void => {
+    switch (reply.type) {
+        case ':warning':
+            return handleWarning(reply)
+        default:
+    }
+}
 
 export class IdrisController {
     errorMarkers: Array<DisplayMarker> = []
-    model: IdrisModel = new IdrisModel()
+    compilerOptions: CompilerOptions = defaultCompilerOptions
+    idrisProc: ChildProcessWithoutNullStreams
+    client: IdrisClient
     messages: MessagePanelView = new MessagePanelView({
         title: 'Idris Messages',
     })
@@ -49,6 +68,24 @@ export class IdrisController {
         this.openREPL = this.openREPL.bind(this)
         this.apropos = this.apropos.bind(this)
         this.displayErrors = this.displayErrors.bind(this)
+
+        const tabLength = atom.config.get('editor.tabLength', {
+            scope: ['source.idris'],
+        })
+
+        this.idrisProc = spawn('idris', [
+            '--ide-mode',
+            '--indent-with=' + tabLength,
+            '--indent-clause=' + tabLength,
+        ])
+        this.client = new IdrisClient(
+            this.idrisProc.stdin,
+            this.idrisProc.stdout,
+            {
+                replyCallback: replyCallback(this.handleWarning.bind(this)),
+            },
+        )
+        this.startCompiler()
     }
 
     getCommands() {
@@ -88,16 +125,18 @@ export class IdrisController {
     }
 
     // prefix code lines with "> "  if we are in the literate grammar
-    prefixLiterateClause(clause: Array<string>): Array<string> {
-        const birdPattern = new RegExp(`^\
->\
-(\\s)+\
-`)
-
+    prefixLiterateClause(clause: string): string {
         if (this.isLiterateGrammar()) {
-            return Array.from(clause).map((line: string) =>
-                line.match(birdPattern) ? line : '> ' + line,
-            )
+            const birdPattern = new RegExp(`^\
+            >\
+            (\\s)+\
+            `)
+            return clause
+                .split('\n')
+                .map((line: string) =>
+                    line.match(birdPattern) ? line : '> ' + line,
+                )
+                .join('\n')
         } else {
             return clause
         }
@@ -129,10 +168,7 @@ export class IdrisController {
     }
 
     destroy(): void {
-        if (this.model) {
-            Logger.logText('Idris: Shutting down!')
-            this.model.stop()
-        }
+        this.stopCompiler()
     }
 
     // clear the message panel and optionally display a new title
@@ -166,13 +202,6 @@ export class IdrisController {
         )
     }
 
-    initialize(compilerOptions: Ipkg.CompilerOptions): void {
-        this.destroyMarkers()
-        this.messages.attach()
-        this.messages.hide()
-        this.model.setCompilerOptions(compilerOptions)
-    }
-
     /**
      * Get the currently active text editor.
      */
@@ -184,17 +213,47 @@ export class IdrisController {
         return atom.workspace.getActivePane()
     }
 
-    stopCompiler(): boolean | undefined {
-        return this.model != null ? this.model.stop() : undefined
+    stopCompiler(): void {
+        if (this.idrisProc) {
+            this.idrisProc.kill()
+        }
+    }
+
+    async startCompiler(): Promise<IdrisClient> {
+        try {
+            const compilerOptions = await findAndReadIpkgFile(atom.project)
+            if (
+                compilerOptions &&
+                !sameCompilerOptions(this.compilerOptions, compilerOptions)
+            ) {
+                const tabLength = atom.config.get('editor.tabLength', {
+                    scope: ['source.idris'],
+                })
+
+                const flags = compilerOptionsToFlags(compilerOptions, tabLength)
+                this.stopCompiler()
+                this.compilerOptions = compilerOptions
+                this.idrisProc = spawn('idris', flags)
+                this.client = new IdrisClient(
+                    this.idrisProc.stdin,
+                    this.idrisProc.stdout,
+                    {
+                        replyCallback: replyCallback(
+                            this.handleWarning.bind(this),
+                        ),
+                    },
+                )
+            }
+            return this.client
+        } catch {
+            return this.client
+        }
     }
 
     runCommand(command: (args: any) => void) {
         return (args: any) => {
-            const compilerOptions = Ipkg.compilerOptions(atom.project)
-            return compilerOptions.subscribe((options: any) => {
-                Logger.logObject('Compiler Options:', options)
-                this.initialize(options)
-                return command(args)
+            this.startCompiler().then(() => {
+                command(args)
             })
         }
     }
@@ -213,18 +272,16 @@ export class IdrisController {
             getSuggestions: ({ prefix, activatedManually }: any) => {
                 const trimmedPrefix = prefix.trim()
                 if (trimmedPrefix.length > 2 || activatedManually) {
-                    return Ipkg.compilerOptions(atom.project)
-                        .flatMap((options: any) => {
-                            this.initialize(options)
-                            return this.model.replCompletions(trimmedPrefix)
+                    return this.startCompiler()
+                        .then(() => {
+                            return this.client.replCompletions(trimmedPrefix)
                         })
-                        .toPromise()
-                        .then(({ msg }: any) =>
-                            Array.from(msg[0][0]).map((sug) => ({
+                        .then((reply: FinalReply.ReplCompletions) => {
+                            return reply.completions.map((sug) => ({
                                 type: 'function',
                                 text: sug,
-                            })),
-                        )
+                            }))
+                        })
                 } else {
                     return null
                 }
@@ -262,18 +319,18 @@ export class IdrisController {
             return this.saveFile(editor).then((uri) => {
                 this.clearMessagePanel('Idris: Typechecking...')
 
-                const successHandler = () => {
-                    return this.clearMessagePanel(
-                        'Idris: File loaded successfully',
-                    )
+                const successHandler = (loadFile: FinalReply.LoadFile) => {
+                    if (loadFile.ok) {
+                        this.clearMessagePanel(
+                            'Idris: File loaded successfully',
+                        )
+                    }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -287,28 +344,27 @@ export class IdrisController {
                     'Idris: Searching docs for <tt>' + word + '</tt> ...',
                 )
 
-                const successHandler = ({ msg }: any) => {
-                    const [type, highlightingInfo] = Array.from(msg)
-                    this.clearMessagePanel(
-                        'Idris: Docs for <tt>' + word + '</tt>',
-                    )
-
-                    const informationView = new InformationView()
-                    informationView.initialize({
-                        obligation: type,
-                        highlightingInfo,
-                    })
-                    return this.messages.add(informationView)
+                const successHandler = (docsFor: FinalReply.DocsFor) => {
+                    if (docsFor.ok) {
+                        this.clearMessagePanel(
+                            'Idris: Docs for <tt>' + word + '</tt>',
+                        )
+                        const informationView = new InformationView()
+                        informationView.initialize(
+                            docsFor.docs,
+                            docsFor.metadata,
+                        )
+                        this.messages.add(informationView)
+                    } else {
+                        this.rawMessage(docsFor.err)
+                    }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.docsFor(word))
-                    .catch(() => this.model.docsFor(word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.docsFor(word, ':full'))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -321,25 +377,26 @@ export class IdrisController {
                 this.clearMessagePanel(
                     'Idris: Searching type of <tt>' + word + '</tt> ...',
                 )
-                const successHandler = ({ msg }: any): void => {
-                    const [type, highlightingInfo] = msg
-                    this.clearMessagePanel(
-                        'Idris: Type of <tt>' + word + '</tt>',
-                    )
-                    const informationView = new InformationView()
-                    informationView.initialize({
-                        obligation: type,
-                        highlightingInfo,
-                    })
-                    this.messages.add(informationView)
+                const successHandler = (typeOf: FinalReply.TypeOf) => {
+                    if (typeOf.ok) {
+                        this.clearMessagePanel(
+                            'Idris: Type of <tt>' + word + '</tt>',
+                        )
+                        const informationView = new InformationView()
+                        informationView.initialize(
+                            typeOf.typeOf,
+                            typeOf.metadata,
+                        )
+                        this.messages.add(informationView)
+                    } else {
+                        this.rawMessage(typeOf.err)
+                    }
                 }
-                return this.model
-                    .load(uri)
-                    .filter((response: any) => {
-                        return response.responseType === 'return'
-                    })
-                    .flatMap(() => this.model.getType(word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.typeOf(word))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -354,29 +411,26 @@ export class IdrisController {
 
                 this.clearMessagePanel('Idris: Do case split ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [split] = msg
-                    if (split === '') {
-                        // split returned nothing - cannot split
-                        return this.clearMessagePanel(
-                            'Idris: Cannot split ' + word,
-                        )
-                    } else {
+                const successHandler = (caseSplit: FinalReply.CaseSplit) => {
+                    if (caseSplit.ok) {
                         this.hideAndClearMessagePanel()
                         const lineRange = cursor.getCurrentLineBufferRange({
                             includeNewline: true,
                         })
-                        return editor.setTextInBufferRange(lineRange, split)
+                        return editor.setTextInBufferRange(
+                            lineRange,
+                            caseSplit.caseClause,
+                        )
+                    } else {
+                        this.clearMessagePanel('Idris: Cannot split ' + word)
                     }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.caseSplit(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.caseSplit(word, line + 1))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -389,14 +443,14 @@ export class IdrisController {
         if (editor) {
             return this.saveFile(editor).then((uri) => {
                 const line = editor.getLastCursor().getBufferRow()
-                // by adding a clause we make sure that the word is
-                // not treated as a symbol
                 const word = getWordUnderCursor(editor)
 
                 this.clearMessagePanel('Idris: Add clause ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [clause] = this.prefixLiterateClause(msg)
+                const successHandler = (addClause: FinalReply.AddClause) => {
+                    const clause = this.prefixLiterateClause(
+                        addClause.initialClause,
+                    )
 
                     this.hideAndClearMessagePanel()
 
@@ -414,13 +468,11 @@ export class IdrisController {
                     })
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.addClause(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.addClause(word, line + 1))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -435,18 +487,15 @@ export class IdrisController {
                 const line = editor.getLastCursor().getBufferRow()
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Add proof clause ...')
-
-                const successHandler = ({ msg }: any) => {
-                    const [clause] = this.prefixLiterateClause(msg)
-
+                const successHandler = (reply: FinalReply.AddClause) => {
+                    const clause = this.prefixLiterateClause(
+                        reply.initialClause,
+                    )
                     this.hideAndClearMessagePanel()
-
                     editor.transact(() => {
                         moveToNextEmptyLine(editor)
-
                         // Insert the new clause
                         editor.insertText(clause)
-
                         // And move the cursor to the beginning of
                         // the new line and add an empty line below it
                         editor.insertNewlineBelow()
@@ -454,14 +503,11 @@ export class IdrisController {
                         editor.moveToBeginningOfLine()
                     })
                 }
-
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.addProofClause(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.addClause(word, line + 1))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -476,8 +522,8 @@ export class IdrisController {
 
                 this.clearMessagePanel('Idris: Make with view ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [clause] = Array.from(this.prefixLiterateClause(msg))
+                const successHandler = (reply: FinalReply.MakeWith) => {
+                    const clause = this.prefixLiterateClause(reply.withClause)
 
                     this.hideAndClearMessagePanel()
 
@@ -493,14 +539,11 @@ export class IdrisController {
                 }
 
                 if (word != null ? word.length : undefined) {
-                    return this.model
-                        .load(uri)
-                        .filter(
-                            ({ responseType }: any) =>
-                                responseType === 'return',
-                        )
-                        .flatMap(() => this.model.makeWith(line + 1, word))
-                        .subscribe(successHandler, this.displayErrors)
+                    return this.client
+                        .loadFile(uri)
+                        .then(() => this.client.makeWith(word, line + 1))
+                        .then(successHandler)
+                        .catch(this.displayErrors)
                 } else {
                     return this.clearMessagePanel(
                         'Idris: Illegal position to make a with view',
@@ -519,16 +562,19 @@ export class IdrisController {
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Make lemma ...')
 
-                const successHandler = ({ msg }: any) => {
-                    // param1 contains the code which replaces the hole
-                    // param2 contains the code for the lemma function
-                    let [lemty, param1, param2] = msg
-                    param2 = this.prefixLiterateClause(param2)
+                const successHandler = (reply: FinalReply.MakeLemma) => {
+                    if ('err' in reply) {
+                        this.clearMessagePanel(
+                            'Idris: Cannot make lemma at ' + word,
+                        )
+                    } else {
+                        // metavariable contains the code which replaces the hole
+                        // declaration contains the code for the lemma function
+                        const { declaration, metavariable } = reply
 
-                    this.hideAndClearMessagePanel()
+                        this.hideAndClearMessagePanel()
 
-                    return editor.transact(function () {
-                        if (lemty === ':metavariable-lemma') {
+                        return editor.transact(function () {
                             // Move the cursor to the beginning of the word
                             editor.moveToBeginningOfWord()
                             // Because the ? in the Holes isn't part of
@@ -538,13 +584,11 @@ export class IdrisController {
                             editor.selectToEndOfWord()
                             editor.selectToEndOfWord()
                             // And then replace the replacement with the lemma call..
-                            editor.insertText(param1[1])
-
+                            editor.insertText(metavariable)
                             // Now move to the previous blank line and insert the type
                             // of the lemma
                             editor.moveToBeginningOfLine()
                             line = editor.getLastCursor().getBufferRow()
-
                             // I tried to make this a function but failed to find out how
                             // to call it and gave up...
                             while (line > 0) {
@@ -557,21 +601,18 @@ export class IdrisController {
                                 editor.moveUp()
                                 line--
                             }
-
                             editor.insertNewlineBelow()
-                            editor.insertText(param2[1])
+                            editor.insertText(declaration)
                             return editor.insertNewlineBelow()
-                        }
-                    })
+                        })
+                    }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.makeLemma(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.makeLemma(word, line + 1))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -585,8 +626,10 @@ export class IdrisController {
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Make case ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [clause] = Array.from(this.prefixLiterateClause(msg))
+                const successHandler = (reply: FinalReply.MakeCase) => {
+                    const [clause] = Array.from(
+                        this.prefixLiterateClause(reply.caseClause),
+                    )
 
                     this.hideAndClearMessagePanel()
 
@@ -602,13 +645,11 @@ export class IdrisController {
                     })
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.makeCase(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.makeCase(word, line + 1))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -620,21 +661,21 @@ export class IdrisController {
             return this.saveFile(editor).then((uri) => {
                 this.clearMessagePanel('Idris: Searching holes ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [holes] = msg
+                const successHandler = (
+                    metavariables: FinalReply.Metavariables,
+                ) => {
+                    debugger
                     this.clearMessagePanel('Idris: Holes')
                     const holesView = new HolesView()
-                    holesView.initialize(holes)
+                    holesView.initialize(metavariables)
                     this.messages.add(holesView)
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.holes(80))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.metavariables(80))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -650,8 +691,8 @@ export class IdrisController {
                 const word = getWordUnderCursor(editor)
                 this.clearMessagePanel('Idris: Searching proof ...')
 
-                const successHandler = ({ msg }: any) => {
-                    const [res] = msg
+                const successHandler = (reply: FinalReply.ProofSearch) => {
+                    const res = reply.solution
 
                     this.hideAndClearMessagePanel()
                     if (res.startsWith('?')) {
@@ -675,13 +716,11 @@ export class IdrisController {
                     }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.proofSearch(line + 1, word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.proofSearch(word, line + 1, []))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -690,48 +729,28 @@ export class IdrisController {
         const editor = this.getEditor()
         if (editor) {
             return this.saveFile(editor).then((uri) => {
-                let nameSpace = editor.getSelectedText()
+                let nameSpace = editor.getSelectedText().trim()
 
                 this.clearMessagePanel(
                     'Idris: Browsing namespace <tt>' + nameSpace + '</tt>',
                 )
 
-                const successHandler = ({ msg }: any) => {
-                    // the information is in a two dimensional array
-                    // one array contains the namespaces contained in the namespace
-                    // and the seconds all the methods
-                    const namesSpaceInformation = msg[0][0]
-                    for (nameSpace of namesSpaceInformation) {
-                        this.rawMessage(nameSpace)
+                const successHandler = (reply: FinalReply.BrowseNamespace) => {
+                    if (reply.ok) {
+                        const view = browseNamespaceView(reply)
+                        this.messages.add(view)
+                    } else {
+                        this.clearMessagePanel(
+                            'Idris: Browse Namespace was not successful.',
+                        )
                     }
-
-                    const methodInformation = msg[0][1]
-                    return (() => {
-                        const result = []
-                        for (let [
-                            line,
-                            highlightInformation,
-                        ] of methodInformation) {
-                            const highlighting = highlighter.highlight(
-                                line,
-                                highlightInformation,
-                            )
-                            const info = highlighter.highlightToString(
-                                highlighting,
-                            )
-                            result.push(this.rawMessage(info))
-                        }
-                        return result
-                    })()
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.browseNamespace(nameSpace))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.browseNamespace(nameSpace))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -748,27 +767,31 @@ export class IdrisController {
                     'Idris: Searching definition of <tt>' + word + '</tt> ...',
                 )
 
-                const successHandler = ({ msg }: any) => {
-                    const [type, highlightingInfo] = Array.from(msg)
-                    this.clearMessagePanel(
-                        'Idris: Definition of <tt>' + word + '</tt>',
-                    )
-                    const informationView = new InformationView()
-                    informationView.initialize({
-                        obligation: type,
-                        highlightingInfo,
-                    })
-                    return this.messages.add(informationView)
+                const successHandler = (reply: FinalReply.PrintDefinition) => {
+                    if (reply.ok) {
+                        this.clearMessagePanel(
+                            'Idris: Definition of <tt>' + word + '</tt>',
+                        )
+                        const informationView = new InformationView()
+                        informationView.initialize(
+                            reply.definition,
+                            reply.metadata,
+                        )
+                        this.messages.add(informationView)
+                    } else {
+                        this.clearMessagePanel(
+                            'Idris: Error getting definition of <tt>' +
+                                word +
+                                '</tt>',
+                        )
+                    }
                 }
 
-                return this.model
-                    .load(uri)
-                    .filter(
-                        ({ responseType }: any) => responseType === 'return',
-                    )
-                    .flatMap(() => this.model.printDefinition(word))
-                    .catch(() => this.model.printDefinition(word))
-                    .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(() => this.client.printDefinition(word))
+                    .then(successHandler)
+                    .catch(this.displayErrors)
             })
         }
     }
@@ -779,24 +802,23 @@ export class IdrisController {
     openREPL() {
         const editor = this.getEditor()
         if (editor) {
-            const uri = editor.getPath() as any
-            this.clearMessagePanel('Idris: opening REPL ...')
+            return this.saveFile(editor).then((uri) => {
+                this.clearMessagePanel('Idris: opening REPL ...')
 
-            const successHandler = () => {
-                this.hideAndClearMessagePanel()
-
-                const options: WorkspaceOpenOptions = {
-                    split: 'right',
-                    searchAllPanes: true,
+                const successHandler = () => {
+                    this.hideAndClearMessagePanel()
+                    const options: WorkspaceOpenOptions = {
+                        split: 'right',
+                        searchAllPanes: true,
+                    }
+                    atom.workspace.open('idris://repl', options)
                 }
 
-                atom.workspace.open('idris://repl', options)
-            }
-
-            return this.model
-                .load(uri)
-                .filter(({ responseType }: any) => responseType === 'return')
-                .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(successHandler)
+                    .catch(this.displayErrors)
+            })
         }
     }
 
@@ -806,90 +828,67 @@ export class IdrisController {
     apropos() {
         const editor = this.getEditor()
         if (editor) {
-            const uri = editor.getPath() as any
-            this.clearMessagePanel('Idris: opening apropos view ...')
-
-            const successHandler = () => {
-                this.hideAndClearMessagePanel()
-
-                const options: WorkspaceOpenOptions = {
-                    split: 'right',
-                    searchAllPanes: true,
+            return this.saveFile(editor).then((uri) => {
+                this.clearMessagePanel('Idris: opening apropos view ...')
+                const successHandler = () => {
+                    this.hideAndClearMessagePanel()
+                    const options: WorkspaceOpenOptions = {
+                        split: 'right',
+                        searchAllPanes: true,
+                    }
+                    return atom.workspace.open('idris://apropos', options)
                 }
-
-                return atom.workspace.open('idris://apropos', options)
-            }
-
-            return this.model
-                .load(uri)
-                .filter(({ responseType }: any) => responseType === 'return')
-                .subscribe(successHandler, this.displayErrors)
+                return this.client
+                    .loadFile(uri)
+                    .then(successHandler)
+                    .catch(this.displayErrors)
+            })
         }
     }
 
+    displayErrors(_e: any) {
+        this.clearMessagePanel(
+            '<i class="icon-bug"></i> There was a fatal error',
+        )
+    }
+
     // generic function to display errors in the status bar
-    displayErrors(err: any) {
+    handleWarning(reply: InfoReply.Warning) {
+        const { err } = reply
+        const { warning, metadata, start, end, filename } = err
+
         this.clearMessagePanel('<i class="icon-bug"></i> Idris Errors')
 
-        // display the general error message
-        if (err.message != null) {
-            this.rawMessage(err.message)
+        const highlighting = highlight(warning, metadata)
+        const info = highlightToString(highlighting)
+
+        // this provides information about the line and column of the error
+        this.messages.add(
+            new LineMessageView({
+                message: info,
+                character: start.column,
+                line: start.line,
+                file: filename,
+            }),
+        )
+
+        const editor = atom.workspace.getActiveTextEditor()
+        if (editor && start.line > 0 && filename === editor.getPath()) {
+            const startPoint = { row: start.line - 1, column: start.column }
+            const endPoint = { row: end.line - 1, column: end.column }
+
+            const gutterMarker = this.createMarker(
+                editor,
+                [startPoint, endPoint],
+                'line-number',
+            )
+            const lineMarker = this.createMarker(
+                editor,
+                [startPoint, startPoint],
+                'line',
+            )
+            this.errorMarkers.push(gutterMarker)
+            this.errorMarkers.push(lineMarker)
         }
-
-        return (() => {
-            const result = []
-            for (let warning of err.warnings) {
-                const type = warning[3]
-                const highlightingInfo = warning[4]
-                const highlighting = highlighter.highlight(
-                    type,
-                    highlightingInfo,
-                )
-                const info = highlighter.highlightToString(highlighting)
-
-                const line = warning[1][0]
-                const character = warning[1][1]
-                const uri = warning[0].replace('./', err.cwd + '/')
-
-                // this provides information about the line and column of the error
-                this.messages.add(
-                    new LineMessageView({
-                        line,
-                        character,
-                        file: uri,
-                    }),
-                )
-
-                // this provides a highlighted version of the error message
-                // returned by idris
-                this.rawMessage(info)
-
-                const editor = atom.workspace.getActiveTextEditor()
-                if (editor && line > 0 && uri === editor.getPath()) {
-                    const startPoint = warning[1]
-                    startPoint[0] = startPoint[0] - 1
-                    const endPoint = warning[2]
-                    endPoint[0] = endPoint[0] - 1
-                    const gutterMarker = this.createMarker(
-                        editor,
-                        [startPoint, endPoint],
-                        'line-number',
-                    )
-                    const lineMarker = this.createMarker(
-                        editor,
-                        [
-                            [line - 1, character - 1],
-                            [line, 0],
-                        ],
-                        'line',
-                    )
-                    this.errorMarkers.push(gutterMarker)
-                    result.push(this.errorMarkers.push(lineMarker))
-                } else {
-                    result.push(undefined)
-                }
-            }
-            return result
-        })()
     }
 }
