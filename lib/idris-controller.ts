@@ -383,7 +383,10 @@ export class IdrisController {
                             'Idris: Type of <tt>' + word + '</tt>',
                         )
                         const informationView = new InformationView()
-                        informationView.initialize(typeOf.type, typeOf.metadata)
+                        informationView.initialize(
+                            typeOf.typeOf,
+                            typeOf.metadata,
+                        )
                         this.messages.add(informationView)
                     } else {
                         this.rawMessage(typeOf.err)
