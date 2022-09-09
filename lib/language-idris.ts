@@ -37,6 +37,6 @@ export const deactivate = () => {
 
 export const provide = () => {
     if (controller) {
-        controller.provideReplCompletions()
+        return controller.provideReplCompletions()
     }
 }
