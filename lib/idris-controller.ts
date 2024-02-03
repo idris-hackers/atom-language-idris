@@ -595,10 +595,12 @@ export class IdrisController {
                         editor.moveToBeginningOfLine()
                         editor.deleteLine()
                         editor.insertText(clause)
+                        editor.insertNewline()
+                        editor.deleteToBeginningOfLine()
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
-                        return editor.moveUp()
+                        return editor.moveUp(2)
                     })
                 }
 
