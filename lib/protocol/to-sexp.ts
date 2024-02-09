@@ -52,7 +52,7 @@ const typeOfCommandToSExp = (cmd: TypeOfCommand): SExp => {
     return {
         type: 'list',
         data: [
-            { type: 'symbol', data: 'interpret' },
+            { type: 'symbol', data: 'type-of' },
             { type: 'string', data: cmd.code },
         ],
     }
@@ -106,7 +106,7 @@ const makeWithCommandToSExp = (cmd: MakeWithCommand): SExp => {
     return {
         type: 'list',
         data: [
-            { type: 'symbol', data: 'make-case' },
+            { type: 'symbol', data: 'make-with' },
             { type: 'integer', data: cmd.line },
             { type: 'string', data: cmd.symbolName },
         ],
