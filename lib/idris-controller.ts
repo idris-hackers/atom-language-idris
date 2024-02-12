@@ -180,6 +180,16 @@ export class IdrisController {
         return atom.workspace.getActiveTextEditor()
     }
 
+    insertNewlineWithoutAutoIndent(): void {
+      const shouldAutoIndent = atom.config.get('editor.autoIndent')
+      try {
+        atom.config.set('editor.autoIndent', false)
+        this.getEditor().insertNewline()
+      } finally {
+        atom.config.set('editor.autoIndent', shouldAutoIndent)
+      }
+    }
+
     getPane(): Pane {
         return atom.workspace.getActivePane()
     }
@@ -481,14 +491,16 @@ export class IdrisController {
 
                     this.hideAndClearMessagePanel()
 
-                    return editor.transact(function () {
+                    return editor.transact(() => {
                         // Delete old line, insert the new with block
                         editor.deleteLine()
+                        editor.moveToBeginningOfLine()
                         editor.insertText(clause)
+                        this.insertNewlineWithoutAutoIndent()
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
-                        return editor.moveUp()
+                        editor.moveUp(2)
                     })
                 }
 
@@ -590,17 +602,16 @@ export class IdrisController {
 
                     this.hideAndClearMessagePanel()
 
-                    return editor.transact(function () {
+                    return editor.transact(() => {
                         // Delete old line, insert the new case block
                         editor.moveToBeginningOfLine()
                         editor.deleteLine()
                         editor.insertText(clause)
-                        editor.insertNewline()
-                        editor.deleteToBeginningOfLine()
+                        this.insertNewlineWithoutAutoIndent()
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
-                        return editor.moveUp(2)
+                        editor.moveUp(2)
                     })
                 }
 
