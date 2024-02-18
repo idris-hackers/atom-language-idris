@@ -180,14 +180,8 @@ export class IdrisController {
         return atom.workspace.getActiveTextEditor()
     }
 
-    insertNewlineWithoutAutoIndent(): void {
-      const shouldAutoIndent = atom.config.get('editor.autoIndent')
-      try {
-        atom.config.set('editor.autoIndent', false)
-        this.getEditor().insertNewline()
-      } finally {
-        atom.config.set('editor.autoIndent', shouldAutoIndent)
-      }
+    insertNewlineWithoutAutoIndent(editor: TextEditor): void {
+        editor.insertText('\n', { autoIndentNewline: false })
     }
 
     getPane(): Pane {
@@ -496,7 +490,7 @@ export class IdrisController {
                         editor.deleteLine()
                         editor.moveToBeginningOfLine()
                         editor.insertText(clause)
-                        this.insertNewlineWithoutAutoIndent()
+                        this.insertNewlineWithoutAutoIndent(editor)
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
@@ -607,7 +601,7 @@ export class IdrisController {
                         editor.moveToBeginningOfLine()
                         editor.deleteLine()
                         editor.insertText(clause)
-                        this.insertNewlineWithoutAutoIndent()
+                        this.insertNewlineWithoutAutoIndent(editor)
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
