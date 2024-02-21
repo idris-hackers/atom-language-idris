@@ -44,6 +44,7 @@ describe "The highlighter", ->
         }
         {
           classes: []
+          description: ''
           word: ' : '
         }
         {
