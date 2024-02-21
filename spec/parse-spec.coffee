@@ -1,6 +1,24 @@
-sexpFormatter = require '../lib/utils/sexp-formatter'
+sexpFormatter = require '../lib/protocol/sexp-formatter'
 parse = require '../lib/utils/parse'
 runP = require('bennu').parse.run
+
+toSexp = (data) ->
+  switch (typeof data)
+    when 'object'
+      if (data instanceof Array)
+        {type: 'list', data: data.map(toSexp)}
+    when 'string'
+      if data[0] == ':'
+        {
+          type: 'symbol'
+          data: data[1..]
+        }
+      else
+        {type: 'string', data}
+    when 'number'
+      {type: 'integer', data}
+    when 'boolean'
+      {type: 'bool', data}
 
 test1 = "(:protocol-version 1 0)"
 list1 = [':protocol-version', 1, 0]
@@ -95,6 +113,14 @@ list7 =
     ":interpret"
     ":cd C:/Path/to/dir"
   ]
+sexp7 =
+  {
+    type: 'list'
+    data: [
+      {type: 'symbol', data: "interpret"}
+      {type: "string", data: ":cd C:/Path/to/dir"}
+    ]
+  }
 
 describe "The sub-parser(s)", ->
   it "for :True and :False should work.", ->
@@ -119,20 +145,20 @@ describe "The sub-parser(s)", ->
 
 describe "A parser", ->
   it "should parse to the right list.", ->
-    expect(parse.parse(test1)).toEqual(list1)
-    expect(parse.parse(test2)).toEqual(list2)
-    expect(parse.parse(test3)).toEqual(list3)
-    expect(parse.parse(test4)).toEqual(list4)
-    expect(parse.parse(test5)).toEqual(list5)
-    expect(parse.parse(test6)).toEqual(list6)
+    expect(parse.parseCommand(test1)).toEqual(list1)
+    expect(parse.parseCommand(test2)).toEqual(list2)
+    expect(parse.parseCommand(test3)).toEqual(list3)
+    expect(parse.parseCommand(test4)).toEqual(list4)
+    expect(parse.parseCommand(test5)).toEqual(list5)
+    expect(parse.parseCommand(test6)).toEqual(list6)
 
   it "should serialize back again.", ->
-    expect(sexpFormatter.formatSexp(list1)).toEqual(test1)
-    expect(sexpFormatter.formatSexp(list2)).toEqual(test2)
-    expect(sexpFormatter.formatSexp(list3)).toEqual(test3)
-    expect(sexpFormatter.formatSexp(list4)).toEqual(test4)
-    expect(sexpFormatter.formatSexp(list7)).toEqual(test7)
+    expect(sexpFormatter.formatSexp(toSexp(list1))).toEqual(test1)
+    expect(sexpFormatter.formatSexp(toSexp(list2))).toEqual(test2)
+    expect(sexpFormatter.formatSexp(toSexp(list3))).toEqual(test3)
+    expect(sexpFormatter.formatSexp(toSexp(list4))).toEqual(test4)
+    expect(sexpFormatter.formatSexp(sexp7)).toEqual(test7)
 
   it "should serialize common commands.", ->
-    loadFile = [[':load-file', "idris.idr"], 1]
+    loadFile = toSexp [[':load-file', "idris.idr"], 1]
     expect(sexpFormatter.formatSexp(loadFile)).toEqual '((:load-file "idris.idr") 1)'
