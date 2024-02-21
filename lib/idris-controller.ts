@@ -180,6 +180,10 @@ export class IdrisController {
         return atom.workspace.getActiveTextEditor()
     }
 
+    insertNewlineWithoutAutoIndent(editor: TextEditor): void {
+        editor.insertText('\n', { autoIndentNewline: false })
+    }
+
     getPane(): Pane {
         return atom.workspace.getActivePane()
     }
@@ -481,14 +485,16 @@ export class IdrisController {
 
                     this.hideAndClearMessagePanel()
 
-                    return editor.transact(function () {
+                    return editor.transact(() => {
                         // Delete old line, insert the new with block
                         editor.deleteLine()
+                        editor.moveToBeginningOfLine()
                         editor.insertText(clause)
+                        this.insertNewlineWithoutAutoIndent(editor)
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
-                        return editor.moveUp()
+                        editor.moveUp(2)
                     })
                 }
 
@@ -590,15 +596,16 @@ export class IdrisController {
 
                     this.hideAndClearMessagePanel()
 
-                    return editor.transact(function () {
+                    return editor.transact(() => {
                         // Delete old line, insert the new case block
                         editor.moveToBeginningOfLine()
                         editor.deleteLine()
                         editor.insertText(clause)
+                        this.insertNewlineWithoutAutoIndent(editor)
                         // And move the cursor to the beginning of
                         // the new line
                         editor.moveToBeginningOfLine()
-                        return editor.moveUp()
+                        editor.moveUp(2)
                     })
                 }
 
