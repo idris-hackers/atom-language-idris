@@ -6,7 +6,6 @@ import { CompilerOptions } from './utils/ipkg'
 import { IDECommand, SExp } from './protocol/ide-protocol'
 import { ideCommandToSExp } from './protocol/to-sexp'
 import Logger from './utils/Logger'
-import { windowsToWsl } from 'wsl-path'
 
 export class IdrisModel {
     requestId = 0
@@ -15,9 +14,11 @@ export class IdrisModel {
     warnings: any = {}
     compilerOptions: CompilerOptions = { pkgs: [] }
     oldCompilerOptions: CompilerOptions = { pkgs: [] }
+    private _windowsToWsl: (path: string) => Promise<string>
 
-    constructor() {
+    constructor(windowsToWsl: (path: string) => Promise<string>) {
         this.handleCommand = this.handleCommand.bind(this)
+        this._windowsToWsl = windowsToWsl
     }
 
     ideMode(compilerOptions: any) {
@@ -131,7 +132,7 @@ export class IdrisModel {
     }
 
     changeDirectory(dir: string) {
-        const directory = this.shouldUseWsl ? Rx.Observable.fromPromise(windowsToWsl(dir)) : Rx.Observable.of(dir)
+        const directory = this.shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(dir)) : Rx.Observable.of(dir)
         return directory.flatMap((dir) => {
           return this.interpret(`:cd ${dir}`)
         })
@@ -151,7 +152,7 @@ export class IdrisModel {
             }
         })()
 
-        const platformUri = this.shouldUseWsl ? Rx.Observable.fromPromise(windowsToWsl(uri)) : Rx.Observable.of(uri)
+        const platformUri = this.shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(uri)) : Rx.Observable.of(uri)
 
         return cd.zip(platformUri).flatMap(([_, uri]) => {
             return this.prepareCommand({ type: 'load-file', fileName: uri })
