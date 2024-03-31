@@ -6,6 +6,7 @@ import { CompilerOptions } from './utils/ipkg'
 import { IDECommand, SExp } from './protocol/ide-protocol'
 import { ideCommandToSExp } from './protocol/to-sexp'
 import Logger from './utils/Logger'
+import { windowsToWsl } from 'wsl-path'
 
 export class IdrisModel {
     requestId = 0
@@ -130,7 +131,10 @@ export class IdrisModel {
     }
 
     changeDirectory(dir: string) {
-        return this.interpret(`:cd ${dir}`)
+        const directory = this.shouldUseWsl ? Rx.Observable.fromPromise(windowsToWsl(dir)) : Rx.Observable.of(dir)
+        return directory.flatMap((dir) => {
+          return this.interpret(`:cd ${dir}`)
+        })
     }
 
     load(uri: string) {
@@ -147,7 +151,9 @@ export class IdrisModel {
             }
         })()
 
-        return cd.flatMap((_) => {
+        const platformUri = this.shouldUseWsl ? Rx.Observable.fromPromise(windowsToWsl(uri)) : Rx.Observable.of(uri)
+
+        return cd.zip(platformUri).flatMap(([_, uri]) => {
             return this.prepareCommand({ type: 'load-file', fileName: uri })
         })
     }
@@ -218,5 +224,9 @@ export class IdrisModel {
 
     browseNamespace(namespace: string) {
         return this.prepareCommand({ type: 'browse-namespace', namespace })
+    }
+
+    get shouldUseWsl(): boolean {
+        return atom.config.get('language-idris.idrisInWsl')
     }
 }
