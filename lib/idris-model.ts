@@ -132,8 +132,8 @@ export class IdrisModel {
     }
 
     changeDirectory(dir: string) {
-        const directory = this.shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(dir)) : Rx.Observable.of(dir)
-        return directory.flatMap((dir) => {
+        const platformDir = this._toPlatformPath(dir)
+        return platformDir.flatMap((dir) => {
           return this.interpret(`:cd ${dir}`)
         })
     }
@@ -152,7 +152,7 @@ export class IdrisModel {
             }
         })()
 
-        const platformUri = this.shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(uri)) : Rx.Observable.of(uri)
+        const platformUri = this._toPlatformPath(uri)
 
         return cd.zip(platformUri).flatMap(([_, uri]) => {
             return this.prepareCommand({ type: 'load-file', fileName: uri })
@@ -227,7 +227,11 @@ export class IdrisModel {
         return this.prepareCommand({ type: 'browse-namespace', namespace })
     }
 
-    get shouldUseWsl(): boolean {
+    private _toPlatformPath(path: string): Rx.Observable<string> {
+        return this._shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(path)) : Rx.Observable.of(path)
+    }
+
+    private get _shouldUseWsl(): boolean {
         return atom.config.get('language-idris.idrisInWsl')
     }
 }
