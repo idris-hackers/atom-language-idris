@@ -68,6 +68,8 @@ export class IdrisIdeMode extends EventEmitter {
     }
 
     stop() {
+        this.process?.removeAllListeners()
+        this.process?.stdout.removeAllListeners()
         return this.process != null ? this.process.kill() : undefined
     }
 

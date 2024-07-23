@@ -25,7 +25,6 @@ export class IdrisModel {
             (!JS.objectEqual(this.oldCompilerOptions, compilerOptions) ||
                 !this.ideModeRef.running())
         ) {
-            this.ideModeRef.process?.removeAllListeners()
             this.ideModeRef.stop()
             this.ideModeRef = null
         }
