@@ -14,9 +14,11 @@ export class IdrisModel {
     warnings: any = {}
     compilerOptions: CompilerOptions = { pkgs: [] }
     oldCompilerOptions: CompilerOptions = { pkgs: [] }
+    private _windowsToWsl: (path: string) => Promise<string>
 
-    constructor() {
+    constructor(windowsToWsl: (path: string) => Promise<string>) {
         this.handleCommand = this.handleCommand.bind(this)
+        this._windowsToWsl = windowsToWsl
     }
 
     ideMode(compilerOptions: any) {
@@ -129,7 +131,10 @@ export class IdrisModel {
     }
 
     changeDirectory(dir: string) {
-        return this.interpret(`:cd ${dir}`)
+        const platformDir = this._toPlatformPath(dir)
+        return platformDir.flatMap((dir) => {
+          return this.interpret(`:cd ${dir}`)
+        })
     }
 
     load(uri: string) {
@@ -146,7 +151,9 @@ export class IdrisModel {
             }
         })()
 
-        return cd.flatMap((_) => {
+        const platformUri = this._toPlatformPath(uri)
+
+        return cd.zip(platformUri).flatMap(([_, uri]) => {
             return this.prepareCommand({ type: 'load-file', fileName: uri })
         })
     }
@@ -217,5 +224,13 @@ export class IdrisModel {
 
     browseNamespace(namespace: string) {
         return this.prepareCommand({ type: 'browse-namespace', namespace })
+    }
+
+    private _toPlatformPath(path: string): Rx.Observable<string> {
+        return this._shouldUseWsl ? Rx.Observable.fromPromise(this._windowsToWsl(path)) : Rx.Observable.of(path)
+    }
+
+    private get _shouldUseWsl(): boolean {
+        return atom.config.get('language-idris.idrisInWsl')
     }
 }

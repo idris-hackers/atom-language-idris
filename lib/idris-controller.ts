@@ -18,10 +18,11 @@ import {
     Pane,
     WorkspaceOpenOptions,
 } from 'atom'
+import { windowsToWsl } from 'wsl-path'
 
 export class IdrisController {
     errorMarkers: Array<DisplayMarker> = []
-    model: IdrisModel = new IdrisModel()
+    model: IdrisModel = new IdrisModel(windowsToWsl)
     messages: MessagePanelView = new MessagePanelView({
         title: 'Idris Messages',
     })

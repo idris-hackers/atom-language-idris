@@ -55,6 +55,12 @@
             "type": "boolean",
             "default": false,
             "description": "Enable ligatures in the various idris panels"
+        },
+        "idrisInWsl": {
+            "title": "Integrate with an Idris installation in WSL",
+            "type": "boolean",
+            "default": false,
+            "description": "Enable this if you installed Idris in WSL but run the editor in Windows"
         }
     },
     "providedServices": {
@@ -84,7 +90,8 @@
         "preact": "10.4.4",
         "rx-lite": "4.0.8",
         "tslib": "1.11.1",
-        "typescript": "3.9.2"
+        "typescript": "3.9.2",
+        "wsl-path": "^3.0.1"
     },
     "devDependencies": {
         "@types/atom": "1.40.4",
